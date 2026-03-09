@@ -1,4 +1,4 @@
-rootProject.name = "PunaPukapukaServer"
+rootProject.name = "AklatanServer"
 
 dependencyResolutionManagement {
     repositories {
