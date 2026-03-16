@@ -61,4 +61,23 @@ Thank you
 
 
 ## API Endpoints
-WIP
+### Authentication
+`/login` (Users, Librarians) - self explanatory
+
+`/register` (U) - with e-mail verification
+
+`/account`??? (UL) - account info management
+
+### Browsing
+`/catalog` (L) - all books (probably from OpenLibrary API), used mainly for search while adding books to inventory
+
+`/inventory` (UL) - allows simplified GET for users, supports GET, PUT, PATCH and DELETE for librarians
+
+### Borrowing
+`/reserve` (UL) - preset time for users, librarians can set an expiration date for the reservation
+
+`/borrow` (L) - sets one or more books as borrowed
+
+`/extend` (UL) - librarians can set custom time/return date
+
+`/return` (L) - responds with a fee if returned late
