@@ -1,30 +1,39 @@
 package com.hexhyperion
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.*
-import io.ktor.server.auth.UserIdPrincipal
-import io.ktor.server.auth.authenticate
-import io.ktor.server.auth.principal
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.sessions.sessions
-import io.ktor.server.sessions.set
 
 fun Application.configureRouting() {
     routing {
-        authenticate("auth-session") {
+        authenticate("auth-jwt") {
             get("/") {
-                val userSession = call.principal<UserSession>()
+                val principal = call.principal<JWTPrincipal>()!!
+                val name = principal.payload.getClaim("username").asString()
 
-                call.respondText("Auth succeeded, authenticated as ${userSession?.name}")
+                call.respondText("Auth succeeded, as $name authenticated you are.")
             }
         }
 
         authenticate("auth-basic") {
             post("/login") {
-                val userName = call.principal<UserIdPrincipal>()?.name.toString()
-                call.sessions.set(UserSession(name = userName))
+                val secret = getEnv("JWT_SECRET")
+                val issuer = environment.config.property("jwt.issuer").getString()
+                val audience = environment.config.property("jwt.audience").getString()
+                val user = call.principal<UserIdPrincipal>()
 
-                call.respondText("Login succeeded")
+                val token = JWT.create()
+                    .withIssuer(issuer)
+                    .withAudience(audience)
+                    .withClaim("username", user?.name)
+                    .withExpiresAt(java.util.Date(System.currentTimeMillis() + 600000))
+                    .sign(Algorithm.HMAC256(secret))
+
+                call.respond(token)
             }
         }
 

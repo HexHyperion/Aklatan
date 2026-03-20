@@ -26,7 +26,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core")
     implementation("io.ktor:ktor-server-config-yaml")
     implementation("io.ktor:ktor-server-auth:$ktor_version")
-    implementation("io.ktor:ktor-server-sessions:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.0")
     implementation("io.ktor:ktor-server-content-negotiation:3.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
