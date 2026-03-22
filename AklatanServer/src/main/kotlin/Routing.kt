@@ -24,13 +24,15 @@ fun Application.configureRouting() {
                 val secret = getEnv("JWT_SECRET")
                 val issuer = environment.config.property("jwt.issuer").getString()
                 val audience = environment.config.property("jwt.audience").getString()
-                val user = call.principal<UserIdPrincipal>()
+                val expirationTimeout = environment.config.property("jwt.tokenTimeout").getString().toLong()
+                val expirationTime = java.util.Date(System.currentTimeMillis() + expirationTimeout)
+                val user = call.principal<UserIdPrincipal>()!!
 
                 val token = JWT.create()
                     .withIssuer(issuer)
                     .withAudience(audience)
-                    .withClaim("username", user?.name)
-                    .withExpiresAt(java.util.Date(System.currentTimeMillis() + 600000))
+                    .withClaim("username", user.name)
+                    .withExpiresAt(expirationTime)
                     .sign(Algorithm.HMAC256(secret))
 
                 call.respond(token)

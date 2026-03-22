@@ -2,6 +2,7 @@ package com.hexhyperion
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.hexhyperion.dao.Users
 import com.hexhyperion.exception.EnvFileMissingException
 import com.hexhyperion.exception.EnvVariableMissingException
 import io.github.cdimascio.dotenv.Dotenv
@@ -11,6 +12,9 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 val dotenv: Dotenv by lazy {
     try {
@@ -50,7 +54,7 @@ fun Application.module() {
             )
 
             validate { credential ->
-                if (credential.payload.getClaim("username").asString() == "admin") {
+                if (credential.payload.getClaim("username").asString() != null) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null
@@ -63,5 +67,25 @@ fun Application.module() {
         }
     }
 
+    configureDatabase()
     configureRouting()
+}
+
+fun Application.configureDatabase() {
+    val dbHost = environment.config.property("db.host").getString()
+    val dbPort = environment.config.property("db.port").getString().toInt()
+    val dbName = environment.config.property("db.database").getString()
+    val dbUser = environment.config.property("db.username").getString()
+    val dbPassword = environment.config.property("db.password").getString()
+
+    Database.connect(
+        url = "jdbc:postgresql://$dbHost:$dbPort/$dbName",
+        driver = "org.postgresql.Driver",
+        user = dbUser,
+        password = dbPassword
+    )
+
+    transaction {
+        SchemaUtils.create(Users)
+    }
 }
