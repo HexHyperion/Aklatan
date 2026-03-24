@@ -1,2 +1,1 @@
-package com.hexhyperion.api.books
-
+package com.hexhyperion.api.book

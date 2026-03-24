@@ -1,0 +1,39 @@
+package com.hexhyperion.api.auth
+
+import com.hexhyperion.db.*
+import com.hexhyperion.utility.Hasher
+import org.jetbrains.exposed.v1.core.eq
+import kotlin.time.Instant
+
+class RefreshTokenRepository {
+    suspend fun save(userId: Int, tokenHash: String, expiresAt: Instant) = withTransaction {
+        RefreshTokenEntity.new {
+            this.user = UserEntity.findById(userId) ?: throw IllegalArgumentException("User not found")
+            this.tokenHash = tokenHash
+            this.expiresAt = expiresAt
+        }
+    }
+
+    suspend fun find(refreshToken: String): RefreshToken? = withTransaction {
+        RefreshTokenEntity
+            .find { RefreshTokens.tokenHash eq Hasher.sha256Hash(refreshToken) }
+            .firstOrNull()
+            ?.toRefreshToken()
+    }
+
+    suspend fun findAllForUser(userId: Int): List<RefreshToken> = withTransaction {
+        RefreshTokenEntity
+            .find { RefreshTokens.user eq userId }
+            .map { it.toRefreshToken() }
+    }
+
+    suspend fun delete(refreshToken: String) = withTransaction {
+        RefreshTokenEntity.find { RefreshTokens.tokenHash eq Hasher.sha256Hash(refreshToken) }
+            .forEach { it.delete() }
+    }
+
+    suspend fun deleteAllForUser(userId: Int) = withTransaction {
+        RefreshTokenEntity.find { RefreshTokens.user eq userId }
+            .forEach { it.delete() }
+    }
+}

@@ -6,10 +6,12 @@ ktor:
     port: 8080
 
 jwt:
-    issuer: "Aklatan Issuer"
-    audience: "Aklatan Audience"
+    issuer: "com.hexhyperion"
+    audience: "com.hexhyperion.aklatan"
     realm: "Access to all Aklatan endpoints"
-    tokenTimeout: 600000
+    accessTokenTimeoutMinutes: 10
+    refreshTokenLength: 32
+    refreshTokenTimeoutDays: 14
 
 db:
     host: "localhost"

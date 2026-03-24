@@ -2,6 +2,7 @@ package com.hexhyperion.db
 
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.dao.IntEntity
 import org.jetbrains.exposed.v1.dao.IntEntityClass
 import org.jetbrains.exposed.v1.datetime.timestamp
@@ -11,93 +12,105 @@ object Roles : IntIdTable() {
     val permissionLevel = integer("permission_level")
 }
 
-class Role(id: EntityID<Int>) : IntEntity(id) {
+class RoleEntity(id: EntityID<Int>) : IntEntity(id) {
     var name by Roles.name
     var permissionLevel by Roles.permissionLevel
 
-    companion object : IntEntityClass<Role>(Roles)
+    fun toRole(): Role = Role(name, permissionLevel)
+
+    companion object : IntEntityClass<RoleEntity>(Roles) {
+        fun findByName(name: String): RoleEntity? = find { Roles.name eq name }.firstOrNull()
+    }
 }
 
-object Users : IntIdTable("users") {
+object Users : IntIdTable() {
     val name = text("name")
     val email = text("email").uniqueIndex()
     val passwordHash = text("password_hash")
-    val roleId = integer("role_id").references(Roles.id)
+    val role = reference("role_id", Roles)
 }
 
-class User(id: EntityID<Int>) : IntEntity(id) {
+class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     var name by Users.name
     var email by Users.email
     var passwordHash by Users.passwordHash
-    var roleId by Users.roleId
+    var role by RoleEntity referencedOn Users.role
 
-    companion object : IntEntityClass<User>(Users)
+    fun toUser(): User = User(name, email, passwordHash, role.id.value)
+
+    companion object : IntEntityClass<UserEntity>(Users)
 }
 
 object RefreshTokens : IntIdTable() {
-    val userId = integer("user_id").references(Users.id)
+    val user = reference("user_id", Users)
     val tokenHash = text("token_hash").uniqueIndex()
     val expiresAt = timestamp("expires_at")
-    val revoked = bool("revoked").default(false)
 }
 
-class RefreshToken(id: EntityID<Int>) : IntEntity(id) {
-    var userId by RefreshTokens.userId
+class RefreshTokenEntity(id: EntityID<Int>) : IntEntity(id) {
+    var user by UserEntity referencedOn RefreshTokens.user
     var tokenHash by RefreshTokens.tokenHash
     var expiresAt by RefreshTokens.expiresAt
-    var revoked by RefreshTokens.revoked
 
-    companion object : IntEntityClass<RefreshToken>(RefreshTokens)
+    fun toRefreshToken(): RefreshToken = RefreshToken(user.id.value, tokenHash, expiresAt)
+
+    companion object : IntEntityClass<RefreshTokenEntity>(RefreshTokens)
 }
 
-object Books : IntIdTable("books") {
+object Books : IntIdTable() {
     val isbn = text("isbn").uniqueIndex()
     val title = text("title").nullable()
     val author = text("author").nullable()
     val year = text("year").nullable()
 }
 
-class Book(id: EntityID<Int>) : IntEntity(id) {
+class BookEntity(id: EntityID<Int>) : IntEntity(id) {
     var isbn by Books.isbn
     var title by Books.title
     var author by Books.author
     var year by Books.year
 
-    companion object : IntEntityClass<Book>(Books)
+    fun toBook(): Book = Book(isbn, title, author, year)
+
+    companion object : IntEntityClass<BookEntity>(Books)
 }
 
 object Reservations : IntIdTable() {
-    val userId = integer("user_id").references(Users.id)
-    val bookId = integer("book_id").references(Books.id)
+    val user = reference("user_id", Users)
+    val book = reference("book_id", Books)
     val reservedAt = timestamp("reserved_at")
     val expiresAt = timestamp("expires_at")
     val cancelled = bool("cancelled").default(false)
 }
 
-class Reservation(id: EntityID<Int>) : IntEntity(id) {
-    var userId by Reservations.userId
-    var bookId by Reservations.bookId
+class ReservationEntity(id: EntityID<Int>) : IntEntity(id) {
+    var user by UserEntity referencedOn Reservations.user
+    var book by BookEntity referencedOn Reservations.book
     var reservedAt by Reservations.reservedAt
     var expiresAt by Reservations.expiresAt
     var cancelled by Reservations.cancelled
 
-    companion object : IntEntityClass<Reservation>(Reservations)
+    fun toReservation(): Reservation = Reservation(user.id.value, book.id.value, reservedAt, expiresAt, cancelled)
+
+    companion object : IntEntityClass<ReservationEntity>(Reservations)
 }
 
 object Borrows : IntIdTable() {
-    val userId = integer("user_id").references(Users.id)
-    val bookId = integer("book_id").references(Books.id)
+    val user = reference("user_id", Users)
+    val book = reference("book_id", Books)
     val borrowedAt = timestamp("borrowed_at")
     val endsAt = timestamp("ends_at")
     val returnedAt = timestamp("returned_at").nullable()
 }
 
-class Borrow(id: EntityID<Int>) : IntEntity(id) {
-    var userId by Borrows.userId
-    var bookId by Borrows.bookId
+class BorrowEntity(id: EntityID<Int>) : IntEntity(id) {
+    var user by UserEntity referencedOn Borrows.user
+    var book by BookEntity referencedOn Borrows.book
     var borrowedAt by Borrows.borrowedAt
     var endsAt by Borrows.endsAt
     var returnedAt by Borrows.returnedAt
 
-    companion object : IntEntityClass<Borrow>(Borrows)
+    fun toBorrow(): Borrow = Borrow(user.id.value, book.id.value, borrowedAt, endsAt, returnedAt)
+
+    companion object : IntEntityClass<BorrowEntity>(Borrows)
 }
