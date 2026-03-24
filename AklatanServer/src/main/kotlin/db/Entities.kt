@@ -1,4 +1,4 @@
-package com.hexhyperion.db
+package com.hexhyperion.aklatan.db
 
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IntIdTable

@@ -1,8 +1,8 @@
-package com.hexhyperion.api.user
+package com.hexhyperion.aklatan.api.user
 
-import com.hexhyperion.api.auth.RoleRepository
-import com.hexhyperion.db.User
-import com.hexhyperion.utility.Hasher
+import com.hexhyperion.aklatan.api.auth.RoleRepository
+import com.hexhyperion.aklatan.db.User
+import com.hexhyperion.aklatan.utility.Hasher
 
 class UserService(private val userRepository: UserRepository, private val roleRepository: RoleRepository) {
     suspend fun create(email: String, name: String, password: String, role: String): User {

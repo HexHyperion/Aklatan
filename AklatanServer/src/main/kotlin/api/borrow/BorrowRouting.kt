@@ -1,8 +1,7 @@
-package com.hexhyperion.api.borrow
+package com.hexhyperion.aklatan.api.borrow
 
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.post
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 
 fun Route.borrowRouting() {
     post("/reserve") {

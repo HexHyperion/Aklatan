@@ -1,11 +1,11 @@
-package com.hexhyperion.plugins
+package com.hexhyperion.aklatan.plugins
 
-import com.hexhyperion.api.auth.RefreshTokenService
-import com.hexhyperion.api.auth.authRouting
-import com.hexhyperion.api.book.bookRouting
-import com.hexhyperion.api.borrow.borrowRouting
-import com.hexhyperion.api.user.UserService
-import com.hexhyperion.api.user.userRouting
+import com.hexhyperion.aklatan.api.auth.RefreshTokenService
+import com.hexhyperion.aklatan.api.auth.authRouting
+import com.hexhyperion.aklatan.api.book.bookRouting
+import com.hexhyperion.aklatan.api.borrow.borrowRouting
+import com.hexhyperion.aklatan.api.user.UserService
+import com.hexhyperion.aklatan.api.user.userRouting
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*

@@ -1,4 +1,4 @@
-package com.hexhyperion.api.auth
+package com.hexhyperion.aklatan.api.auth
 
 import kotlinx.serialization.Serializable
 

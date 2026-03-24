@@ -1,6 +1,6 @@
-package com.hexhyperion.api.auth
+package com.hexhyperion.aklatan.api.auth
 
-import com.hexhyperion.utility.Hasher
+import com.hexhyperion.aklatan.utility.Hasher
 import io.ktor.server.config.*
 import java.security.SecureRandom
 import java.util.*

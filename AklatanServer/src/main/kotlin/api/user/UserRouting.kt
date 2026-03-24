@@ -1,10 +1,7 @@
-package com.hexhyperion.api.user
+package com.hexhyperion.aklatan.api.user
 
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 
 fun Route.userRouting() {
     route("/account") {

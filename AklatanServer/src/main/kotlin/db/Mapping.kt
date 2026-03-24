@@ -1,4 +1,4 @@
-package com.hexhyperion.db
+package com.hexhyperion.aklatan.db
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

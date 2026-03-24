@@ -1,2 +1,2 @@
-package com.hexhyperion.api.book
+package com.hexhyperion.aklatan.api.book
 

@@ -1,4 +1,4 @@
-package com.hexhyperion.utility
+package com.hexhyperion.aklatan.utility
 
 import io.github.cdimascio.dotenv.Dotenv
 import io.github.cdimascio.dotenv.dotenv

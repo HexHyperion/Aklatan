@@ -1,6 +1,6 @@
-package com.hexhyperion.api.auth
+package com.hexhyperion.aklatan.api.auth
 
-import com.hexhyperion.db.Role
+import com.hexhyperion.aklatan.db.Role
 
 class RoleService(private val roleRepository: RoleRepository) {
     suspend fun create(name: String, permissionLevel: Int): Role {

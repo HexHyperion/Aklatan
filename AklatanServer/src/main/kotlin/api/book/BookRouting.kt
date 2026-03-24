@@ -1,12 +1,7 @@
-package com.hexhyperion.api.book
+package com.hexhyperion.aklatan.api.book
 
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.patch
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 
 fun Route.bookRouting() {
     get("/catalog") {

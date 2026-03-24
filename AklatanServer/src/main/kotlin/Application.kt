@@ -1,15 +1,15 @@
-package com.hexhyperion
+package com.hexhyperion.aklatan
 
-import com.hexhyperion.api.auth.RefreshTokenRepository
-import com.hexhyperion.api.auth.RefreshTokenService
-import com.hexhyperion.api.auth.RoleRepository
-import com.hexhyperion.api.auth.RoleService
-import com.hexhyperion.api.user.UserRepository
-import com.hexhyperion.api.user.UserService
-import com.hexhyperion.plugins.configureAuthentication
-import com.hexhyperion.plugins.configureDatabase
-import com.hexhyperion.plugins.configureRouting
-import com.hexhyperion.plugins.configureSerialization
+import com.hexhyperion.aklatan.api.auth.RefreshTokenRepository
+import com.hexhyperion.aklatan.api.auth.RefreshTokenService
+import com.hexhyperion.aklatan.api.auth.RoleRepository
+import com.hexhyperion.aklatan.api.auth.RoleService
+import com.hexhyperion.aklatan.api.user.UserRepository
+import com.hexhyperion.aklatan.api.user.UserService
+import com.hexhyperion.aklatan.plugins.configureAuthentication
+import com.hexhyperion.aklatan.plugins.configureDatabase
+import com.hexhyperion.aklatan.plugins.configureRouting
+import com.hexhyperion.aklatan.plugins.configureSerialization
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {

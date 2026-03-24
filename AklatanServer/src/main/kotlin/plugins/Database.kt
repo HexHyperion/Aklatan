@@ -1,7 +1,7 @@
-package com.hexhyperion.plugins
+package com.hexhyperion.aklatan.plugins
 
-import com.hexhyperion.db.Users
-import io.ktor.server.application.Application
+import com.hexhyperion.aklatan.db.Users
+import io.ktor.server.application.*
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction

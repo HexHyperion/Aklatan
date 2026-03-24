@@ -1,7 +1,7 @@
-package com.hexhyperion.api.auth
+package com.hexhyperion.aklatan.api.auth
 
-import com.hexhyperion.db.*
-import com.hexhyperion.utility.Hasher
+import com.hexhyperion.aklatan.db.*
+import com.hexhyperion.aklatan.utility.Hasher
 import org.jetbrains.exposed.v1.core.eq
 import kotlin.time.Instant
 

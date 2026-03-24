@@ -1,6 +1,6 @@
-package com.hexhyperion.api.user
+package com.hexhyperion.aklatan.api.user
 
-import com.hexhyperion.db.*
+import com.hexhyperion.aklatan.db.*
 import org.jetbrains.exposed.v1.core.eq
 
 class UserRepository {

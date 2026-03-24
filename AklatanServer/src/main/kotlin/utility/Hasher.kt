@@ -1,4 +1,4 @@
-package com.hexhyperion.utility
+package com.hexhyperion.aklatan.utility
 
 import org.mindrot.jbcrypt.BCrypt
 import java.security.MessageDigest

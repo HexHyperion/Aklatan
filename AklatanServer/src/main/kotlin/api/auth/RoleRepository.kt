@@ -1,8 +1,8 @@
-package com.hexhyperion.api.auth
+package com.hexhyperion.aklatan.api.auth
 
-import com.hexhyperion.db.RoleEntity
-import com.hexhyperion.db.Roles
-import com.hexhyperion.db.withTransaction
+import com.hexhyperion.aklatan.db.RoleEntity
+import com.hexhyperion.aklatan.db.Roles
+import com.hexhyperion.aklatan.db.withTransaction
 import org.jetbrains.exposed.v1.core.eq
 
 class RoleRepository {

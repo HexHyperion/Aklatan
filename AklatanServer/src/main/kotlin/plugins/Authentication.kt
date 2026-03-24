@@ -1,8 +1,8 @@
-package com.hexhyperion.plugins
+package com.hexhyperion.aklatan.plugins
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.hexhyperion.utility.getEnv
+import com.hexhyperion.aklatan.utility.getEnv
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

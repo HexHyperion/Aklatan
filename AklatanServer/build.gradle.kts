@@ -9,7 +9,7 @@ plugins {
     kotlin("plugin.serialization") version "2.3.0"
 }
 
-group = "com.hexhyperion"
+group = "com.hexhyperion.aklatan"
 version = "0.0.1"
 
 application {
