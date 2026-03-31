@@ -74,7 +74,7 @@ fun Route.authRouting(
             if (userService.getByEmail(userCredentials.email) != null) {
                 return@post call.respond(
                     HttpStatusCode.Conflict,
-                    "Exist, a user with that email already does. Login or use a different one, you should."
+                    "Exist, a user with that email already does. Login, or use a different one, you should."
                 )
             }
 

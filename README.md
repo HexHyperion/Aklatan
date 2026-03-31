@@ -63,7 +63,7 @@ Thank you
 
 ## API Endpoints
 ### Authentication
-`/login` (Users, Librarians) - user must send a base64-encoded string in the format name:password<br>
+`/login` (Users, Librarians) - user must send an object with name and password<br>
 Method: `POST`
 
 `/register` (U) - with e-mail verification<br>
@@ -96,4 +96,14 @@ Method: `POST`
 Method: `POST`
 
 `/return` (L) - sets one or more borrowed books as returned, responds with a fee if any were returned late<br>
+Method: `POST`
+
+### Administration
+`/roles` (A) - show all user roles with permissions<br>
+Method: `GET`
+
+`/users` (A) - create and delete accounts of all roles<br>
+Method: `POST`, `DELETE`
+
+`/hours` (A) - set library open hours, maybe with some exceptions for holidays or just 2 weeks ahead<br>
 Method: `POST`

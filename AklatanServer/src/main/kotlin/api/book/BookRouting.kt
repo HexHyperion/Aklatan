@@ -1,9 +1,17 @@
 package com.hexhyperion.aklatan.api.book
 
+import com.hexhyperion.aklatan.api.borrow.BorrowService
+import com.hexhyperion.aklatan.api.borrow.ReservationService
+import com.hexhyperion.aklatan.api.user.UserService
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Route.bookRouting() {
+fun Route.bookRouting(
+    userService: UserService,
+    bookService: BookService,
+    reservationService: ReservationService,
+    borrowService: BorrowService
+) {
     get("/catalog") {
         call.respondText("Catalog endpoint")
     }
@@ -27,6 +35,7 @@ fun Route.bookRouting() {
     }
 
     get("/books") {
-        call.respondText("Books endpoint")
+        val books = bookService.getAllBooks()
+        call.respond(books)
     }
 }
