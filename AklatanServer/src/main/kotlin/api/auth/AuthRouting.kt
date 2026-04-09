@@ -3,6 +3,7 @@ package com.hexhyperion.aklatan.api.auth
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.hexhyperion.aklatan.api.user.UserService
+import com.hexhyperion.aklatan.utility.EmailMessage
 import com.hexhyperion.aklatan.utility.getEnv
 import io.ktor.http.*
 import io.ktor.server.request.*
@@ -84,6 +85,20 @@ fun Route.authRouting(
                 password = userCredentials.password,
                 role = "user"
             )
+
+            val message = EmailMessage(
+                userCredentials.email,
+                "Confirm your Aklatan account",
+                """
+                    <p>Welcome to Aklatan, ${userCredentials.name}!</p>
+                    <p>Click the link below to finish creating your account and start using our services:</p>
+                    <a href="#">Confirm account</a>
+                    <p>If you did not create this account, you can ignore this email.</p>
+                    <p>Best regards,<br>
+                    Aklatan team</p>
+                """.trimIndent()
+            )
+            message.send()
 
             call.respond(
                 HttpStatusCode.Created,
