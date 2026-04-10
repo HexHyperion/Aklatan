@@ -4,16 +4,15 @@ import com.hexhyperion.aklatan.utility.Hasher
 import io.ktor.server.config.*
 import java.security.SecureRandom
 import java.util.*
-import kotlin.time.Instant
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.days
 
 class RefreshTokenService(val refreshTokenRepository: RefreshTokenRepository, private val config: ApplicationConfig) {
     suspend fun generate(userId: Int): String {
         val token = generateRandomString()
         val tokenHash = Hasher.sha256Hash(token)
-        val expiryDays = config.property("jwt.refreshTokenTimeoutDays").getString()
-        val expirationTime = Instant.fromEpochMilliseconds(
-            System.currentTimeMillis() + expiryDays.toLong() * 24L * 60L * 60L * 1000L
-        )
+        val expiryDays = config.property("jwt.refreshTokenTimeoutDays").getString().toInt()
+        val expirationTime = Clock.System.now() + expiryDays.days
         refreshTokenRepository.save(userId, tokenHash, expirationTime)
         return token
     }
@@ -33,7 +32,7 @@ class RefreshTokenService(val refreshTokenRepository: RefreshTokenRepository, pr
 
     suspend fun validate(token: String): Boolean {
         val refreshToken = refreshTokenRepository.find(token)
-        return refreshToken != null && refreshToken.expiresAt > Instant.fromEpochMilliseconds(System.currentTimeMillis())
+        return refreshToken != null && refreshToken.expiresAt > Clock.System.now()
     }
 
     suspend fun revoke(refreshToken: String) {

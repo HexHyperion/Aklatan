@@ -28,6 +28,7 @@ object Users : IntIdTable() {
     val email = text("email").uniqueIndex()
     val passwordHash = text("password_hash")
     val role = reference("role_id", Roles)
+    val registeredAt = timestamp("registered_at")
 }
 
 class UserEntity(id: EntityID<Int>) : IntEntity(id) {
@@ -35,8 +36,9 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     var email by Users.email
     var passwordHash by Users.passwordHash
     var role by RoleEntity referencedOn Users.role
+    var registeredAt by Users.registeredAt
 
-    fun toUser(): User = User(name, email, passwordHash, role.id.value)
+    fun toUser(): User = User(name, email, passwordHash, role.id.value, registeredAt)
 
     companion object : IntEntityClass<UserEntity>(Users)
 }

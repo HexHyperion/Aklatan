@@ -22,7 +22,8 @@ data class User (
     val name: String,
     val email: String,
     val passwordHash: String,
-    val roleId: Int
+    val roleId: Int,
+    val registeredAt: Instant
 )
 
 @Serializable
