@@ -27,6 +27,20 @@ data class User (
 )
 
 @Serializable
+data class RegistrationToken (
+    val userId: Int,
+    val tokenHash: String,
+    val expiresAt: Instant
+)
+
+@Serializable
+data class PasswordResetToken (
+    val userId: Int,
+    val tokenHash: String,
+    val expiresAt: Instant
+)
+
+@Serializable
 data class RefreshToken (
     val userId: Int,
     val tokenHash: String,

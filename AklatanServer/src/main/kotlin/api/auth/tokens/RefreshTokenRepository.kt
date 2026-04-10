@@ -1,4 +1,4 @@
-package com.hexhyperion.aklatan.api.auth
+package com.hexhyperion.aklatan.api.auth.tokens
 
 import com.hexhyperion.aklatan.db.*
 import com.hexhyperion.aklatan.utility.Hasher

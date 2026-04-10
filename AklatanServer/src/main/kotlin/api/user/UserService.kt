@@ -30,4 +30,8 @@ class UserService(private val userRepository: UserRepository, private val roleRe
         val user = userRepository.findByEmail(email) ?: return null
         return if (Hasher.bcryptVerify(password, user.passwordHash)) user else null
     }
+
+    suspend fun delete(id: Int) {
+        userRepository.delete(id)
+    }
 }

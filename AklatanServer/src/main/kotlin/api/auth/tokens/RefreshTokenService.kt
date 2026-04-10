@@ -1,15 +1,14 @@
-package com.hexhyperion.aklatan.api.auth
+package com.hexhyperion.aklatan.api.auth.tokens
 
 import com.hexhyperion.aklatan.utility.Hasher
 import io.ktor.server.config.*
-import java.security.SecureRandom
-import java.util.*
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 
 class RefreshTokenService(val refreshTokenRepository: RefreshTokenRepository, private val config: ApplicationConfig) {
     suspend fun generate(userId: Int): String {
-        val token = generateRandomString()
+        val tokenLength = config.property("jwt.refreshTokenLength").getString().toInt()
+        val token = Hasher.generateRandomString(tokenLength)
         val tokenHash = Hasher.sha256Hash(token)
         val expiryDays = config.property("jwt.refreshTokenTimeoutDays").getString().toInt()
         val expirationTime = Clock.System.now() + expiryDays.days
@@ -20,14 +19,6 @@ class RefreshTokenService(val refreshTokenRepository: RefreshTokenRepository, pr
     suspend fun getUserId(token: String): Int? {
         val refreshToken = refreshTokenRepository.find(token) ?: return null
         return refreshToken.userId
-    }
-
-    private fun generateRandomString(): String {
-        val secureRandom = SecureRandom()
-        val tokenLength = config.property("jwt.refreshTokenLength").getString().toInt()
-        val bytes = ByteArray(tokenLength)
-        secureRandom.nextBytes(bytes)
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
     }
 
     suspend fun validate(token: String): Boolean {

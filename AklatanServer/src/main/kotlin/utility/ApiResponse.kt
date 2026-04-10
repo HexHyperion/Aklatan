@@ -69,4 +69,10 @@ object ApiError {
         "Refresh token provide, you did not.",
         HttpStatusCode.BadRequest
     )
+
+    val UnknownError = ApiResponse.Error(
+        "UNKNOWN_ERROR",
+        "An unknown error, occurred has. Contact support, you should.",
+        HttpStatusCode.InternalServerError
+    )
 }

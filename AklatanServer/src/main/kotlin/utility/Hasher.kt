@@ -2,6 +2,8 @@ package com.hexhyperion.aklatan.utility
 
 import org.mindrot.jbcrypt.BCrypt
 import java.security.MessageDigest
+import java.security.SecureRandom
+import java.util.*
 
 class Hasher {
     companion object {
@@ -17,6 +19,13 @@ class Hasher {
 
         fun bcryptVerify(str: String, hash: String): Boolean {
             return BCrypt.checkpw(str, hash)
+        }
+
+        fun generateRandomString(tokenLength: Int): String {
+            val secureRandom = SecureRandom()
+            val bytes = ByteArray(tokenLength)
+            secureRandom.nextBytes(bytes)
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
         }
     }
 }

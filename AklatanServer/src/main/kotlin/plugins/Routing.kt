@@ -1,9 +1,9 @@
 package com.hexhyperion.aklatan.plugins
 
 import com.hexhyperion.aklatan.api.admin.adminRouting
-import com.hexhyperion.aklatan.api.auth.RefreshTokenService
 import com.hexhyperion.aklatan.api.auth.RoleService
 import com.hexhyperion.aklatan.api.auth.authRouting
+import com.hexhyperion.aklatan.api.auth.tokens.RefreshTokenService
 import com.hexhyperion.aklatan.api.book.BookService
 import com.hexhyperion.aklatan.api.book.bookRouting
 import com.hexhyperion.aklatan.api.borrow.BorrowService

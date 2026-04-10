@@ -1,9 +1,9 @@
 package com.hexhyperion.aklatan
 
-import com.hexhyperion.aklatan.api.auth.RefreshTokenRepository
-import com.hexhyperion.aklatan.api.auth.RefreshTokenService
 import com.hexhyperion.aklatan.api.auth.RoleRepository
 import com.hexhyperion.aklatan.api.auth.RoleService
+import com.hexhyperion.aklatan.api.auth.tokens.RefreshTokenRepository
+import com.hexhyperion.aklatan.api.auth.tokens.RefreshTokenService
 import com.hexhyperion.aklatan.api.book.BookRepository
 import com.hexhyperion.aklatan.api.book.BookService
 import com.hexhyperion.aklatan.api.borrow.BorrowRepository

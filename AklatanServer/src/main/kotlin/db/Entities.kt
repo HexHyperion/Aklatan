@@ -43,6 +43,38 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<UserEntity>(Users)
 }
 
+object RegistrationTokens: IntIdTable() {
+    val user = reference("user_id", Users)
+    val tokenHash = text("token").uniqueIndex()
+    val expiresAt = timestamp("expires_at")
+}
+
+class RegistrationTokenEntity(id: EntityID<Int>) : IntEntity(id) {
+    var user by UserEntity referencedOn RegistrationTokens.user
+    var tokenHash by RegistrationTokens.tokenHash
+    var expiresAt by RegistrationTokens.expiresAt
+
+    fun toRegistrationToken(): RegistrationToken = RegistrationToken(user.id.value, tokenHash, expiresAt)
+
+    companion object : IntEntityClass<RegistrationTokenEntity>(RegistrationTokens)
+}
+
+object PasswordResetTokens: IntIdTable() {
+    val user = reference("user_id", Users)
+    val tokenHash = text("token").uniqueIndex()
+    val expiresAt = timestamp("expires_at")
+}
+
+class PasswordResetTokenEntity(id: EntityID<Int>) : IntEntity(id) {
+    var user by UserEntity referencedOn PasswordResetTokens.user
+    var tokenHash by PasswordResetTokens.tokenHash
+    var expiresAt by PasswordResetTokens.expiresAt
+
+    fun toPasswordResetToken(): PasswordResetToken = PasswordResetToken(user.id.value, tokenHash, expiresAt)
+
+    companion object : IntEntityClass<PasswordResetTokenEntity>(PasswordResetTokens)
+}
+
 object RefreshTokens : IntIdTable() {
     val user = reference("user_id", Users)
     val tokenHash = text("token_hash").uniqueIndex()

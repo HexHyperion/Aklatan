@@ -2,6 +2,7 @@ package com.hexhyperion.aklatan.api.auth
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.hexhyperion.aklatan.api.auth.tokens.RefreshTokenService
 import com.hexhyperion.aklatan.api.user.UserService
 import com.hexhyperion.aklatan.utility.*
 import io.ktor.http.*
@@ -17,8 +18,8 @@ fun Route.authRouting(
         val secret = getEnv("JWT_SECRET")
         val issuer = environment.config.property("jwt.issuer").getString()
         val audience = environment.config.property("jwt.audience").getString()
-        val expiryMinutes = environment.config.property("jwt.accessTokenTimeoutMinutes").getString()
-        val expirationTime = Date(System.currentTimeMillis() + expiryMinutes.toLong() * 1000L * 60L)
+        val expiryMinutes = environment.config.property("jwt.accessTokenTimeoutMinutes").getString().toInt()
+        val expirationTime = Date(System.currentTimeMillis() + expiryMinutes * 60 * 1000)
 
         return JWT.create()
             .withIssuer(issuer)
