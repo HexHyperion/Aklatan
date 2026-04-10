@@ -4,9 +4,10 @@ import com.hexhyperion.aklatan.api.auth.RegisterRequest
 import com.hexhyperion.aklatan.api.auth.RoleService
 
 import com.hexhyperion.aklatan.api.user.UserService
-import io.ktor.http.*
+import com.hexhyperion.aklatan.utility.ApiError
+import com.hexhyperion.aklatan.utility.ApiSuccess
+import com.hexhyperion.aklatan.utility.respond
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Route.adminRouting(
@@ -21,10 +22,7 @@ fun Route.adminRouting(
         post("/users") {
             val librarianCredentials = call.receive<RegisterRequest>()
             if (userService.getByEmail(librarianCredentials.email) != null) {
-                return@post call.respond(
-                    HttpStatusCode.Conflict,
-                    "Exist, a user with that email already does. Use a different one, you should."
-                )
+                return@post call.respond(ApiError.UserAlreadyExists)
             }
 
             userService.create(
@@ -34,9 +32,7 @@ fun Route.adminRouting(
                 role = librarianCredentials.role ?: "user"
             )
 
-            call.respond(
-                HttpStatusCode.Created,
-                "Successfully registered, the user has been. Login now, they can.")
+            call.respond(ApiSuccess.UserCreated)
         }
 
         post("/hours") {

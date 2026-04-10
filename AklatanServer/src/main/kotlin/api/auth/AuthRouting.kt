@@ -3,11 +3,9 @@ package com.hexhyperion.aklatan.api.auth
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.hexhyperion.aklatan.api.user.UserService
-import com.hexhyperion.aklatan.utility.EmailMessage
-import com.hexhyperion.aklatan.utility.getEnv
+import com.hexhyperion.aklatan.utility.*
 import io.ktor.http.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.util.*
 
@@ -35,17 +33,11 @@ fun Route.authRouting(
         post("/login") {
             val userCredentials = call.receive<LoginRequest>()
             userService.authenticate(userCredentials.email, userCredentials.password)
-                ?: return@post call.respond(
-                    HttpStatusCode.Unauthorized,
-                    "Incorrect, the e-mail or password is. Check your credentials, you should."
-                )
+                ?: return@post call.respond(ApiError.IncorrectUserCredentials)
 
             val userId = userService.getIdByEmail(userCredentials.email)!!
             val roleName = userService.getRoleNameById(userId)
-                ?: return@post call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Not found, the user's role was. Contact support, you should."
-                )
+                ?: return@post call.respond(ApiError.UserRoleNotFound)
 
             val accessToken = generateAccessToken(userId, roleName)
             val refreshToken = refreshTokenService.generate(userId)
@@ -64,19 +56,13 @@ fun Route.authRouting(
                 "Bearer $accessToken"
             )
 
-            call.respond(
-                HttpStatusCode.OK,
-                "Successfully logged in, you have been. Access and refresh tokens, you now have."
-            )
+            call.respond(ApiSuccess.UserLoggedIn)
         }
 
         post("/register") {
             val userCredentials = call.receive<RegisterRequest>()
             if (userService.getByEmail(userCredentials.email) != null) {
-                return@post call.respond(
-                    HttpStatusCode.Conflict,
-                    "Exist, a user with that email already does. Login, or use a different one, you should."
-                )
+                return@post call.respond(ApiError.UserAlreadyExists)
             }
 
             userService.create(
@@ -100,25 +86,17 @@ fun Route.authRouting(
             )
             message.send()
 
-            call.respond(
-                HttpStatusCode.Created,
-                "Successfully registered, you have been. Login now, you can.")
+            call.respond(ApiSuccess.UserCreated)
         }
 
         post("/refresh") {
             val refreshToken = call.request.cookies["refreshToken"] ?:
-                return@post call.respond(
-                    HttpStatusCode.BadRequest,
-                    "Refresh token provide, you did not."
-                )
+                return@post call.respond(ApiError.RefreshTokenNotProvided)
 
             if (refreshTokenService.validate(refreshToken)) {
                 val userId = refreshTokenService.getUserId(refreshToken)!!
                 val roleName = userService.getRoleNameById(userId)
-                    ?: return@post call.respond(
-                        HttpStatusCode.InternalServerError,
-                        "Not found, the user's role was. Contact support, you should."
-                    )
+                    ?: return@post call.respond(ApiError.UserRoleNotFound)
 
                 refreshTokenService.revoke(refreshToken)
                 val newRefreshToken = refreshTokenService.generate(userId)
@@ -138,24 +116,15 @@ fun Route.authRouting(
                     "Bearer $newAccessToken"
                 )
 
-                call.respond(
-                    HttpStatusCode.OK,
-                    "Both tokens refreshed, you have. Use the new ones, you should."
-                )
+                call.respond(ApiSuccess.TokensRefreshed)
             } else {
-                call.respond(
-                    HttpStatusCode.Unauthorized,
-                    "Invalid or expired, the refresh token is. Acquire a new one, you must."
-                )
+                call.respond(ApiError.RefreshTokenInvalid)
             }
         }
 
         post("/logout") {
             val refreshToken = call.request.cookies["refreshToken"] ?:
-                return@post call.respond(
-                    HttpStatusCode.BadRequest,
-                    "Refresh token provide, you did not."
-                )
+                return@post call.respond(ApiError.RefreshTokenNotProvided)
 
             if (refreshTokenService.validate(refreshToken)) {
                 refreshTokenService.revoke(refreshToken)
@@ -171,15 +140,9 @@ fun Route.authRouting(
                     )
                 )
 
-                call.respond(
-                    HttpStatusCode.OK,
-                    "Successfully logged out, you have been."
-                )
+                call.respond(ApiSuccess.UserLoggedOut)
             } else {
-                call.respond(
-                    HttpStatusCode.Unauthorized,
-                    "Invalid or expired, the refresh token is. Acquire a new one, you must."
-                )
+                call.respond(ApiError.RefreshTokenInvalid)
             }
         }
     }
