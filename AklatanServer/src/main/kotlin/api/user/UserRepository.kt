@@ -16,8 +16,7 @@ class UserRepository {
     }
 
     suspend fun findById(id: Int): User? = withTransaction {
-        UserEntity.find { Users.id eq id }
-            .firstOrNull()
+        UserEntity.findById(id)
             ?.toUser()
     }
 
@@ -31,6 +30,20 @@ class UserRepository {
         UserEntity.find { Users.email eq email }
             .firstOrNull()
             ?.id?.value
+    }
+
+    suspend fun updateVerified(id: Int) = withTransaction {
+        UserEntity.findById(id)?.let {
+            it.verified = true
+            it.flush()
+        }
+    }
+
+    suspend fun updatePasswordHash(id: Int, newHash: String) = withTransaction {
+        UserEntity.findById(id)?.let {
+            it.passwordHash = newHash
+            it.flush()
+        }
     }
 
     suspend fun delete(id: Int) = withTransaction {

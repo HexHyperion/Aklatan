@@ -2,6 +2,7 @@ package com.hexhyperion.aklatan.api.admin
 
 import com.hexhyperion.aklatan.api.auth.RegisterRequest
 import com.hexhyperion.aklatan.api.auth.RoleService
+import com.hexhyperion.aklatan.api.auth.tokens.PasswordResetTokenService
 
 import com.hexhyperion.aklatan.api.user.UserService
 import com.hexhyperion.aklatan.utility.ApiError
@@ -12,10 +13,15 @@ import io.ktor.server.routing.*
 
 fun Route.adminRouting(
     roleService: RoleService,
+    passwordResetTokenService: PasswordResetTokenService,
     userService: UserService
 ) {
     route("/admin") {
         get("/roles") {
+
+        }
+
+        get("/users") {
 
         }
 
@@ -35,7 +41,7 @@ fun Route.adminRouting(
             call.respond(ApiSuccess.UserCreated)
         }
 
-        post("/hours") {
+        post("/open-hours") {
 
         }
     }

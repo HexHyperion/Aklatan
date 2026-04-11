@@ -2,8 +2,7 @@ package com.hexhyperion.aklatan
 
 import com.hexhyperion.aklatan.api.auth.RoleRepository
 import com.hexhyperion.aklatan.api.auth.RoleService
-import com.hexhyperion.aklatan.api.auth.tokens.RefreshTokenRepository
-import com.hexhyperion.aklatan.api.auth.tokens.RefreshTokenService
+import com.hexhyperion.aklatan.api.auth.tokens.*
 import com.hexhyperion.aklatan.api.book.BookRepository
 import com.hexhyperion.aklatan.api.book.BookService
 import com.hexhyperion.aklatan.api.borrow.BorrowRepository
@@ -25,10 +24,18 @@ fun main(args: Array<String>) {
 fun Application.module() {
     val roleRepository = RoleRepository()
     val roleService = RoleService(roleRepository)
-    val userRepository = UserRepository()
-    val userService = UserService(userRepository, roleRepository)
+
+    val registrationTokenRepository = RegistrationTokenRepository()
+    val registrationTokenService = RegistrationTokenService(registrationTokenRepository, environment.config)
+    val passwordResetTokenRepository = PasswordResetTokenRepository()
+    val passwordResetTokenService = PasswordResetTokenService(passwordResetTokenRepository, environment.config)
+
     val refreshTokenRepository = RefreshTokenRepository()
     val refreshTokenService = RefreshTokenService(refreshTokenRepository, environment.config)
+
+    val userRepository = UserRepository()
+    val userService = UserService(userRepository, roleRepository)
+
     val bookRepository = BookRepository()
     val bookService = BookService(bookRepository)
     val reservationRepository = ReservationRepository()
@@ -40,7 +47,7 @@ fun Application.module() {
     configureDatabase()
     configureAuthentication()
     configureRouting(
-        roleService, userService, refreshTokenService,
-        bookService, reservationService, borrowService
+        roleService, registrationTokenService, passwordResetTokenService, refreshTokenService,
+        userService, bookService, reservationService, borrowService,
     )
 }

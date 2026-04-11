@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
-data class EmailMessage (
+open class EmailMessage (
     val to: String,
     val subject: String,
     val body: String,
@@ -35,4 +35,38 @@ data class EmailMessage (
         message.setContent(body, "text/html; charset=utf-8")
         Transport.send(message)
     }
+
+    data class VerifyEmailMessage (
+        val email: String,
+        val name: String,
+        val confirmationLink: String,
+    ) : EmailMessage(
+        to = email,
+        subject = "Verify your Aklatan account email",
+        body = """
+            <p>Welcome to Aklatan, $name!</p>
+            <p>Click the link below to finish creating your account and start using our services:</p>
+            <a href="$confirmationLink">Confirm account</a>
+            <p>If you did not create this account, you can ignore this email.</p>
+            <p>Best regards,<br>
+            Aklatan team</p>
+        """.trimIndent()
+    )
+
+    data class ResetPasswordMessage (
+        val email: String,
+        val name: String,
+        val resetLink: String,
+    ) : EmailMessage(
+        to = email,
+        subject = "Reset your Aklatan password",
+        body = """
+            <p>Hello, $name!</p>
+            <p>Click the link below to reset your Aklatan password:</p>
+            <a href="$resetLink">Reset your password</a>
+            <p>If you did not request a password change, you can safely ignore this email.</p>
+            <p>Best regards,<br>
+            Aklatan team</p>
+        """.trimIndent()
+    )
 }

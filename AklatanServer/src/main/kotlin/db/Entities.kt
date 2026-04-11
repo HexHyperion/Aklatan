@@ -29,6 +29,7 @@ object Users : IntIdTable() {
     val passwordHash = text("password_hash")
     val role = reference("role_id", Roles)
     val registeredAt = timestamp("registered_at")
+    val verified = bool("verified").default(false)
 }
 
 class UserEntity(id: EntityID<Int>) : IntEntity(id) {
@@ -37,15 +38,16 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     var passwordHash by Users.passwordHash
     var role by RoleEntity referencedOn Users.role
     var registeredAt by Users.registeredAt
+    var verified by Users.verified
 
-    fun toUser(): User = User(name, email, passwordHash, role.id.value, registeredAt)
+    fun toUser(): User = User(name, email, passwordHash, role.id.value, registeredAt, verified)
 
     companion object : IntEntityClass<UserEntity>(Users)
 }
 
 object RegistrationTokens: IntIdTable() {
     val user = reference("user_id", Users)
-    val tokenHash = text("token").uniqueIndex()
+    val tokenHash = text("token_hash").uniqueIndex()
     val expiresAt = timestamp("expires_at")
 }
 
@@ -61,7 +63,7 @@ class RegistrationTokenEntity(id: EntityID<Int>) : IntEntity(id) {
 
 object PasswordResetTokens: IntIdTable() {
     val user = reference("user_id", Users)
-    val tokenHash = text("token").uniqueIndex()
+    val tokenHash = text("token_hash").uniqueIndex()
     val expiresAt = timestamp("expires_at")
 }
 

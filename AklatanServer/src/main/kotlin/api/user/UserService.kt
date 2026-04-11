@@ -31,6 +31,14 @@ class UserService(private val userRepository: UserRepository, private val roleRe
         return if (Hasher.bcryptVerify(password, user.passwordHash)) user else null
     }
 
+    suspend fun verifyEmail(id: Int) {
+        userRepository.updateVerified(id)
+    }
+
+    suspend fun resetPassword(id: Int, password: String) {
+        userRepository.updatePasswordHash(id, Hasher.bcryptHash(password))
+    }
+
     suspend fun delete(id: Int) {
         userRepository.delete(id)
     }

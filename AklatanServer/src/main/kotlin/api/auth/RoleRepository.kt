@@ -19,7 +19,6 @@ class RoleRepository {
     }
 
     suspend fun findById(id: Int): RoleEntity? = withTransaction {
-        RoleEntity.find { Roles.id eq id }
-            .firstOrNull()
+        RoleEntity.findById(id)
     }
 }

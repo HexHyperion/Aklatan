@@ -26,13 +26,28 @@ suspend fun <T> ApplicationCall.respond(response: ApiResponse<T>) = when (respon
 }
 
 object ApiSuccess {
-    val UserCreated = ApiResponse.Success(
-        "Successfully registered, the user has been. Login now, they can.",
-        HttpStatusCode.Created
-    )
     val UserLoggedIn = ApiResponse.Success(
         "Successfully logged in, you have been. Access and refresh token, you now have."
     )
+
+    val UserCreated = ApiResponse.Success(
+        "Successfully registered, the user has been. Receive an email with a confirmation link, they should.",
+        HttpStatusCode.Created
+    )
+    val RegistrationEmailSent = ApiResponse.Success(
+        "Sent, the verification email has been, if the accout exists. Check your inbox, you should."
+    )
+    val UserVerified = ApiResponse.Success(
+        "Verified, the user's email has been. Login now, they can.",
+    )
+
+    val PasswordResetEmailSent = ApiResponse.Success(
+        "Sent, the password reset email has been, if the account exists. Check your inbox, you should."
+    )
+    val PasswordReset = ApiResponse.Success(
+        "Successfully reset, the password has been.",
+    )
+
     val UserLoggedOut = ApiResponse.Success(
         "Successfully logged out, you have been."
     )
@@ -45,8 +60,8 @@ object ApiSuccess {
 object ApiError {
     val UserRoleNotFound = ApiResponse.Error(
         "USER_ROLE_NOT_FOUND",
-        "Not found, the user's role was. Contact support, you should.",
-        HttpStatusCode.InternalServerError
+        "Exist, the user's role does not. Contact support, you should.",
+        HttpStatusCode.NotFound
     )
     val UserAlreadyExists = ApiResponse.Error(
         "USER_ALREADY_EXISTS",
@@ -58,6 +73,22 @@ object ApiError {
         "Incorrect, the e-mail or password is. Check your credentials, you should.",
         HttpStatusCode.Unauthorized
     )
+    val UserNotVerified = ApiResponse.Error(
+        "USER_NOT_VERIFIED",
+        "Not verified, your account is. Check your email for the confirmation link, you should.",
+        HttpStatusCode.Unauthorized
+    )
+
+    val RegistrationTokenInvalid = ApiResponse.Error(
+        "REGISTRATION_TOKEN_INVALID",
+        "Invalid or expired, the registration token is. Acquire a new one, you must.",
+        HttpStatusCode.Unauthorized
+    )
+    val RegistrationTokenNotProvided = ApiResponse.Error(
+        "REGISTRATION_TOKEN_NOT_PROVIDED",
+        "Registration token provide, you did not.",
+        HttpStatusCode.BadRequest
+    )
 
     val RefreshTokenInvalid = ApiResponse.Error(
         "REFRESH_TOKEN_INVALID",
@@ -67,6 +98,17 @@ object ApiError {
     val RefreshTokenNotProvided = ApiResponse.Error(
         "REFRESH_TOKEN_NOT_PROVIDED",
         "Refresh token provide, you did not.",
+        HttpStatusCode.BadRequest
+    )
+
+    val PasswordResetTokenInvalid = ApiResponse.Error(
+        "PASSWORD_RESET_TOKEN_INVALID",
+        "Invalid or expired, the password reset token is. Acquire a new one, you must.",
+        HttpStatusCode.Unauthorized
+    )
+    val PasswordResetTokenNotProvided = ApiResponse.Error(
+        "PASSWORD_RESET_TOKEN_NOT_PROVIDED",
+        "Password reset token provide, you did not.",
         HttpStatusCode.BadRequest
     )
 
