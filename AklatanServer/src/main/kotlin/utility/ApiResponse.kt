@@ -84,11 +84,6 @@ object ApiError {
         "Invalid or expired, the registration token is. Acquire a new one, you must.",
         HttpStatusCode.Unauthorized
     )
-    val RegistrationTokenNotProvided = ApiResponse.Error(
-        "REGISTRATION_TOKEN_NOT_PROVIDED",
-        "Registration token provide, you did not.",
-        HttpStatusCode.BadRequest
-    )
 
     val RefreshTokenInvalid = ApiResponse.Error(
         "REFRESH_TOKEN_INVALID",
@@ -106,12 +101,12 @@ object ApiError {
         "Invalid or expired, the password reset token is. Acquire a new one, you must.",
         HttpStatusCode.Unauthorized
     )
-    val PasswordResetTokenNotProvided = ApiResponse.Error(
-        "PASSWORD_RESET_TOKEN_NOT_PROVIDED",
-        "Password reset token provide, you did not.",
+
+    val InvalidRequest = ApiResponse.Error(
+        "INVALID_REQUEST",
+        "Invalid, the request parameters are. Check the API documentation and try again, you should.",
         HttpStatusCode.BadRequest
     )
-
     val UnknownError = ApiResponse.Error(
         "UNKNOWN_ERROR",
         "An unknown error, occurred has. Contact support, you should.",
