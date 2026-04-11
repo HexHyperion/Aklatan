@@ -2,7 +2,7 @@ package com.hexhyperion.aklatan.plugins
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.hexhyperion.aklatan.utility.exception.BadAuthTokenException
+import com.hexhyperion.aklatan.utility.exception.BadAccessTokenException
 import com.hexhyperion.aklatan.utility.getEnv
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -31,7 +31,7 @@ fun Application.configureAuthentication() {
             }
 
             challenge { _, _ ->
-                throw BadAuthTokenException()
+                throw BadAccessTokenException()
             }
         }
     }

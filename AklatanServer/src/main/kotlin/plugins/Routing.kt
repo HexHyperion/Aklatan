@@ -40,7 +40,7 @@ fun Application.configureRouting(
             get("/") {
                 val principal = call.principal<JWTPrincipal>()!!
                 val userId = principal.payload.getClaim("userId").asInt()
-                val name = userService.getById(userId)?.name ?: "Unknown"
+                val name = userService.getById(userId).name
 
                 call.respondText("Auth succeeded, as $name authenticated you are.")
             }

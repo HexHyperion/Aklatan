@@ -3,6 +3,7 @@ package com.hexhyperion.aklatan.api.book
 import com.hexhyperion.aklatan.api.borrow.BorrowService
 import com.hexhyperion.aklatan.api.borrow.ReservationService
 import com.hexhyperion.aklatan.api.user.UserService
+import com.hexhyperion.aklatan.utility.ApiResponse
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
@@ -36,6 +37,6 @@ fun Route.bookRouting(
 
     get("/books") {
         val books = bookService.getAllBooks()
-        call.respond(books)
+        call.respond(ApiResponse.SuccessWithData(books))
     }
 }

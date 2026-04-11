@@ -5,12 +5,16 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 
 sealed class ApiResponse<out T> {
-    data class Success<T>(
+    data class Success (
+        val code: HttpStatusCode = HttpStatusCode.OK,
+    ) : ApiResponse<Nothing>()
+
+    data class SuccessWithData<T> (
         val data: T,
         val code: HttpStatusCode = HttpStatusCode.OK,
     ) : ApiResponse<T>()
 
-    data class Error(
+    data class Error (
         val name: String,
         val message: String,
         val code: HttpStatusCode,
@@ -18,42 +22,14 @@ sealed class ApiResponse<out T> {
 }
 
 suspend fun <T> ApplicationCall.respond(response: ApiResponse<T>) = when (response) {
-    is ApiResponse.Success -> respond(response.code, response.data as Any)
+    is ApiResponse.Success -> respond(response.code)
+    is ApiResponse.SuccessWithData -> respond(
+        response.code,
+        response.data as Any,
+    )
     is ApiResponse.Error -> respond(
         response.code,
         mapOf("error" to response.name, "message" to response.message)
-    )
-}
-
-object ApiSuccess {
-    val UserLoggedIn = ApiResponse.Success(
-        "Successfully logged in, you have been. Access and refresh token, you now have."
-    )
-
-    val UserCreated = ApiResponse.Success(
-        "Successfully registered, the user has been. Receive an email with a confirmation link, they should.",
-        HttpStatusCode.Created
-    )
-    val RegistrationEmailSent = ApiResponse.Success(
-        "Sent, the verification email has been, if the accout exists. Check your inbox, you should."
-    )
-    val UserVerified = ApiResponse.Success(
-        "Verified, the user's email has been. Login now, they can.",
-    )
-
-    val PasswordResetEmailSent = ApiResponse.Success(
-        "Sent, the password reset email has been, if the account exists. Check your inbox, you should."
-    )
-    val PasswordReset = ApiResponse.Success(
-        "Successfully reset, the password has been.",
-    )
-
-    val UserLoggedOut = ApiResponse.Success(
-        "Successfully logged out, you have been."
-    )
-
-    val TokensRefreshed = ApiResponse.Success(
-        "Both tokens refreshed, you have. Use the new ones, you should."
     )
 }
 
@@ -63,9 +39,9 @@ object ApiError {
         "Incorrect, the e-mail or password is. Check your credentials, you should.",
         HttpStatusCode.Unauthorized
     )
-    val AuthTokenInvalid = ApiResponse.Error(
-        "AUTH_TOKEN_INVALID",
-        "Invalid or expired, the provided auth token in. Refresh it and try again, you should.",
+    val AccessTokenInvalid = ApiResponse.Error(
+        "ACCESS_TOKEN_INVALID",
+        "Invalid or expired, the provided access token in. Refresh it and try again, you should.",
         HttpStatusCode.Unauthorized
     )
     val DeeplinkTokenInvalid = ApiResponse.Error(

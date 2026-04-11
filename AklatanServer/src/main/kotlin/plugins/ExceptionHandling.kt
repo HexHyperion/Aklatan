@@ -17,8 +17,8 @@ fun Application.configureExceptionHandling() {
                         is BadCredentialsException -> {
                             call.respond(ApiError.IncorrectUserCredentials)
                         }
-                        is BadAuthTokenException -> {
-                            call.respond(ApiError.AuthTokenInvalid)
+                        is BadAccessTokenException -> {
+                            call.respond(ApiError.AccessTokenInvalid)
                         }
                         is BadDeeplinkTokenException -> {
                             call.respond(ApiError.DeeplinkTokenInvalid)

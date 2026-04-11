@@ -5,12 +5,12 @@ import org.jetbrains.exposed.v1.core.eq
 import kotlin.time.Clock
 
 class UserRepository {
-    suspend fun create(email: String, name: String, passwordHash: String, role: String): User = withTransaction {
+    suspend fun create(email: String, name: String, passwordHash: String, roleId: Int): User = withTransaction {
         return@withTransaction UserEntity.new {
             this.email = email
             this.name = name
             this.passwordHash = passwordHash
-            this.role = RoleEntity.findByName(role) ?: throw IllegalArgumentException("Role not found")
+            this.role = RoleEntity.findById(roleId)!!
             this.registeredAt = Clock.System.now()
         }.toUser()
     }

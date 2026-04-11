@@ -16,7 +16,7 @@ class RefreshTokenService(val refreshTokenRepository: RefreshTokenRepository, pr
         return token
     }
 
-    suspend fun getUserId(token: String): Int? {
+    suspend fun getUserIdOrNull(token: String): Int? {
         val refreshToken = refreshTokenRepository.find(token) ?: return null
         return refreshToken.userId
     }

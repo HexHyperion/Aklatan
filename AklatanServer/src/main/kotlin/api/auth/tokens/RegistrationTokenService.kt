@@ -19,7 +19,7 @@ class RegistrationTokenService(
         return token
     }
 
-    suspend fun getUserId(token: String): Int? {
+    suspend fun getUserIdOrNull(token: String): Int? {
         val registrationToken = registrationTokenRepository.find(token) ?: return null
         return registrationToken.userId
     }
@@ -31,10 +31,6 @@ class RegistrationTokenService(
 
     suspend fun cleanupExpired() {
         registrationTokenRepository.deleteAllExpired()
-    }
-
-    suspend fun revoke(registrationToken: String) {
-        registrationTokenRepository.delete(registrationToken)
     }
 
     suspend fun revokeAllForUser(userId: Int) {

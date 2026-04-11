@@ -7,7 +7,7 @@ open class AuthenticationException(message: String? = null) : ApiException(messa
 
 class BadCredentialsException(message: String? = null) : AuthenticationException(message)
 
-class BadAuthTokenException(message: String? = null) : AuthenticationException(message)
+class BadAccessTokenException(message: String? = null) : AuthenticationException(message)
 
 class BadDeeplinkTokenException(message: String? = null) : AuthenticationException(message)
 

@@ -19,7 +19,7 @@ class PasswordResetTokenService(
         return token
     }
 
-    suspend fun getUserId(token: String): Int? {
+    suspend fun getUserIdOrNull(token: String): Int? {
         val passwordResetToken = passwordResetTokenRepository.find(token) ?: return null
         return passwordResetToken.userId
     }
@@ -31,10 +31,6 @@ class PasswordResetTokenService(
 
     suspend fun cleanupExpired() {
         passwordResetTokenRepository.deleteAllExpired()
-    }
-
-    suspend fun revoke(passwordResetToken: String) {
-        passwordResetTokenRepository.delete(passwordResetToken)
     }
 
     suspend fun revokeAllForUser(userId: Int) {
