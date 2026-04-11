@@ -14,9 +14,9 @@ jwt:
     refreshTokenTimeoutDays: 14
 
 auth:
-    registrationTokenLength: 32
+    registrationTokenLength: 24
     registrationTokenTimeoutHours: 3
-    passwordResetTokenLength: 32
+    passwordResetTokenLength: 24
     passwordResetTokenTimeoutHours: 1
 
 db:
