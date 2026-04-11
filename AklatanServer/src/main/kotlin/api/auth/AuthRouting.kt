@@ -13,9 +13,9 @@ import com.hexhyperion.aklatan.utility.exception.BadRefreshTokenException
 import com.hexhyperion.aklatan.utility.exception.UserExistsException
 import com.hexhyperion.aklatan.utility.exception.UserNotVerifiedException
 import com.hexhyperion.aklatan.utility.getEnv
+import com.hexhyperion.aklatan.utility.respond
 import io.ktor.http.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -43,7 +43,7 @@ fun Route.authRouting(
         return JWT.create()
             .withIssuer(issuer)
             .withAudience(audience)
-            .withClaim("userId", userId)
+            .withClaim("id", userId)
             .withClaim("role", roleName)
             .withExpiresAt(expirationTime)
             .sign(Algorithm.HMAC256(secret))

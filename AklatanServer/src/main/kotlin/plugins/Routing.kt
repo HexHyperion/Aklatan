@@ -31,7 +31,7 @@ fun Application.configureRouting(
 ) {
     routing {
         authRouting(registrationTokenService, passwordResetTokenService, refreshTokenService, userService)
-        userRouting()
+        userRouting(userService)
         bookRouting(userService, bookService, reservationService, borrowService)
         borrowRouting(userService, bookService, reservationService, borrowService)
         adminRouting(roleService, passwordResetTokenService, userService)
@@ -39,7 +39,7 @@ fun Application.configureRouting(
         authenticate("auth-jwt") {
             get("/") {
                 val principal = call.principal<JWTPrincipal>()!!
-                val userId = principal.payload.getClaim("userId").asInt()
+                val userId = principal.payload.getClaim("id").asInt()
                 val name = userService.getById(userId).name
 
                 call.respondText("Auth succeeded, as $name authenticated you are.")

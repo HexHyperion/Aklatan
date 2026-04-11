@@ -8,7 +8,6 @@ ktor:
 jwt:
     issuer: "com.hexhyperion"
     audience: "com.hexhyperion.aklatan"
-    realm: "Access to all Aklatan endpoints"
     accessTokenTimeoutMinutes: 10
     refreshTokenLength: 32
     refreshTokenTimeoutDays: 14

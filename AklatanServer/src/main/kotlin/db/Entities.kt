@@ -2,25 +2,20 @@ package com.hexhyperion.aklatan.db
 
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
-import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.dao.IntEntity
 import org.jetbrains.exposed.v1.dao.IntEntityClass
 import org.jetbrains.exposed.v1.datetime.timestamp
 
 object Roles : IntIdTable() {
     val name = text("name").uniqueIndex()
-    val permissionLevel = integer("permission_level")
 }
 
 class RoleEntity(id: EntityID<Int>) : IntEntity(id) {
     var name by Roles.name
-    var permissionLevel by Roles.permissionLevel
 
-    fun toRole(): Role = Role(name, permissionLevel)
+    fun toRole(): Role = Role(name)
 
-    companion object : IntEntityClass<RoleEntity>(Roles) {
-        fun findByName(name: String): RoleEntity? = find { Roles.name eq name }.firstOrNull()
-    }
+    companion object : IntEntityClass<RoleEntity>(Roles)
 }
 
 object Users : IntIdTable() {

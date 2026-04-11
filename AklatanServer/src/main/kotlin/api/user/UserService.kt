@@ -2,6 +2,7 @@ package com.hexhyperion.aklatan.api.user
 
 import com.hexhyperion.aklatan.api.auth.RoleRepository
 import com.hexhyperion.aklatan.db.User
+import com.hexhyperion.aklatan.db.UserReadable
 import com.hexhyperion.aklatan.utility.Hasher
 import com.hexhyperion.aklatan.utility.exception.BadCredentialsException
 import com.hexhyperion.aklatan.utility.exception.RoleNotFoundException
@@ -29,6 +30,34 @@ class UserService(private val userRepository: UserRepository, private val roleRe
         return userRepository.findByEmail(email)
     }
 
+    suspend fun getByIdReadable(id: Int): UserReadable {
+        val userRaw = userRepository.findById(id) ?: throw UserNotFoundException()
+        val userRole = roleRepository.findById(userRaw.roleId)?.name ?: throw RoleNotFoundException()
+        return UserReadable(
+            name = userRaw.name,
+            email = userRaw.email,
+            role = userRole,
+            registeredAt = userRaw.registeredAt,
+            verified = userRaw.verified
+        )
+    }
+
+    suspend fun getAllReadable(): List<UserReadable> {
+        val usersRaw = userRepository.findAll()
+        val users = mutableListOf<UserReadable>()
+        for (userRaw in usersRaw) {
+            val userRole = roleRepository.findById(userRaw.roleId)?.name ?: throw RoleNotFoundException()
+            users.add(UserReadable(
+                name = userRaw.name,
+                email = userRaw.email,
+                role = userRole,
+                registeredAt = userRaw.registeredAt,
+                verified = userRaw.verified
+            ))
+        }
+        return users
+    }
+
     suspend fun getIdByEmail(email: String): Int {
         return userRepository.findIdByEmail(email) ?: throw UserNotFoundException()
     }
@@ -40,6 +69,10 @@ class UserService(private val userRepository: UserRepository, private val roleRe
     suspend fun getRoleNameById(id: Int): String {
         val user = userRepository.findById(id) ?: throw UserNotFoundException()
         return user.roleId.let { roleRepository.findById(it)?.name ?: throw RoleNotFoundException() }
+    }
+
+    suspend fun checkExistsById(id: Int): Boolean {
+        return userRepository.findById(id) != null
     }
 
     suspend fun checkExistsByEmail(email: String): Boolean {

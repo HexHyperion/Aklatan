@@ -4,8 +4,8 @@ import com.hexhyperion.aklatan.db.Role
 import com.hexhyperion.aklatan.utility.exception.RoleNotFoundException
 
 class RoleService(private val roleRepository: RoleRepository) {
-    suspend fun create(name: String, permissionLevel: Int): Role {
-        return roleRepository.create(name, permissionLevel).toRole()
+    suspend fun create(name: String): Role {
+        return roleRepository.create(name).toRole()
     }
 
     suspend fun getByName(name: String): Role {
@@ -16,5 +16,9 @@ class RoleService(private val roleRepository: RoleRepository) {
     suspend fun getById(id: Int): Role {
         val roleEntity = roleRepository.findById(id) ?: throw RoleNotFoundException()
         return roleEntity.toRole()
+    }
+
+    suspend fun getAll(): List<Role> {
+        return roleRepository.findAll().map { it.toRole() }
     }
 }

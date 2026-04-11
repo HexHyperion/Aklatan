@@ -13,8 +13,7 @@ suspend fun <T> withTransaction(block: suspend JdbcTransaction.() -> T): T = wit
 
 @Serializable
 data class Role (
-    val name: String,
-    val permissionLevel: Int
+    val name: String
 )
 
 @Serializable
@@ -23,6 +22,15 @@ data class User (
     val email: String,
     val passwordHash: String,
     val roleId: Int,
+    val registeredAt: Instant,
+    val verified: Boolean
+)
+
+@Serializable
+data class UserReadable (
+    val name: String,
+    val email: String,
+    val role: String,
     val registeredAt: Instant,
     val verified: Boolean
 )

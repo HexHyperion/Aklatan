@@ -26,6 +26,11 @@ class UserRepository {
             ?.toUser()
     }
 
+    suspend fun findAll(): List<User> = withTransaction {
+        UserEntity.all()
+            .map { it.toUser() }
+    }
+
     suspend fun findIdByEmail(email: String): Int? = withTransaction {
         UserEntity.find { Users.email eq email }
             .firstOrNull()

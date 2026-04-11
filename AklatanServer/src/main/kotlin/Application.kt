@@ -43,7 +43,7 @@ fun Application.module() {
     configureExceptionHandling()
     configureSerialization()
     configureDatabase()
-    configureAuthentication()
+    configureAuthentication(userService, roleService)
     configureRouting(
         roleService, registrationTokenService, passwordResetTokenService, refreshTokenService,
         userService, bookService, reservationService, borrowService,
