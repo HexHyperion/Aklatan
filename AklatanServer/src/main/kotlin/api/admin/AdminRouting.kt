@@ -3,10 +3,9 @@ package com.hexhyperion.aklatan.api.admin
 import com.hexhyperion.aklatan.api.auth.RegisterRequest
 import com.hexhyperion.aklatan.api.auth.RoleService
 import com.hexhyperion.aklatan.api.auth.tokens.PasswordResetTokenService
-
 import com.hexhyperion.aklatan.api.user.UserService
-import com.hexhyperion.aklatan.utility.ApiError
 import com.hexhyperion.aklatan.utility.ApiSuccess
+import com.hexhyperion.aklatan.utility.exception.UserExistsException
 import com.hexhyperion.aklatan.utility.respond
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
@@ -28,7 +27,7 @@ fun Route.adminRouting(
         post("/users") {
             val librarianCredentials = call.receive<RegisterRequest>()
             if (userService.getByEmail(librarianCredentials.email) != null) {
-                return@post call.respond(ApiError.UserAlreadyExists)
+                throw UserExistsException()
             }
 
             userService.create(

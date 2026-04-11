@@ -58,20 +58,30 @@ object ApiSuccess {
 }
 
 object ApiError {
-    val UserRoleNotFound = ApiResponse.Error(
-        "USER_ROLE_NOT_FOUND",
-        "Exist, the user's role does not. Contact support, you should.",
-        HttpStatusCode.NotFound
+    val IncorrectUserCredentials = ApiResponse.Error(
+        "INCORRECT_USER_CREDENTIALS",
+        "Incorrect, the e-mail or password is. Check your credentials, you should.",
+        HttpStatusCode.Unauthorized
+    )
+    val AuthTokenInvalid = ApiResponse.Error(
+        "AUTH_TOKEN_INVALID",
+        "Invalid or expired, the provided auth token in. Refresh it and try again, you should.",
+        HttpStatusCode.Unauthorized
+    )
+    val DeeplinkTokenInvalid = ApiResponse.Error(
+        "DEEPLINK_TOKEN_INVALID",
+        "Invalid or expired, the provided token is. Request a new one, you must.",
+        HttpStatusCode.Unauthorized
+    )
+    val RefreshTokenInvalid = ApiResponse.Error(
+        "REFRESH_TOKEN_INVALID",
+        "Invalid or expired, the provided refresh token is. Acquire a new one, you must.",
+        HttpStatusCode.Unauthorized
     )
     val UserAlreadyExists = ApiResponse.Error(
         "USER_ALREADY_EXISTS",
         "Exist, a user with that email already does. Use a different one, you should.",
         HttpStatusCode.Conflict
-    )
-    val IncorrectUserCredentials = ApiResponse.Error(
-        "INCORRECT_USER_CREDENTIALS",
-        "Incorrect, the e-mail or password is. Check your credentials, you should.",
-        HttpStatusCode.Unauthorized
     )
     val UserNotVerified = ApiResponse.Error(
         "USER_NOT_VERIFIED",
@@ -79,27 +89,15 @@ object ApiError {
         HttpStatusCode.Unauthorized
     )
 
-    val RegistrationTokenInvalid = ApiResponse.Error(
-        "REGISTRATION_TOKEN_INVALID",
-        "Invalid or expired, the registration token is. Acquire a new one, you must.",
-        HttpStatusCode.Unauthorized
+    val RoleNotFound = ApiResponse.Error(
+        "ROLE_NOT_FOUND",
+        "Exist, the user's role does not. Contact support, you should.",
+        HttpStatusCode.NotFound
     )
-
-    val RefreshTokenInvalid = ApiResponse.Error(
-        "REFRESH_TOKEN_INVALID",
-        "Invalid or expired, the refresh token is. Acquire a new one, you must.",
-        HttpStatusCode.Unauthorized
-    )
-    val RefreshTokenNotProvided = ApiResponse.Error(
-        "REFRESH_TOKEN_NOT_PROVIDED",
-        "Refresh token provide, you did not.",
-        HttpStatusCode.BadRequest
-    )
-
-    val PasswordResetTokenInvalid = ApiResponse.Error(
-        "PASSWORD_RESET_TOKEN_INVALID",
-        "Invalid or expired, the password reset token is. Acquire a new one, you must.",
-        HttpStatusCode.Unauthorized
+    val UserNotFound = ApiResponse.Error(
+        "USER_NOT_FOUND",
+        "Exist, the user does not. Contact support, you should.",
+        HttpStatusCode.NotFound
     )
 
     val InvalidRequest = ApiResponse.Error(

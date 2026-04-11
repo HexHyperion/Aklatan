@@ -11,10 +11,7 @@ import com.hexhyperion.aklatan.api.borrow.ReservationRepository
 import com.hexhyperion.aklatan.api.borrow.ReservationService
 import com.hexhyperion.aklatan.api.user.UserRepository
 import com.hexhyperion.aklatan.api.user.UserService
-import com.hexhyperion.aklatan.plugins.configureAuthentication
-import com.hexhyperion.aklatan.plugins.configureDatabase
-import com.hexhyperion.aklatan.plugins.configureRouting
-import com.hexhyperion.aklatan.plugins.configureSerialization
+import com.hexhyperion.aklatan.plugins.*
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -43,6 +40,7 @@ fun Application.module() {
     val borrowRepository = BorrowRepository()
     val borrowService = BorrowService(borrowRepository)
 
+    configureExceptionHandling()
     configureSerialization()
     configureDatabase()
     configureAuthentication()
