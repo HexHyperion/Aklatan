@@ -29,6 +29,10 @@ class RegistrationTokenService(
         return registrationToken != null && registrationToken.expiresAt > Clock.System.now()
     }
 
+    suspend fun cleanupExpired() {
+        registrationTokenRepository.deleteAllExpired()
+    }
+
     suspend fun revoke(registrationToken: String) {
         registrationTokenRepository.delete(registrationToken)
     }

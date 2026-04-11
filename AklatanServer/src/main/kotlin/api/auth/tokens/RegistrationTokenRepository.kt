@@ -3,6 +3,8 @@ package com.hexhyperion.aklatan.api.auth.tokens
 import com.hexhyperion.aklatan.db.*
 import com.hexhyperion.aklatan.utility.Hasher
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.less
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 class RegistrationTokenRepository {
@@ -25,6 +27,11 @@ class RegistrationTokenRepository {
         RegistrationTokenEntity
             .find { RegistrationTokens.user eq userId }
             .map { it.toRegistrationToken() }
+    }
+
+    suspend fun deleteAllExpired() = withTransaction {
+        RegistrationTokenEntity.find { RegistrationTokens.expiresAt less Clock.System.now() }
+            .forEach { it.delete() }
     }
 
     suspend fun delete(registrationToken: String) = withTransaction {

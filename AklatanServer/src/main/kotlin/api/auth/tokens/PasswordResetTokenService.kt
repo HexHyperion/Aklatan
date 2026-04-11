@@ -29,6 +29,10 @@ class PasswordResetTokenService(
         return passwordResetToken != null && passwordResetToken.expiresAt > Clock.System.now()
     }
 
+    suspend fun cleanupExpired() {
+        passwordResetTokenRepository.deleteAllExpired()
+    }
+
     suspend fun revoke(passwordResetToken: String) {
         passwordResetTokenRepository.delete(passwordResetToken)
     }

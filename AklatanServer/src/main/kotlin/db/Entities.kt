@@ -45,7 +45,7 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<UserEntity>(Users)
 }
 
-object RegistrationTokens: IntIdTable() {
+object RegistrationTokens: IntIdTable("registration_tokens") {
     val user = reference("user_id", Users)
     val tokenHash = text("token_hash").uniqueIndex()
     val expiresAt = timestamp("expires_at")
@@ -61,7 +61,7 @@ class RegistrationTokenEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<RegistrationTokenEntity>(RegistrationTokens)
 }
 
-object PasswordResetTokens: IntIdTable() {
+object PasswordResetTokens: IntIdTable("password_reset_tokens") {
     val user = reference("user_id", Users)
     val tokenHash = text("token_hash").uniqueIndex()
     val expiresAt = timestamp("expires_at")
@@ -77,7 +77,7 @@ class PasswordResetTokenEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<PasswordResetTokenEntity>(PasswordResetTokens)
 }
 
-object RefreshTokens : IntIdTable() {
+object RefreshTokens : IntIdTable("refresh_tokens") {
     val user = reference("user_id", Users)
     val tokenHash = text("token_hash").uniqueIndex()
     val expiresAt = timestamp("expires_at")

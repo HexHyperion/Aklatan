@@ -3,6 +3,8 @@ package com.hexhyperion.aklatan.api.auth.tokens
 import com.hexhyperion.aklatan.db.*
 import com.hexhyperion.aklatan.utility.Hasher
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.less
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 class PasswordResetTokenRepository {
@@ -25,6 +27,11 @@ class PasswordResetTokenRepository {
         PasswordResetTokenEntity
             .find { PasswordResetTokens.user eq userId }
             .map { it.toPasswordResetToken() }
+    }
+
+    suspend fun deleteAllExpired() = withTransaction {
+        PasswordResetTokenEntity.find { PasswordResetTokens.expiresAt less Clock.System.now() }
+            .forEach { it.delete() }
     }
 
     suspend fun delete(passwordResetToken: String) = withTransaction {

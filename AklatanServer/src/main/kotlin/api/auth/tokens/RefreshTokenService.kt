@@ -26,6 +26,10 @@ class RefreshTokenService(val refreshTokenRepository: RefreshTokenRepository, pr
         return refreshToken != null && refreshToken.expiresAt > Clock.System.now()
     }
 
+    suspend fun cleanupExpired() {
+        refreshTokenRepository.deleteAllExpired()
+    }
+
     suspend fun revoke(refreshToken: String) {
         refreshTokenRepository.delete(refreshToken)
     }
