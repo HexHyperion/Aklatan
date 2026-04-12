@@ -75,6 +75,11 @@ object ApiError {
         "Exist, the user does not. Contact support, you should.",
         HttpStatusCode.NotFound
     )
+    val WeekDayNotFound = ApiResponse.Error(
+        "WEEK_DAY_NOT_FOUND",
+        "Exist, the provided week day does not. Learn the calendar, you should.",
+        HttpStatusCode.NotFound
+    )
 
     val InvalidRequest = ApiResponse.Error(
         "INVALID_REQUEST",

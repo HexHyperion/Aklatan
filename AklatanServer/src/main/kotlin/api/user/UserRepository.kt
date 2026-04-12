@@ -38,17 +38,23 @@ class UserRepository {
     }
 
     suspend fun updateVerified(id: Int) = withTransaction {
-        UserEntity.findById(id)?.let {
-            it.verified = true
-            it.flush()
-        }
+        UserEntity.findById(id)?.verified = true
+    }
+
+    suspend fun updateName(id: Int, name: String) = withTransaction {
+        UserEntity.findById(id)?.name = name
+    }
+
+    suspend fun updateEmail(id: Int, email: String) = withTransaction {
+        UserEntity.findById(id)?.email = email
     }
 
     suspend fun updatePasswordHash(id: Int, newHash: String) = withTransaction {
-        UserEntity.findById(id)?.let {
-            it.passwordHash = newHash
-            it.flush()
-        }
+        UserEntity.findById(id)?.passwordHash = newHash
+    }
+
+    suspend fun updateRoleId(id: Int, roleId: Int) = withTransaction {
+        UserEntity.findById(id)?.role = RoleEntity.findById(roleId)!!
     }
 
     suspend fun delete(id: Int) = withTransaction {

@@ -23,3 +23,5 @@ open class NotFoundException(message: String? = null) : ApiException(message)
 class UserNotFoundException(message: String? = null) : NotFoundException(message)
 
 class RoleNotFoundException(message: String? = null) : NotFoundException(message)
+
+class WeekDayNotFoundException(message: String? = null) : NotFoundException(message)

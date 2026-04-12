@@ -33,7 +33,9 @@ class UserService(private val userRepository: UserRepository, private val roleRe
     suspend fun getByIdReadable(id: Int): UserReadable {
         val userRaw = userRepository.findById(id) ?: throw UserNotFoundException()
         val userRole = roleRepository.findById(userRaw.roleId)?.name ?: throw RoleNotFoundException()
+        val userId = userRepository.findIdByEmail(userRaw.email) ?: throw UserNotFoundException()
         return UserReadable(
+            id = userId,
             name = userRaw.name,
             email = userRaw.email,
             role = userRole,
@@ -47,7 +49,9 @@ class UserService(private val userRepository: UserRepository, private val roleRe
         val users = mutableListOf<UserReadable>()
         for (userRaw in usersRaw) {
             val userRole = roleRepository.findById(userRaw.roleId)?.name ?: throw RoleNotFoundException()
+            val userId = userRepository.findIdByEmail(userRaw.email) ?: throw UserNotFoundException()
             users.add(UserReadable(
+                id = userId,
                 name = userRaw.name,
                 email = userRaw.email,
                 role = userRole,
@@ -88,8 +92,21 @@ class UserService(private val userRepository: UserRepository, private val roleRe
         userRepository.updateVerified(id)
     }
 
-    suspend fun resetPassword(id: Int, password: String) {
+    suspend fun changeName(id: Int, name: String) {
+        userRepository.updateName(id, name)
+    }
+
+    suspend fun changeEmail(id: Int, email: String) {
+        userRepository.updateEmail(id, email)
+    }
+
+    suspend fun changePassword(id: Int, password: String) {
         userRepository.updatePasswordHash(id, Hasher.bcryptHash(password))
+    }
+
+    suspend fun changeRole(id: Int, role: String) {
+        val roleId = roleRepository.findByName(role)?.id?.value ?: throw RoleNotFoundException()
+        userRepository.updateRoleId(id, roleId)
     }
 
     suspend fun delete(id: Int) {

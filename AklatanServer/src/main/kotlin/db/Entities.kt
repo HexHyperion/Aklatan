@@ -4,6 +4,8 @@ import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
 import org.jetbrains.exposed.v1.dao.IntEntity
 import org.jetbrains.exposed.v1.dao.IntEntityClass
+import org.jetbrains.exposed.v1.datetime.date
+import org.jetbrains.exposed.v1.datetime.time
 import org.jetbrains.exposed.v1.datetime.timestamp
 
 object Roles : IntIdTable() {
@@ -144,4 +146,38 @@ class BorrowEntity(id: EntityID<Int>) : IntEntity(id) {
     fun toBorrow(): Borrow = Borrow(user.id.value, book.id.value, borrowedAt, endsAt, returnedAt)
 
     companion object : IntEntityClass<BorrowEntity>(Borrows)
+}
+
+object OpenHours : IntIdTable("open_hours") {
+    val weekDay = integer("week_day").uniqueIndex()
+    val openTime = time("open_time").nullable()
+    val closeTime = time("close_time").nullable()
+}
+
+class OpenHourEntity(id: EntityID<Int>) : IntEntity(id) {
+    var weekDay by OpenHours.weekDay
+    var openTime by OpenHours.openTime
+    var closeTime by OpenHours.closeTime
+
+    fun toOpenHour(): OpenHour = OpenHour(weekDay, openTime, closeTime)
+
+    companion object : IntEntityClass<OpenHourEntity>(OpenHours)
+}
+
+object OpenHourExceptions : IntIdTable("open_hour_exceptions") {
+    val date = date("date").uniqueIndex()
+    val openTime = time("open_time").nullable()
+    val closeTime = time("close_time").nullable()
+    val comment = text("comment").nullable()
+}
+
+class OpenHourExceptionEntity(id: EntityID<Int>) : IntEntity(id) {
+    var date by OpenHourExceptions.date
+    var openTime by OpenHourExceptions.openTime
+    var closeTime by OpenHourExceptions.closeTime
+    var comment by OpenHourExceptions.comment
+
+    fun toOpenHourException(): OpenHourException = OpenHourException(date, openTime, closeTime, comment)
+
+    companion object : IntEntityClass<OpenHourExceptionEntity>(OpenHourExceptions)
 }

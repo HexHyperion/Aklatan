@@ -159,7 +159,7 @@ fun Route.authRouting(
             if (passwordResetTokenService.validate(token)) {
                 val userId = passwordResetTokenService.getUserIdOrNull(token)!!
                 passwordResetTokenService.revokeAllForUser(userId)
-                userService.resetPassword(userId, password)
+                userService.changePassword(userId, password)
 
                 call.respond(ApiResponse.Success())
             } else {

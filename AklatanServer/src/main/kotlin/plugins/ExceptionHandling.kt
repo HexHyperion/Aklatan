@@ -42,6 +42,9 @@ fun Application.configureExceptionHandling() {
                         is RoleNotFoundException -> {
                             call.respond(ApiError.RoleNotFound)
                         }
+                        is WeekDayNotFoundException -> {
+                            call.respond(ApiError.WeekDayNotFound)
+                        }
                     }
                 }
                 is BadRequestException -> {

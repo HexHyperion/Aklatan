@@ -1,5 +1,7 @@
 package com.hexhyperion.aklatan.plugins
 
+import com.hexhyperion.aklatan.api.admin.OpenHourExceptionService
+import com.hexhyperion.aklatan.api.admin.OpenHourService
 import com.hexhyperion.aklatan.api.admin.adminRouting
 import com.hexhyperion.aklatan.api.auth.RoleService
 import com.hexhyperion.aklatan.api.auth.authRouting
@@ -27,14 +29,19 @@ fun Application.configureRouting(
     userService: UserService,
     bookService: BookService,
     reservationService: ReservationService,
-    borrowService: BorrowService
+    borrowService: BorrowService,
+    openHourService: OpenHourService,
+    openHourExceptionService: OpenHourExceptionService
 ) {
     routing {
         authRouting(registrationTokenService, passwordResetTokenService, refreshTokenService, userService)
         userRouting(userService)
         bookRouting(userService, bookService, reservationService, borrowService)
         borrowRouting(userService, bookService, reservationService, borrowService)
-        adminRouting(roleService, passwordResetTokenService, userService)
+        adminRouting(
+            roleService, registrationTokenService, passwordResetTokenService,
+            refreshTokenService, userService, openHourService, openHourExceptionService
+        )
 
         authenticate("auth-jwt") {
             get("/") {

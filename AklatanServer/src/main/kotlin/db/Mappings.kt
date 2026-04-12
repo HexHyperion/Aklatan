@@ -2,6 +2,8 @@ package com.hexhyperion.aklatan.db
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
 import org.jetbrains.exposed.v1.jdbc.transactions.inTopLevelSuspendTransaction
@@ -28,6 +30,7 @@ data class User (
 
 @Serializable
 data class UserReadable (
+    val id: Int,
     val name: String,
     val email: String,
     val role: String,
@@ -79,5 +82,20 @@ data class Borrow (
     val bookId: Int,
     val borrowedAt: Instant,
     val endsAt: Instant,
-    val returnedAt: Instant?,
+    val returnedAt: Instant?
+)
+
+@Serializable
+data class OpenHour (
+    val weekDay: Int,
+    val openTime: LocalTime?,
+    val closeTime: LocalTime?
+)
+
+@Serializable
+data class OpenHourException (
+    val date: LocalDate,
+    val openTime: LocalTime?,
+    val closeTime: LocalTime?,
+    val comment: String?
 )
