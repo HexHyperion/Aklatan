@@ -41,6 +41,11 @@ class BookRepository {
             .map { it.toBook() }
     }
 
+    suspend fun findIdsByIsbn(isbn: String): List<Int> = withTransaction {
+        return@withTransaction BookEntity.find { Books.isbn eq isbn }
+            .map { it.id.value }
+    }
+
     suspend fun update(id: Int, isbn: String?, title: String?, author: String?, year: String?): Unit = withTransaction {
         BookEntity.findById(id)
             ?.apply {

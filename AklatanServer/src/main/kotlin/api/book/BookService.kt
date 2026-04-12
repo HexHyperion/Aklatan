@@ -26,29 +26,58 @@ class BookService(private val bookRepository: BookRepository) {
         return bookRepository.findById(id) ?: throw BookNotFoundException()
     }
 
-    suspend fun getByIsbn(isbn: String): List<Book> {
-        return bookRepository.findByIsbn(isbn)
+    suspend fun getManyByIsbn(isbn: String): List<Book> {
+        val books = bookRepository.findByIsbn(isbn)
+        if (books.isEmpty()) throw BookNotFoundException()
+        return books
     }
 
-    suspend fun getByTitle(title: String): List<Book> {
-        return bookRepository.findByTitle(title)
+    suspend fun getManyByTitle(title: String): List<Book> {
+        val books = bookRepository.findByTitle(title)
+        if (books.isEmpty()) throw BookNotFoundException()
+        return books
     }
 
-    suspend fun getByAuthor(author: String): List<Book> {
-        return bookRepository.findByAuthor(author)
+    suspend fun getManyByAuthor(author: String): List<Book> {
+        val books = bookRepository.findByAuthor(author)
+        if (books.isEmpty()) throw BookNotFoundException()
+        return books
     }
 
     suspend fun getAll(): List<Book> {
         return bookRepository.findAll()
     }
 
-    suspend fun edit(id: Int, isbn: String?, title: String?, author: String?, year: String?) {
+    suspend fun getIdsByIsbn(isbn: String): List<Int> {
+        val bookIds = bookRepository.findIdsByIsbn(isbn)
+        if (bookIds.isEmpty()) throw BookNotFoundException()
+        return bookIds
+    }
+
+    suspend fun editById(id: Int, isbn: String?, title: String?, author: String?, year: String?) {
         bookRepository.findById(id) ?: throw BookNotFoundException()
         bookRepository.update(id, isbn, title, author, year)
+    }
+
+    suspend fun editManyByIsbn(isbn: String, newIsbn: String?, title: String?, author: String?, year: String?) {
+        val bookIds = bookRepository.findIdsByIsbn(isbn)
+        if (bookIds.isEmpty()) throw BookNotFoundException()
+        bookIds.forEach { id ->
+            bookRepository.update(id, newIsbn, title, author, year)
+        }
     }
 
     suspend fun remove(id: Int) {
         bookRepository.findById(id) ?: throw BookNotFoundException()
         bookRepository.delete(id)
+    }
+
+    suspend fun removeMany(ids: List<Int>) {
+        ids.forEach { id ->
+            bookRepository.findById(id) ?: throw BookNotFoundException()
+        }
+        ids.forEach { id ->
+            bookRepository.delete(id)
+        }
     }
 }

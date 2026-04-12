@@ -6,6 +6,7 @@ import com.hexhyperion.aklatan.api.user.UserService
 import com.hexhyperion.aklatan.utility.ApiResponse
 import com.hexhyperion.aklatan.utility.respond
 import io.ktor.http.*
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
@@ -17,43 +18,64 @@ fun Route.bookRouting(
     borrowService: BorrowService
 ) {
     route("/inventory") {
-        get {
-            val books = bookService.getAll()
-            call.respond(ApiResponse.SuccessWithData(books))
-        }
-
-        post {
-            val request = call.receive<AddMultipleBooksRequest>()
-            bookService.addMany(request.books)
-            call.respond(ApiResponse.Success(HttpStatusCode.Created))
-        }
-
-        route("/id/{id}") {
+        authenticate("auth-jwt") {
             get {
-                val id = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
-                val book = bookService.getById(id)
-                call.respond(ApiResponse.SuccessWithData(book))
+                val books = bookService.getAll()
+                call.respond(ApiResponse.SuccessWithData(books))
             }
 
-            patch {
-                val id = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
-                val request = call.receive<EditBookRequest>()
-                bookService.edit(id, request.isbn, request.title, request.author, request.year)
-                call.respond(ApiResponse.Success())
+            get("/search") {
+
+            }
+        }
+
+        authenticate("auth-jwt-librarian") {
+            post {
+                val request = call.receive<AddMultipleBooksRequest>()
+                bookService.addMany(request.books)
+                call.respond(ApiResponse.Success(HttpStatusCode.Created))
             }
 
             delete {
-                val id = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
-                bookService.remove(id)
+                val request = call.receive<RemoveMultipleBooksRequest>()
+                bookService.removeMany(request.ids)
                 call.respond(ApiResponse.Success())
             }
-        }
 
-        route("/isbn/{isbn}") {
-            get {
-                val isbn = call.parameters["isbn"] ?: throw BadRequestException("Missing book ISBN")
-                val books = bookService.getByIsbn(isbn)
-                call.respond(ApiResponse.SuccessWithData(books))
+            route("/id/{id}") {
+                get {
+                    val id = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
+                    val book = bookService.getById(id)
+                    call.respond(ApiResponse.SuccessWithData(book))
+                }
+
+                patch {
+                    val id = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
+                    val request = call.receive<EditBookRequest>()
+                    bookService.editById(id, request.isbn, request.title, request.author, request.year)
+                    call.respond(ApiResponse.Success())
+                }
+
+                delete {
+                    val id = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
+                    bookService.remove(id)
+                    call.respond(ApiResponse.Success())
+                }
+            }
+
+            route("/isbn/{isbn}") {
+                get {
+                    val isbn = call.parameters["isbn"] ?: throw BadRequestException("Missing book ISBN")
+                    val books = bookService.getManyByIsbn(isbn)
+                    call.respond(ApiResponse.SuccessWithData(books))
+                }
+
+                patch {
+                    val isbn = call.parameters["isbn"] ?: throw BadRequestException("Missing book ISBN")
+                    val request = call.receive<EditBookRequest>()
+                    bookService.editManyByIsbn(isbn, request.isbn, request.title, request.author, request.year)
+                    call.respond(ApiResponse.Success())
+                }
             }
         }
     }

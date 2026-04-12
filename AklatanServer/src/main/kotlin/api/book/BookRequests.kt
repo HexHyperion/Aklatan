@@ -17,6 +17,11 @@ data class AddMultipleBooksRequest (
 )
 
 @Serializable
+data class RemoveMultipleBooksRequest (
+    val ids: List<Int>
+)
+
+@Serializable
 data class EditBookRequest (
     val isbn: String? = null,
     val title: String? = null,
