@@ -8,11 +8,3 @@ data class EditAccountRequest (
     val password: String? = null,
     val newPassword: String? = null
 )
-
-@Serializable
-data class EditAccountAdminRequest (
-    val newName: String? = null,
-    val newEmail: String? = null,
-    val newPassword: String? = null,
-    val newRole: String? = null
-)

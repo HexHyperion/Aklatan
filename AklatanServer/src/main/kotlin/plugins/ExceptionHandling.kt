@@ -7,6 +7,7 @@ import com.hexhyperion.aklatan.utility.respond
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.plugins.statuspages.*
+import java.time.format.DateTimeParseException
 
 fun Application.configureExceptionHandling() {
     install(StatusPages) {
@@ -45,7 +46,13 @@ fun Application.configureExceptionHandling() {
                         is WeekDayNotFoundException -> {
                             call.respond(ApiError.WeekDayNotFound)
                         }
+                        is OpenHourExceptionNotFoundException -> {
+                            call.respond(ApiError.OpenHourExceptionNotFound)
+                        }
                     }
+                }
+                is DateTimeParseException -> {
+                    call.respond(ApiError.InvalidDateTimeFormat)
                 }
                 is BadRequestException -> {
                     call.respond(ApiError.InvalidRequest)

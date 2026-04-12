@@ -5,16 +5,19 @@ import com.hexhyperion.aklatan.api.auth.RoleService
 import com.hexhyperion.aklatan.api.auth.tokens.PasswordResetTokenService
 import com.hexhyperion.aklatan.api.auth.tokens.RefreshTokenService
 import com.hexhyperion.aklatan.api.auth.tokens.RegistrationTokenService
-import com.hexhyperion.aklatan.api.user.EditAccountAdminRequest
 import com.hexhyperion.aklatan.api.user.UserService
 import com.hexhyperion.aklatan.utility.ApiResponse
 import com.hexhyperion.aklatan.utility.exception.UserExistsException
 import com.hexhyperion.aklatan.utility.exception.UserNotFoundException
+import com.hexhyperion.aklatan.utility.exception.WeekDayNotFoundException
 import com.hexhyperion.aklatan.utility.respond
 import io.ktor.http.*
 import io.ktor.server.auth.*
+import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 
 fun Route.adminRouting(
     roleService: RoleService,
@@ -79,6 +82,9 @@ fun Route.adminRouting(
                         if (request.newRole != null) {
                             userService.changeRole(userId, request.newRole)
                         }
+                        if (request.verified != null) {
+                            userService.verifyEmail(userId, request.verified)
+                        }
                         call.respond(ApiResponse.Success())
                     }
 
@@ -94,13 +100,54 @@ fun Route.adminRouting(
                 }
             }
 
-            post("/open-hours") {
+            route("/open-hours") {
+                get("/{day}") {
+                    val weekDay = call.parameters["day"]?.toIntOrNull() ?: throw WeekDayNotFoundException()
+                    val openHour = openHourService.getByDay(weekDay)
+                    call.respond(ApiResponse.SuccessWithData(openHour))
+                }
 
+                patch("/{day}") {
+                    val weekDay = call.parameters["day"]?.toIntOrNull() ?: throw WeekDayNotFoundException()
+                    val request = call.receive<EditOpenHoursRequest>()
+                    val openTime = request.openTime?.let { LocalTime.parse(it) }
+                    val closeTime = request.closeTime?.let { LocalTime.parse(it) }
+                    openHourService.change(weekDay, openTime, closeTime)
+                    call.respond(ApiResponse.Success())
+                }
+
+                route("/exceptions") {
+                    get {
+                        val exceptions = openHourExceptionService.getAll()
+                        call.respond(ApiResponse.SuccessWithData(exceptions))
+                    }
+
+                    get("/{date}") {
+                        val dateString = call.parameters["date"] ?: throw BadRequestException("Missing date parameter")
+                        val date = LocalDate.parse(dateString)
+
+                        val openHourException = openHourExceptionService.getByDate(date)
+                        call.respond(ApiResponse.SuccessWithData(openHourException))
+                    }
+
+                    put("/{date}") {
+                        val dateString = call.parameters["date"] ?: throw BadRequestException("Missing date parameter")
+                        val date = LocalDate.parse(dateString)
+
+                        val request = call.receive<EditOpenHourExceptionRequest>()
+                        val openTime = request.openTime?.let { LocalTime.parse(it) }
+                        val closeTime = request.closeTime?.let { LocalTime.parse(it) }
+
+                        openHourExceptionService.changeOrCreate(date, openTime, closeTime, request.comment)
+                        call.respond(ApiResponse.Success())
+                    }
+                }
             }
         }
     }
 
     get("/open-hours") {
-
+        val openHours = openHourService.getAll()
+        call.respond(ApiResponse.SuccessWithData(openHours))
     }
 }

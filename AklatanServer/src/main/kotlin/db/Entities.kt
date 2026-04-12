@@ -149,17 +149,15 @@ class BorrowEntity(id: EntityID<Int>) : IntEntity(id) {
 }
 
 object OpenHours : IntIdTable("open_hours") {
-    val weekDay = integer("week_day").uniqueIndex()
     val openTime = time("open_time").nullable()
     val closeTime = time("close_time").nullable()
 }
 
 class OpenHourEntity(id: EntityID<Int>) : IntEntity(id) {
-    var weekDay by OpenHours.weekDay
     var openTime by OpenHours.openTime
     var closeTime by OpenHours.closeTime
 
-    fun toOpenHour(): OpenHour = OpenHour(weekDay, openTime, closeTime)
+    fun toOpenHour(): OpenHour = OpenHour(id.value, openTime, closeTime)
 
     companion object : IntEntityClass<OpenHourEntity>(OpenHours)
 }

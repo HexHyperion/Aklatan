@@ -67,12 +67,12 @@ object ApiError {
 
     val RoleNotFound = ApiResponse.Error(
         "ROLE_NOT_FOUND",
-        "Exist, the user's role does not. Contact support, you should.",
+        "Exist, a role with provided name does not.",
         HttpStatusCode.NotFound
     )
     val UserNotFound = ApiResponse.Error(
         "USER_NOT_FOUND",
-        "Exist, the user does not. Contact support, you should.",
+        "Exist, the user does not.",
         HttpStatusCode.NotFound
     )
     val WeekDayNotFound = ApiResponse.Error(
@@ -80,7 +80,17 @@ object ApiError {
         "Exist, the provided week day does not. Learn the calendar, you should.",
         HttpStatusCode.NotFound
     )
+    val OpenHourExceptionNotFound = ApiResponse.Error(
+        "OPEN_HOUR_EXCEPTION_NOT_FOUND",
+        "Exist, an open hour exception on provided date does not.",
+        HttpStatusCode.NotFound
+    )
 
+    val InvalidDateTimeFormat = ApiResponse.Error(
+        "INVALID_DATE_TIME_FORMAT",
+        "Invalid, the provided date or time format is. Check the API documentation, you should.",
+        HttpStatusCode.BadRequest
+    )
     val InvalidRequest = ApiResponse.Error(
         "INVALID_REQUEST",
         "Invalid, the request parameters are. Check the API documentation and try again, you should.",

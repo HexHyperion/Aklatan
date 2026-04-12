@@ -25,3 +25,5 @@ class UserNotFoundException(message: String? = null) : NotFoundException(message
 class RoleNotFoundException(message: String? = null) : NotFoundException(message)
 
 class WeekDayNotFoundException(message: String? = null) : NotFoundException(message)
+
+class OpenHourExceptionNotFoundException(message: String? = null) : NotFoundException(message)

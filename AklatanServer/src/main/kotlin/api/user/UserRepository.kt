@@ -37,8 +37,8 @@ class UserRepository {
             ?.id?.value
     }
 
-    suspend fun updateVerified(id: Int) = withTransaction {
-        UserEntity.findById(id)?.verified = true
+    suspend fun updateVerified(id: Int, verified: Boolean) = withTransaction {
+        UserEntity.findById(id)?.verified = verified
     }
 
     suspend fun updateName(id: Int, name: String) = withTransaction {

@@ -88,8 +88,8 @@ class UserService(private val userRepository: UserRepository, private val roleRe
         return if (Hasher.bcryptVerify(password, user.passwordHash)) user else throw BadCredentialsException()
     }
 
-    suspend fun verifyEmail(id: Int) {
-        userRepository.updateVerified(id)
+    suspend fun verifyEmail(id: Int, verified: Boolean = true) {
+        userRepository.updateVerified(id, verified)
     }
 
     suspend fun changeName(id: Int, name: String) {
