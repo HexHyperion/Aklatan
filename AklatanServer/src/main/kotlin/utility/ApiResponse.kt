@@ -75,6 +75,11 @@ object ApiError {
         "Exist, the user does not.",
         HttpStatusCode.NotFound
     )
+    val BookNotFound = ApiResponse.Error(
+        "BOOK_NOT_FOUND",
+        "Exist, the book does not.",
+        HttpStatusCode.NotFound
+    )
     val WeekDayNotFound = ApiResponse.Error(
         "WEEK_DAY_NOT_FOUND",
         "Exist, the provided week day does not. Learn the calendar, you should.",

@@ -20,9 +20,11 @@ class UserNotVerifiedException(message: String? = null) : AuthenticationExceptio
 
 open class NotFoundException(message: String? = null) : ApiException(message)
 
+class RoleNotFoundException(message: String? = null) : NotFoundException(message)
+
 class UserNotFoundException(message: String? = null) : NotFoundException(message)
 
-class RoleNotFoundException(message: String? = null) : NotFoundException(message)
+class BookNotFoundException(message: String? = null) : NotFoundException(message)
 
 class WeekDayNotFoundException(message: String? = null) : NotFoundException(message)
 

@@ -8,8 +8,6 @@ import com.hexhyperion.aklatan.api.auth.tokens.RegistrationTokenService
 import com.hexhyperion.aklatan.api.user.UserService
 import com.hexhyperion.aklatan.utility.ApiResponse
 import com.hexhyperion.aklatan.utility.exception.UserExistsException
-import com.hexhyperion.aklatan.utility.exception.UserNotFoundException
-import com.hexhyperion.aklatan.utility.exception.WeekDayNotFoundException
 import com.hexhyperion.aklatan.utility.respond
 import io.ktor.http.*
 import io.ktor.server.auth.*
@@ -62,13 +60,13 @@ fun Route.adminRouting(
 
                 route("/{id}") {
                     get {
-                        val userId = call.parameters["id"]?.toIntOrNull() ?: throw UserNotFoundException()
+                        val userId = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid user ID")
                         val user = userService.getByIdReadable(userId)
                         call.respond(ApiResponse.SuccessWithData(user))
                     }
 
                     patch {
-                        val userId = call.parameters["id"]?.toIntOrNull() ?: throw UserNotFoundException()
+                        val userId = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid user ID")
                         val request = call.receive<EditAccountAdminRequest>()
                         if (request.newName != null) {
                             userService.changeName(userId, request.newName)
@@ -89,7 +87,7 @@ fun Route.adminRouting(
                     }
 
                     delete {
-                        val userId = call.parameters["id"]?.toIntOrNull() ?: throw UserNotFoundException()
+                        val userId = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid user ID")
                         registrationTokenService.revokeAllForUser(userId)
                         passwordResetTokenService.revokeAllForUser(userId)
                         refreshTokenService.revokeAllForUser(userId)
@@ -102,13 +100,13 @@ fun Route.adminRouting(
 
             route("/open-hours") {
                 get("/{day}") {
-                    val weekDay = call.parameters["day"]?.toIntOrNull() ?: throw WeekDayNotFoundException()
+                    val weekDay = call.parameters["day"]?.toIntOrNull() ?: throw BadRequestException("Invalid day")
                     val openHour = openHourService.getByDay(weekDay)
                     call.respond(ApiResponse.SuccessWithData(openHour))
                 }
 
                 patch("/{day}") {
-                    val weekDay = call.parameters["day"]?.toIntOrNull() ?: throw WeekDayNotFoundException()
+                    val weekDay = call.parameters["day"]?.toIntOrNull() ?: throw BadRequestException("Invalid day")
                     val request = call.receive<EditOpenHoursRequest>()
                     val openTime = request.openTime?.let { LocalTime.parse(it) }
                     val closeTime = request.closeTime?.let { LocalTime.parse(it) }

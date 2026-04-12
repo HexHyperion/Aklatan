@@ -37,11 +37,14 @@ fun Application.configureExceptionHandling() {
                 }
                 is NotFoundException -> {
                     when (cause) {
+                        is RoleNotFoundException -> {
+                            call.respond(ApiError.RoleNotFound)
+                        }
                         is UserNotFoundException -> {
                             call.respond(ApiError.UserNotFound)
                         }
-                        is RoleNotFoundException -> {
-                            call.respond(ApiError.RoleNotFound)
+                        is BookNotFoundException -> {
+                            call.respond(ApiError.BookNotFound)
                         }
                         is WeekDayNotFoundException -> {
                             call.respond(ApiError.WeekDayNotFound)

@@ -89,27 +89,33 @@ class UserService(private val userRepository: UserRepository, private val roleRe
     }
 
     suspend fun verifyEmail(id: Int, verified: Boolean = true) {
+        userRepository.findById(id) ?: throw UserNotFoundException()
         userRepository.updateVerified(id, verified)
     }
 
     suspend fun changeName(id: Int, name: String) {
+        userRepository.findById(id) ?: throw UserNotFoundException()
         userRepository.updateName(id, name)
     }
 
     suspend fun changeEmail(id: Int, email: String) {
+        userRepository.findById(id) ?: throw UserNotFoundException()
         userRepository.updateEmail(id, email)
     }
 
     suspend fun changePassword(id: Int, password: String) {
+        userRepository.findById(id) ?: throw UserNotFoundException()
         userRepository.updatePasswordHash(id, Hasher.bcryptHash(password))
     }
 
     suspend fun changeRole(id: Int, role: String) {
         val roleId = roleRepository.findByName(role)?.id?.value ?: throw RoleNotFoundException()
+        userRepository.findById(id) ?: throw UserNotFoundException()
         userRepository.updateRoleId(id, roleId)
     }
 
     suspend fun delete(id: Int) {
+        userRepository.findById(id) ?: throw UserNotFoundException()
         userRepository.delete(id)
     }
 }

@@ -23,6 +23,7 @@ class OpenHourExceptionService(private val openHourExceptionRepository: OpenHour
     }
 
     suspend fun delete(date: LocalDate) {
+        openHourExceptionRepository.findByDate(date) ?: throw OpenHourExceptionNotFoundException()
         openHourExceptionRepository.delete(date)
     }
 }

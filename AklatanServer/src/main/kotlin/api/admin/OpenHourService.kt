@@ -14,6 +14,7 @@ class OpenHourService(private val openHourRepository: OpenHourRepository) {
     }
 
     suspend fun change(weekDay: Int, openTime: LocalTime?, closeTime: LocalTime?) {
+        openHourRepository.find(weekDay) ?: throw WeekDayNotFoundException()
         openHourRepository.update(weekDay, openTime, closeTime)
     }
 }
