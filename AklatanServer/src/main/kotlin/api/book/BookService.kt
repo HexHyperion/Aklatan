@@ -44,6 +44,18 @@ class BookService(private val bookRepository: BookRepository) {
         return books
     }
 
+    suspend fun search(isbn: String?, titles: List<String>?, authors: List<String>?, year: String?, yearFrom: String?, yearTo: String?): List<Book> {
+        val books = bookRepository.find(isbn, titles, authors, year, yearFrom, yearTo)
+        if (books.isEmpty()) throw BookNotFoundException()
+        return books
+    }
+
+    suspend fun searchUnique(isbn: String?, titles: List<String>?, authors: List<String>?, year: String?, yearFrom: String?, yearTo: String?): Set<Book> {
+        val books = search(isbn, titles, authors, year, yearFrom, yearTo)
+        if (books.isEmpty()) throw BookNotFoundException()
+        return setOf(*books.toTypedArray())
+    }
+
     suspend fun getAll(): List<Book> {
         return bookRepository.findAll()
     }

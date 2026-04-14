@@ -4,8 +4,12 @@ import com.hexhyperion.aklatan.db.Book
 import com.hexhyperion.aklatan.db.BookEntity
 import com.hexhyperion.aklatan.db.Books
 import com.hexhyperion.aklatan.db.withTransaction
-import org.jetbrains.exposed.v1.core.eq
-import org.jetbrains.exposed.v1.core.like
+import org.jetbrains.exposed.v1.core.*
+
+class InsensitiveLikeOp(expr1: Expression<*>, expr2: Expression<*>) : ComparisonOp(expr1, expr2, "ILIKE")
+
+infix fun<T:String?> ExpressionWithColumnType<T>.ilike(pattern: T): Op<Boolean> =
+    InsensitiveLikeOp(this, QueryParameter(pattern, columnType))
 
 class BookRepository {
     suspend fun create(isbn: String, title: String?, author: String?, year: String?): Book = withTransaction {
@@ -27,14 +31,37 @@ class BookRepository {
     }
 
     suspend fun findByTitle(title: String): List<Book> = withTransaction {
-        return@withTransaction BookEntity.find { Books.title like "%$title%" }
+        return@withTransaction BookEntity.find { Books.title ilike "%$title%" }
             .map { it.toBook() }
     }
 
     suspend fun findByAuthor(author: String): List<Book> = withTransaction {
-        return@withTransaction BookEntity.find { Books.author like "%$author%" }
+        return@withTransaction BookEntity.find { Books.author ilike "%$author%" }
             .map { it.toBook() }
     }
+
+    suspend fun find(isbn: String?, titles: List<String>?, authors: List<String>?, year: String?, yearFrom: String?, yearTo: String?): List<Book> = withTransaction {
+        var condition: Op<Boolean> = Books.id greaterEq 0
+        if (isbn != null)
+            condition = condition.and(Books.isbn eq isbn)
+        if (!titles.isNullOrEmpty()) {
+            val titleCondition = titles.map { Books.title ilike "%$it%" }.reduce { acc, op -> acc or op }
+            condition = condition.and(titleCondition)
+        }
+        if (!authors.isNullOrEmpty()) {
+            val authorCondition = authors.map { Books.author ilike "%$it%" }.reduce { acc, op -> acc or op }
+            condition = condition.and(authorCondition)
+        }
+        if (year != null)
+            condition = condition.and(Books.year eq year)
+        if (yearFrom != null)
+            condition = condition.and(Books.year greaterEq yearFrom)
+        if (yearTo != null)
+            condition = condition.and(Books.year lessEq yearTo)
+        val query = BookEntity.find { condition }
+        return@withTransaction query.map { it.toBook() }
+    }
+
 
     suspend fun findAll(): List<Book> = withTransaction {
         return@withTransaction BookEntity.all()

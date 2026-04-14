@@ -25,7 +25,14 @@ fun Route.bookRouting(
             }
 
             get("/search") {
-
+                val isbn = call.request.queryParameters["isbn"]
+                val title = call.request.queryParameters["title"]?.split(",")
+                val author = call.request.queryParameters["author"]?.split(",")
+                val year = call.request.queryParameters["year"]
+                val yearFrom = call.request.queryParameters["yearFrom"]
+                val yearTo = call.request.queryParameters["yearTo"]
+                val books = bookService.searchUnique(isbn, title, author, year, yearFrom, yearTo)
+                call.respond(ApiResponse.SuccessWithData(books))
             }
         }
 
