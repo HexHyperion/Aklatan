@@ -16,3 +16,7 @@ val dotenv: Dotenv by lazy {
 fun getEnv(name: String): String {
     return dotenv.get(name) ?: throw EnvVariableMissingException(name)
 }
+
+fun isProduction(): Boolean {
+    return dotenv.get("ENV") == "production"
+}

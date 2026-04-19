@@ -40,9 +40,13 @@ fun Application.module() {
     val bookRepository = BookRepository()
     val bookService = BookService(bookRepository)
     val reservationRepository = ReservationRepository()
-    val reservationService = ReservationService(reservationRepository)
+    val reservationService = ReservationService(
+        reservationRepository, userRepository, bookRepository, environment.config
+    )
     val borrowRepository = BorrowRepository()
-    val borrowService = BorrowService(borrowRepository)
+    val borrowService = BorrowService(
+        borrowRepository, userRepository, bookRepository, reservationRepository, environment.config
+    )
 
     val openHourRepository = OpenHourRepository()
     val openHourService = OpenHourService(openHourRepository)

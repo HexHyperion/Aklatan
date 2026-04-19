@@ -109,21 +109,21 @@ class BookEntity(id: EntityID<Int>) : IntEntity(id) {
 }
 
 object Reservations : IntIdTable() {
+    val isbn = text("isbn")
     val user = reference("user_id", Users)
-    val book = reference("book_id", Books)
     val reservedAt = timestamp("reserved_at")
     val expiresAt = timestamp("expires_at")
-    val cancelled = bool("cancelled").default(false)
+    val canceled = bool("canceled").default(false)
 }
 
 class ReservationEntity(id: EntityID<Int>) : IntEntity(id) {
+    var isbn by Reservations.isbn
     var user by UserEntity referencedOn Reservations.user
-    var book by BookEntity referencedOn Reservations.book
     var reservedAt by Reservations.reservedAt
     var expiresAt by Reservations.expiresAt
-    var cancelled by Reservations.cancelled
+    var canceled by Reservations.canceled
 
-    fun toReservation(): Reservation = Reservation(user.id.value, book.id.value, reservedAt, expiresAt, cancelled)
+    fun toReservation(): Reservation = Reservation(isbn, user.id.value, reservedAt, expiresAt, canceled)
 
     companion object : IntEntityClass<ReservationEntity>(Reservations)
 }

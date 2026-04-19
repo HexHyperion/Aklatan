@@ -6,22 +6,27 @@ ktor:
     port: 8080
 
 jwt:
-    issuer: "com.hexhyperion"
-    audience: "com.hexhyperion.aklatan"
-    accessTokenTimeoutMinutes: 10
-    refreshTokenLength: 32
-    refreshTokenTimeoutDays: 14
+  issuer: "com.hexhyperion"
+  audience: "com.hexhyperion.aklatan"
+  accessTokenTimeoutMinutes: 10
+  refreshTokenLength: 32
+  refreshTokenTimeoutDays: 14
 
 auth:
-    registrationTokenLength: 24
-    registrationTokenTimeoutHours: 3
-    passwordResetTokenLength: 24
-    passwordResetTokenTimeoutHours: 1
+  registrationTokenLength: 24
+  registrationTokenTimeoutHours: 3
+  passwordResetTokenLength: 24
+  passwordResetTokenTimeoutHours: 1
+
+books:
+  defaultReservationDurationDays: 7
+  defaultBorrowDurationDays: 28
+  finePerDayPln: 0.35
 
 db:
-    host: "localhost"
-    port: 5432
-    database: "aklatan"
-    username: "aklatan"
-    password: "aklatan"
-    driver: "org.postgresql.Driver"
+  host: "localhost"
+  port: 5432
+  database: "aklatan"
+  username: "aklatan"
+  password: "aklatan"
+  driver: "org.postgresql.Driver"

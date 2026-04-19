@@ -65,6 +65,12 @@ object ApiError {
         HttpStatusCode.Unauthorized
     )
 
+    val BookAlreadyReserved = ApiResponse.Error(
+        "BOOK_ALREADY_RESERVED",
+        "Already reserved by this user, the book is.",
+        HttpStatusCode.Conflict
+    )
+
     val RoleNotFound = ApiResponse.Error(
         "ROLE_NOT_FOUND",
         "Exist, a role with provided name does not.",
@@ -80,6 +86,16 @@ object ApiError {
         "Exist, the book does not.",
         HttpStatusCode.NotFound
     )
+    val ReservationNotFound = ApiResponse.Error(
+        "RESERVATION_NOT_FOUND",
+        "Exist, a reservation with ID provided does not.",
+        HttpStatusCode.NotFound
+    )
+    val BorrowNotFound = ApiResponse.Error(
+        "BORROW_NOT_FOUND",
+        "Exist, a borrow with ID provided does not.",
+        HttpStatusCode.NotFound
+    )
     val WeekDayNotFound = ApiResponse.Error(
         "WEEK_DAY_NOT_FOUND",
         "Exist, the provided week day does not. Learn the calendar, you should.",
@@ -87,7 +103,7 @@ object ApiError {
     )
     val OpenHourExceptionNotFound = ApiResponse.Error(
         "OPEN_HOUR_EXCEPTION_NOT_FOUND",
-        "Exist, an open hour exception on provided date does not.",
+        "Exist, an open hour exception on date provided does not.",
         HttpStatusCode.NotFound
     )
 

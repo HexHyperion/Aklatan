@@ -35,6 +35,13 @@ fun Application.configureExceptionHandling() {
                         }
                     }
                 }
+                is BorrowException -> {
+                    when (cause) {
+                        is BookAlreadyReservedException -> {
+                            call.respond(ApiError.BookAlreadyReserved)
+                        }
+                    }
+                }
                 is NotFoundException -> {
                     when (cause) {
                         is RoleNotFoundException -> {
@@ -45,6 +52,12 @@ fun Application.configureExceptionHandling() {
                         }
                         is BookNotFoundException -> {
                             call.respond(ApiError.BookNotFound)
+                        }
+                        is ReservationNotFoundException -> {
+                            call.respond(ApiError.ReservationNotFound)
+                        }
+                        is BorrowNotFoundException -> {
+                            call.respond(ApiError.BorrowNotFound)
                         }
                         is WeekDayNotFoundException -> {
                             call.respond(ApiError.WeekDayNotFound)

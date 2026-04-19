@@ -6,14 +6,11 @@ import com.hexhyperion.aklatan.api.auth.tokens.PasswordResetTokenService
 import com.hexhyperion.aklatan.api.auth.tokens.RefreshTokenService
 import com.hexhyperion.aklatan.api.auth.tokens.RegistrationTokenService
 import com.hexhyperion.aklatan.api.user.UserService
-import com.hexhyperion.aklatan.utility.ApiResponse
-import com.hexhyperion.aklatan.utility.EmailMessage
+import com.hexhyperion.aklatan.utility.*
 import com.hexhyperion.aklatan.utility.exception.BadDeeplinkTokenException
 import com.hexhyperion.aklatan.utility.exception.BadRefreshTokenException
 import com.hexhyperion.aklatan.utility.exception.UserExistsException
 import com.hexhyperion.aklatan.utility.exception.UserNotVerifiedException
-import com.hexhyperion.aklatan.utility.getEnv
-import com.hexhyperion.aklatan.utility.respond
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
@@ -65,7 +62,7 @@ fun Route.authRouting(
                         name = "refreshToken",
                         value = refreshToken,
                         httpOnly = true,
-                        secure = getEnv("ENV") == "production",
+                        secure = isProduction(),
                         path = "/",
                     )
                 )
@@ -186,7 +183,7 @@ fun Route.authRouting(
                         name = "refreshToken",
                         value = newRefreshToken,
                         httpOnly = true,
-                        secure = getEnv("ENV") == "production",
+                        secure = isProduction(),
                         path = "/",
                         maxAge = 0,
                     )
@@ -210,7 +207,7 @@ fun Route.authRouting(
                         name = "refreshToken",
                         value = "",
                         httpOnly = true,
-                        secure = true,
+                        secure = isProduction(),
                         path = "/auth/refresh",
                         maxAge = 0
                     )
