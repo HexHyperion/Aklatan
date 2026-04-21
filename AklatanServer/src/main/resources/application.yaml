@@ -19,9 +19,9 @@ auth:
   passwordResetTokenTimeoutHours: 1
 
 books:
-  defaultReservationDurationDays: 7
-  defaultBorrowDurationDays: 28
-  finePerDayPln: 0.35
+  reservationDurationDays: 7
+  borrowDurationDays: 28
+  feePerDayPln: 0.35
 
 db:
   host: "localhost"

@@ -70,6 +70,21 @@ object ApiError {
         "Already reserved by this user, the book is.",
         HttpStatusCode.Conflict
     )
+    val BookAlreadyBorrowed = ApiResponse.Error(
+        "BOOK_ALREADY_BORROWED",
+        "Already borrowed, the book is.",
+        HttpStatusCode.Conflict
+    )
+    val NoBooksAvailable = ApiResponse.Error(
+        "NO_BOOKS_AVAILABLE",
+        "No books left for borrow, there are.",
+        HttpStatusCode.Conflict
+    )
+    val BorrowExtensionForbidden = ApiResponse.Error(
+        "BORROW_EXTENSION_FORBIDDEN",
+        "Forbidden, the borrow extension is. Reserved or overdue, the book might be.",
+        HttpStatusCode.Conflict
+    )
 
     val RoleNotFound = ApiResponse.Error(
         "ROLE_NOT_FOUND",

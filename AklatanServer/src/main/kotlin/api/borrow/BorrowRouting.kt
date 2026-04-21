@@ -47,7 +47,7 @@ fun Route.borrowRouting(
                 call.respond(ApiResponse.Success())
             }
 
-            delete("/{isbn}") {
+            patch("/{isbn}/cancel") {
                 val principal = call.principal<JWTPrincipal>()!!
                 val role = principal.payload.getClaim("role").asString()
                 val isbn = call.parameters["isbn"] ?: throw BadRequestException("Missing book ISBN")
@@ -66,15 +66,41 @@ fun Route.borrowRouting(
         }
     }
 
-    post("/borrow") {
-        call.respondText("Borrow book endpoint")
-    }
+    authenticate("auth-jwt-librarian") {
+        route("/borrows") {
+            get("/{userId}") {
+                val userId = call.parameters["userId"]?.toIntOrNull() ?: throw BadRequestException("Invalid user ID")
+                val borrows = borrowService.getByUserId(userId)
+                call.respond(ApiResponse.SuccessWithData(borrows))
+            }
 
-    post("/extend") {
-        call.respondText("Extend book endpoint")
-    }
+            post {
+                val request = call.receive<BorrowBookAdminRequest>()
+                val isbn = request.isbn
+                val userId = userService.getIdByEmail(request.email)
+                borrowService.borrow(isbn, userId)
+                call.respond(ApiResponse.Success())
+            }
 
-    post("/return") {
-        call.respondText("Return book endpoint")
+            route("/{bookId}") {
+                get {
+                    val bookId = call.parameters["bookId"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
+                    val borrows = borrowService.getByBookId(bookId)
+                    call.respond(borrows)
+                }
+
+                patch("/extend") {
+                    val bookId = call.parameters["bookId"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
+                    borrowService.extend(bookId)
+                    call.respond(ApiResponse.Success())
+                }
+
+                patch("/return") {
+                    val bookId = call.parameters["bookId"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
+                    val fee = borrowService.returnAndGetFee(bookId)
+                    call.respond(ApiResponse.SuccessWithData(mapOf("fee" to fee)))
+                }
+            }
+        }
     }
 }

@@ -23,7 +23,7 @@ class ReservationService (
         if (bookRepository.findByIsbn(isbn).isEmpty()) {
             throw BookNotFoundException()
         }
-        val reservationDays = config.property("books.defaultReservationDurationDays").getString().toInt()
+        val reservationDays = config.property("books.reservationDurationDays").getString().toInt()
         val expiresAt = Clock.System.now() + reservationDays.days
         return reservationRepository.create(isbn, userId, expiresAt)
     }

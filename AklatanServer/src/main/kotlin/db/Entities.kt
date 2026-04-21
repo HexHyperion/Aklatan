@@ -129,21 +129,21 @@ class ReservationEntity(id: EntityID<Int>) : IntEntity(id) {
 }
 
 object Borrows : IntIdTable() {
-    val user = reference("user_id", Users)
     val book = reference("book_id", Books)
+    val user = reference("user_id", Users)
     val borrowedAt = timestamp("borrowed_at")
     val endsAt = timestamp("ends_at")
     val returnedAt = timestamp("returned_at").nullable()
 }
 
 class BorrowEntity(id: EntityID<Int>) : IntEntity(id) {
-    var user by UserEntity referencedOn Borrows.user
     var book by BookEntity referencedOn Borrows.book
+    var user by UserEntity referencedOn Borrows.user
     var borrowedAt by Borrows.borrowedAt
     var endsAt by Borrows.endsAt
     var returnedAt by Borrows.returnedAt
 
-    fun toBorrow(): Borrow = Borrow(user.id.value, book.id.value, borrowedAt, endsAt, returnedAt)
+    fun toBorrow(): Borrow = Borrow(book.id.value, user.id.value, borrowedAt, endsAt, returnedAt)
 
     companion object : IntEntityClass<BorrowEntity>(Borrows)
 }

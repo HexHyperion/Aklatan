@@ -40,6 +40,15 @@ fun Application.configureExceptionHandling() {
                         is BookAlreadyReservedException -> {
                             call.respond(ApiError.BookAlreadyReserved)
                         }
+                        is BookAlreadyBorrowedException -> {
+                            call.respond(ApiError.BookAlreadyBorrowed)
+                        }
+                        is NoBooksAvailableException -> {
+                            call.respond(ApiError.NoBooksAvailable)
+                        }
+                        is BorrowExtensionForbiddenException -> {
+                            call.respond(ApiError.BorrowExtensionForbidden)
+                        }
                     }
                 }
                 is NotFoundException -> {
