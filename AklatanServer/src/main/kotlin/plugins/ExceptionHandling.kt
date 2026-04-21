@@ -43,8 +43,8 @@ fun Application.configureExceptionHandling() {
                         is BookAlreadyBorrowedException -> {
                             call.respond(ApiError.BookAlreadyBorrowed)
                         }
-                        is NoBooksAvailableException -> {
-                            call.respond(ApiError.NoBooksAvailable)
+                        is NoBorrowableBooksLeftException -> {
+                            call.respond(ApiError.NoBorrowableBooksLeft)
                         }
                         is BorrowExtensionForbiddenException -> {
                             call.respond(ApiError.BorrowExtensionForbidden)

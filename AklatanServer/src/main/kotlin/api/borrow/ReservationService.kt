@@ -44,6 +44,12 @@ class ReservationService (
         return reservations
     }
 
+    suspend fun getAllActivePrioritizedForIsbn(isbn: String): List<Reservation> {
+        val reservations = reservationRepository.findActiveOrderedByDateByIsbn(isbn)
+        if (reservations.isEmpty()) throw ReservationNotFoundException()
+        return reservations
+    }
+
     suspend fun getAll(): List<Reservation> {
         return reservationRepository.findAll()
     }

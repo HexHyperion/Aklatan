@@ -75,9 +75,9 @@ object ApiError {
         "Already borrowed, the book is.",
         HttpStatusCode.Conflict
     )
-    val NoBooksAvailable = ApiResponse.Error(
-        "NO_BOOKS_AVAILABLE",
-        "No books left for borrow, there are.",
+    val NoBorrowableBooksLeft = ApiResponse.Error(
+        "NO_BORROWABLE_BOOKS_LEFT",
+        "No books left for borrow, there are. Borrowed or reserved by someone else, they might be.",
         HttpStatusCode.Conflict
     )
     val BorrowExtensionForbidden = ApiResponse.Error(

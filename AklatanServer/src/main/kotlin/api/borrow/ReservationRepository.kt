@@ -2,6 +2,7 @@ package com.hexhyperion.aklatan.api.borrow
 
 import com.hexhyperion.aklatan.db.*
 import com.hexhyperion.aklatan.utility.exception.UserNotFoundException
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greaterEq
@@ -39,6 +40,16 @@ class ReservationRepository {
             (Reservations.canceled eq false) and
             (Reservations.expiresAt greaterEq now)
         }.map { it.toReservation() }
+    }
+
+    suspend fun findActiveOrderedByDateByIsbn(isbn: String): List<Reservation> = withTransaction {
+        val now = Clock.System.now()
+        return@withTransaction ReservationEntity.find {
+            (Reservations.isbn eq isbn) and
+            (Reservations.canceled eq false) and
+            (Reservations.expiresAt greaterEq now)
+        }.orderBy(Reservations.reservedAt to SortOrder.ASC)
+        .map { it.toReservation() }
     }
 
     suspend fun findAll(): List<Reservation> = withTransaction {

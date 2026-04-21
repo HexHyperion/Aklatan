@@ -24,7 +24,7 @@ class BookAlreadyReservedException(message: String? = null) : BorrowException(me
 
 class BookAlreadyBorrowedException(message: String? = null) : BorrowException(message)
 
-class NoBooksAvailableException(message: String? = null) : BorrowException(message)
+class NoBorrowableBooksLeftException(message: String? = null) : BorrowException(message)
 
 class BorrowExtensionForbiddenException(message: String? = null) : BorrowException(message)
 

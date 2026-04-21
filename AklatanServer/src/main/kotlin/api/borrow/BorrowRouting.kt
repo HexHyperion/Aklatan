@@ -66,8 +66,25 @@ fun Route.borrowRouting(
         }
     }
 
-    authenticate("auth-jwt-librarian") {
-        route("/borrows") {
+    route("/borrows") {
+        authenticate("auth-jwt-user") {
+            get {
+                val principal = call.principal<JWTPrincipal>()!!
+                val userId = principal.payload.getClaim("id").asInt()
+                val borrows = borrowService.getByUserId(userId)
+                call.respond(ApiResponse.SuccessWithData(borrows))
+            }
+        }
+
+        authenticate("auth-jwt") {
+            patch("/{bookId}/extend") {
+                val bookId = call.parameters["bookId"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
+                borrowService.extend(bookId)
+                call.respond(ApiResponse.Success())
+            }
+        }
+
+        authenticate("auth-jwt-librarian") {
             get("/{userId}") {
                 val userId = call.parameters["userId"]?.toIntOrNull() ?: throw BadRequestException("Invalid user ID")
                 val borrows = borrowService.getByUserId(userId)
@@ -87,12 +104,6 @@ fun Route.borrowRouting(
                     val bookId = call.parameters["bookId"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
                     val borrows = borrowService.getByBookId(bookId)
                     call.respond(borrows)
-                }
-
-                patch("/extend") {
-                    val bookId = call.parameters["bookId"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
-                    borrowService.extend(bookId)
-                    call.respond(ApiResponse.Success())
                 }
 
                 patch("/return") {

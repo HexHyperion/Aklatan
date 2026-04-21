@@ -3,10 +3,7 @@ package com.hexhyperion.aklatan.api.borrow
 import com.hexhyperion.aklatan.api.book.BookRepository
 import com.hexhyperion.aklatan.api.user.UserRepository
 import com.hexhyperion.aklatan.db.Borrow
-import com.hexhyperion.aklatan.utility.exception.BookNotFoundException
-import com.hexhyperion.aklatan.utility.exception.BorrowExtensionForbiddenException
-import com.hexhyperion.aklatan.utility.exception.BorrowNotFoundException
-import com.hexhyperion.aklatan.utility.exception.NoBooksAvailableException
+import com.hexhyperion.aklatan.utility.exception.*
 import io.ktor.server.config.*
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
@@ -18,20 +15,32 @@ class BorrowService (
     private val reservationRepository: ReservationRepository,
     private val config: ApplicationConfig
 ) {
-
     suspend fun borrow(isbn: String, userId: Int): Borrow {
         val bookIds = bookRepository.findIdsByIsbn(isbn)
         if (bookIds.isEmpty()) {
             throw BookNotFoundException()
         }
+
+        val currentReservationId = reservationRepository.findActiveIdByIsbnAndUserId(isbn, userId)
+        val reservations = reservationRepository.findActiveOrderedByDateByIsbn(isbn)
+        val blockingReservationCount = if (currentReservationId != null) {
+            val priority = reservations.indexOfFirst { it.userId == userId }
+            if (priority < 0) {
+                throw ReservationNotFoundException()
+            }
+            val priorReservations = reservations.slice(0 until priority)
+            priorReservations.size
+        } else {
+            reservations.size
+        }
+
         val borrows = borrowRepository.findActiveByIsbn(isbn)
         val borrowedIds = borrows.map { it.bookId }
         val availableBookIds = bookIds.filter { it !in borrowedIds }
-        val reservationCount = reservationRepository.findActiveByIsbn(isbn).size
-        val currentReservationId = reservationRepository.findActiveIdByIsbnAndUserId(isbn, userId)
-        if (availableBookIds.size <= reservationCount - if (currentReservationId != null) 1 else 0) {
-            throw NoBooksAvailableException()
+        if (availableBookIds.size <= blockingReservationCount) {
+            throw NoBorrowableBooksLeftException()
         }
+
         val bookId = availableBookIds.first()
         val borrowDays = config.property("books.borrowDurationDays").getString().toInt()
         val endsAt = Clock.System.now() + borrowDays.days
