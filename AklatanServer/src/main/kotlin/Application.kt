@@ -1,9 +1,9 @@
 package com.hexhyperion.aklatan
 
-import com.hexhyperion.aklatan.api.admin.OpenHourExceptionRepository
-import com.hexhyperion.aklatan.api.admin.OpenHourExceptionService
 import com.hexhyperion.aklatan.api.admin.OpenHourRepository
 import com.hexhyperion.aklatan.api.admin.OpenHourService
+import com.hexhyperion.aklatan.api.admin.SpecialOpenHourRepository
+import com.hexhyperion.aklatan.api.admin.SpecialOpenHourService
 import com.hexhyperion.aklatan.api.auth.RoleRepository
 import com.hexhyperion.aklatan.api.auth.RoleService
 import com.hexhyperion.aklatan.api.auth.tokens.*
@@ -50,8 +50,8 @@ fun Application.module() {
 
     val openHourRepository = OpenHourRepository()
     val openHourService = OpenHourService(openHourRepository)
-    val openHourExceptionRepository = OpenHourExceptionRepository()
-    val openHourExceptionService = OpenHourExceptionService(openHourExceptionRepository)
+    val specialOpenHourRepository = SpecialOpenHourRepository()
+    val specialOpenHourService = SpecialOpenHourService(specialOpenHourRepository)
 
     configureExceptionHandling()
     configureSerialization()
@@ -59,6 +59,6 @@ fun Application.module() {
     configureAuthentication(userService, roleService)
     configureRouting(
         roleService, registrationTokenService, passwordResetTokenService, refreshTokenService, userService,
-        bookService, reservationService, borrowService, openHourService, openHourExceptionService
+        bookService, reservationService, borrowService, openHourService, specialOpenHourService
     )
 }

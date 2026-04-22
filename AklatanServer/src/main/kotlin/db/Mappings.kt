@@ -15,11 +15,13 @@ suspend fun <T> withTransaction(block: suspend JdbcTransaction.() -> T): T = wit
 
 @Serializable
 data class Role (
+    val id: Int,
     val name: String
 )
 
 @Serializable
 data class User (
+    val id: Int,
     val name: String,
     val email: String,
     val passwordHash: String,
@@ -61,6 +63,7 @@ data class RefreshToken (
 
 @Serializable
 data class Book (
+    val id: Int,
     val isbn: String,
     val title: String?,
     val author: String?,
@@ -69,6 +72,7 @@ data class Book (
 
 @Serializable
 data class Reservation (
+    val id: Int,
     val isbn: String,
     val userId: Int,
     val reservedAt: Instant,
@@ -78,6 +82,7 @@ data class Reservation (
 
 @Serializable
 data class Borrow (
+    val id: Int,
     val bookId: Int,
     val userId: Int,
     val borrowedAt: Instant,
@@ -93,7 +98,7 @@ data class OpenHour (
 )
 
 @Serializable
-data class OpenHourException (
+data class SpecialOpenHour (
     val date: LocalDate,
     val openTime: LocalTime?,
     val closeTime: LocalTime?,

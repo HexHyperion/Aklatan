@@ -14,7 +14,7 @@ fun Route.userRouting(userService: UserService) {
             get {
                 val principal = call.principal<JWTPrincipal>()!!
                 val userId = principal.payload.getClaim("id").asInt()
-                val user = userService.getByIdReadable(userId)
+                val user = userService.getReadableById(userId)
                 call.respond(ApiResponse.SuccessWithData(user))
             }
 
@@ -22,6 +22,7 @@ fun Route.userRouting(userService: UserService) {
                 val principal = call.principal<JWTPrincipal>()!!
                 val userId = principal.payload.getClaim("id").asInt()
                 val request = call.receive<EditAccountRequest>()
+
                 if (request.newName != null) {
                     userService.changeName(userId, request.newName)
                 }

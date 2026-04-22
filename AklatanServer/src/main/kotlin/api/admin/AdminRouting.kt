@@ -24,7 +24,7 @@ fun Route.adminRouting(
     refreshTokenService: RefreshTokenService,
     userService: UserService,
     openHourService: OpenHourService,
-    openHourExceptionService: OpenHourExceptionService,
+    specialOpenHourService: SpecialOpenHourService,
 ) {
     authenticate("auth-jwt-manager") {
         route("/admin") {
@@ -45,28 +45,25 @@ fun Route.adminRouting(
                         throw UserExistsException()
                     }
 
-                    userService.create(
+                    val user = userService.create(
                         email = librarianCredentials.email,
                         name = librarianCredentials.name,
                         password = librarianCredentials.password,
                         role = librarianCredentials.role ?: "user"
                     )
-
-                    val userId = userService.getIdByEmail(librarianCredentials.email)
-                    userService.verifyEmail(userId)
-
+                    userService.verifyEmail(user.id)
                     call.respond(ApiResponse.Success(HttpStatusCode.Created))
                 }
 
-                route("/{id}") {
+                route("/{userId}") {
                     get {
-                        val userId = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid user ID")
-                        val user = userService.getByIdReadable(userId)
+                        val userId = call.parameters["userId"]?.toIntOrNull() ?: throw BadRequestException("Invalid user ID")
+                        val user = userService.getReadableById(userId)
                         call.respond(ApiResponse.SuccessWithData(user))
                     }
 
                     patch {
-                        val userId = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid user ID")
+                        val userId = call.parameters["userId"]?.toIntOrNull() ?: throw BadRequestException("Invalid user ID")
                         val request = call.receive<EditAccountAdminRequest>()
                         if (request.newName != null) {
                             userService.changeName(userId, request.newName)
@@ -87,12 +84,11 @@ fun Route.adminRouting(
                     }
 
                     delete {
-                        val userId = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid user ID")
+                        val userId = call.parameters["userId"]?.toIntOrNull() ?: throw BadRequestException("Invalid user ID")
                         registrationTokenService.revokeAllForUser(userId)
                         passwordResetTokenService.revokeAllForUser(userId)
                         refreshTokenService.revokeAllForUser(userId)
                         userService.delete(userId)
-
                         call.respond(ApiResponse.Success())
                     }
                 }
@@ -110,13 +106,14 @@ fun Route.adminRouting(
                     val request = call.receive<EditOpenHoursRequest>()
                     val openTime = request.openTime?.let { LocalTime.parse(it) }
                     val closeTime = request.closeTime?.let { LocalTime.parse(it) }
+
                     openHourService.change(weekDay, openTime, closeTime)
                     call.respond(ApiResponse.Success())
                 }
 
                 route("/exceptions") {
                     get {
-                        val exceptions = openHourExceptionService.getAll()
+                        val exceptions = specialOpenHourService.getAll()
                         call.respond(ApiResponse.SuccessWithData(exceptions))
                     }
 
@@ -124,19 +121,19 @@ fun Route.adminRouting(
                         val dateString = call.parameters["date"] ?: throw BadRequestException("Missing date parameter")
                         val date = LocalDate.parse(dateString)
 
-                        val openHourException = openHourExceptionService.getByDate(date)
-                        call.respond(ApiResponse.SuccessWithData(openHourException))
+                        val specialOpenHour = specialOpenHourService.getByDate(date)
+                        call.respond(ApiResponse.SuccessWithData(specialOpenHour))
                     }
 
                     put("/{date}") {
                         val dateString = call.parameters["date"] ?: throw BadRequestException("Missing date parameter")
                         val date = LocalDate.parse(dateString)
 
-                        val request = call.receive<EditOpenHourExceptionRequest>()
+                        val request = call.receive<EditSpecialOpenHourRequest>()
                         val openTime = request.openTime?.let { LocalTime.parse(it) }
                         val closeTime = request.closeTime?.let { LocalTime.parse(it) }
 
-                        openHourExceptionService.changeOrCreate(date, openTime, closeTime, request.comment)
+                        specialOpenHourService.changeOrCreate(date, openTime, closeTime, request.comment)
                         call.respond(ApiResponse.Success())
                     }
                 }

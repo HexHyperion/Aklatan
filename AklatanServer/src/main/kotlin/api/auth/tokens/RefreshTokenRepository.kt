@@ -18,16 +18,9 @@ class RefreshTokenRepository {
     }
 
     suspend fun find(refreshToken: String): RefreshToken? = withTransaction {
-        RefreshTokenEntity
-            .find { RefreshTokens.tokenHash eq Hasher.sha256Hash(refreshToken) }
+        RefreshTokenEntity.find { RefreshTokens.tokenHash eq Hasher.sha256Hash(refreshToken) }
             .firstOrNull()
             ?.toRefreshToken()
-    }
-
-    suspend fun findAllForUser(userId: Int): List<RefreshToken> = withTransaction {
-        RefreshTokenEntity
-            .find { RefreshTokens.user eq userId }
-            .map { it.toRefreshToken() }
     }
 
     suspend fun deleteAllExpired() = withTransaction {

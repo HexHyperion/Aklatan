@@ -18,7 +18,7 @@ data class EditOpenHoursRequest (
 )
 
 @Serializable
-data class EditOpenHourExceptionRequest (
+data class EditSpecialOpenHourRequest (
     val openTime: String? = null,
     val closeTime: String? = null,
     val comment: String? = null

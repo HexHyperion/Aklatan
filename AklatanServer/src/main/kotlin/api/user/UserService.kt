@@ -10,7 +10,7 @@ import com.hexhyperion.aklatan.utility.exception.UserNotFoundException
 
 class UserService(private val userRepository: UserRepository, private val roleRepository: RoleRepository) {
     suspend fun create(email: String, name: String, password: String, role: String): User {
-        val roleId = roleRepository.findByName(role)?.id?.value ?: throw RoleNotFoundException()
+        val roleId = roleRepository.findByName(role)?.id ?: throw RoleNotFoundException()
         return userRepository.create(email, name, Hasher.bcryptHash(password), roleId)
     }
 
@@ -30,12 +30,11 @@ class UserService(private val userRepository: UserRepository, private val roleRe
         return userRepository.findByEmail(email)
     }
 
-    suspend fun getByIdReadable(id: Int): UserReadable {
+    suspend fun getReadableById(id: Int): UserReadable {
         val userRaw = userRepository.findById(id) ?: throw UserNotFoundException()
         val userRole = roleRepository.findById(userRaw.roleId)?.name ?: throw RoleNotFoundException()
-        val userId = userRepository.findIdByEmail(userRaw.email) ?: throw UserNotFoundException()
         return UserReadable(
-            id = userId,
+            id = userRaw.id,
             name = userRaw.name,
             email = userRaw.email,
             role = userRole,
@@ -49,9 +48,8 @@ class UserService(private val userRepository: UserRepository, private val roleRe
         val users = mutableListOf<UserReadable>()
         for (userRaw in usersRaw) {
             val userRole = roleRepository.findById(userRaw.roleId)?.name ?: throw RoleNotFoundException()
-            val userId = userRepository.findIdByEmail(userRaw.email) ?: throw UserNotFoundException()
             users.add(UserReadable(
-                id = userId,
+                id = userRaw.id,
                 name = userRaw.name,
                 email = userRaw.email,
                 role = userRole,
@@ -73,10 +71,6 @@ class UserService(private val userRepository: UserRepository, private val roleRe
     suspend fun getRoleNameById(id: Int): String {
         val user = userRepository.findById(id) ?: throw UserNotFoundException()
         return user.roleId.let { roleRepository.findById(it)?.name ?: throw RoleNotFoundException() }
-    }
-
-    suspend fun checkExistsById(id: Int): Boolean {
-        return userRepository.findById(id) != null
     }
 
     suspend fun checkExistsByEmail(email: String): Boolean {
@@ -109,7 +103,7 @@ class UserService(private val userRepository: UserRepository, private val roleRe
     }
 
     suspend fun changeRole(id: Int, role: String) {
-        val roleId = roleRepository.findByName(role)?.id?.value ?: throw RoleNotFoundException()
+        val roleId = roleRepository.findByName(role)?.id ?: throw RoleNotFoundException()
         userRepository.findById(id) ?: throw UserNotFoundException()
         userRepository.updateRoleId(id, roleId)
     }

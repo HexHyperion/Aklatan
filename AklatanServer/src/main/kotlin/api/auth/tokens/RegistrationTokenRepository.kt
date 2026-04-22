@@ -18,16 +18,9 @@ class RegistrationTokenRepository {
     }
 
     suspend fun find(registrationToken: String): RegistrationToken? = withTransaction {
-        RegistrationTokenEntity
-            .find { RegistrationTokens.tokenHash eq Hasher.sha256Hash(registrationToken) }
+        RegistrationTokenEntity.find { RegistrationTokens.tokenHash eq Hasher.sha256Hash(registrationToken) }
             .firstOrNull()
             ?.toRegistrationToken()
-    }
-
-    suspend fun findAllForUser(userId: Int): List<RegistrationToken> = withTransaction {
-        RegistrationTokenEntity
-            .find { RegistrationTokens.user eq userId }
-            .map { it.toRegistrationToken() }
     }
 
     suspend fun deleteAllExpired() = withTransaction {

@@ -15,7 +15,7 @@ object Roles : IntIdTable() {
 class RoleEntity(id: EntityID<Int>) : IntEntity(id) {
     var name by Roles.name
 
-    fun toRole(): Role = Role(name)
+    fun toRole(): Role = Role(id.value, name)
 
     companion object : IntEntityClass<RoleEntity>(Roles)
 }
@@ -37,7 +37,7 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     var registeredAt by Users.registeredAt
     var verified by Users.verified
 
-    fun toUser(): User = User(name, email, passwordHash, role.id.value, registeredAt, verified)
+    fun toUser(): User = User(id.value, name, email, passwordHash, role.id.value, registeredAt, verified)
 
     companion object : IntEntityClass<UserEntity>(Users)
 }
@@ -103,7 +103,7 @@ class BookEntity(id: EntityID<Int>) : IntEntity(id) {
     var author by Books.author
     var year by Books.year
 
-    fun toBook(): Book = Book(isbn, title, author, year)
+    fun toBook(): Book = Book(id.value, isbn, title, author, year)
 
     companion object : IntEntityClass<BookEntity>(Books)
 }
@@ -123,7 +123,7 @@ class ReservationEntity(id: EntityID<Int>) : IntEntity(id) {
     var expiresAt by Reservations.expiresAt
     var canceled by Reservations.canceled
 
-    fun toReservation(): Reservation = Reservation(isbn, user.id.value, reservedAt, expiresAt, canceled)
+    fun toReservation(): Reservation = Reservation(id.value, isbn, user.id.value, reservedAt, expiresAt, canceled)
 
     companion object : IntEntityClass<ReservationEntity>(Reservations)
 }
@@ -143,7 +143,7 @@ class BorrowEntity(id: EntityID<Int>) : IntEntity(id) {
     var endsAt by Borrows.endsAt
     var returnedAt by Borrows.returnedAt
 
-    fun toBorrow(): Borrow = Borrow(book.id.value, user.id.value, borrowedAt, endsAt, returnedAt)
+    fun toBorrow(): Borrow = Borrow(id.value, book.id.value, user.id.value, borrowedAt, endsAt, returnedAt)
 
     companion object : IntEntityClass<BorrowEntity>(Borrows)
 }
@@ -162,20 +162,20 @@ class OpenHourEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<OpenHourEntity>(OpenHours)
 }
 
-object OpenHourExceptions : IntIdTable("open_hour_exceptions") {
+object SpecialOpenHours : IntIdTable("special_open_hours") {
     val date = date("date").uniqueIndex()
     val openTime = time("open_time").nullable()
     val closeTime = time("close_time").nullable()
     val comment = text("comment").nullable()
 }
 
-class OpenHourExceptionEntity(id: EntityID<Int>) : IntEntity(id) {
-    var date by OpenHourExceptions.date
-    var openTime by OpenHourExceptions.openTime
-    var closeTime by OpenHourExceptions.closeTime
-    var comment by OpenHourExceptions.comment
+class SpecialOpenHourEntity(id: EntityID<Int>) : IntEntity(id) {
+    var date by SpecialOpenHours.date
+    var openTime by SpecialOpenHours.openTime
+    var closeTime by SpecialOpenHours.closeTime
+    var comment by SpecialOpenHours.comment
 
-    fun toOpenHourException(): OpenHourException = OpenHourException(date, openTime, closeTime, comment)
+    fun toSpecialOpenHour(): SpecialOpenHour = SpecialOpenHour(date, openTime, closeTime, comment)
 
-    companion object : IntEntityClass<OpenHourExceptionEntity>(OpenHourExceptions)
+    companion object : IntEntityClass<SpecialOpenHourEntity>(SpecialOpenHours)
 }

@@ -49,23 +49,23 @@ fun Route.bookRouting(
                 call.respond(ApiResponse.Success())
             }
 
-            route("/id/{id}") {
+            route("/id/{bookId}") {
                 get {
-                    val id = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
-                    val book = bookService.getById(id)
+                    val bookId = call.parameters["bookId"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
+                    val book = bookService.getById(bookId)
                     call.respond(ApiResponse.SuccessWithData(book))
                 }
 
                 patch {
-                    val id = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
+                    val bookId = call.parameters["bookId"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
                     val request = call.receive<EditBookRequest>()
-                    bookService.editById(id, request.isbn, request.title, request.author, request.year)
+                    bookService.editById(bookId, request.isbn, request.title, request.author, request.year)
                     call.respond(ApiResponse.Success())
                 }
 
                 delete {
-                    val id = call.parameters["id"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
-                    bookService.remove(id)
+                    val bookId = call.parameters["bookId"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
+                    bookService.remove(bookId)
                     call.respond(ApiResponse.Success())
                 }
             }

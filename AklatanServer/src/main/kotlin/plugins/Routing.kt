@@ -1,7 +1,7 @@
 package com.hexhyperion.aklatan.plugins
 
-import com.hexhyperion.aklatan.api.admin.OpenHourExceptionService
 import com.hexhyperion.aklatan.api.admin.OpenHourService
+import com.hexhyperion.aklatan.api.admin.SpecialOpenHourService
 import com.hexhyperion.aklatan.api.admin.adminRouting
 import com.hexhyperion.aklatan.api.auth.RoleService
 import com.hexhyperion.aklatan.api.auth.authRouting
@@ -31,7 +31,7 @@ fun Application.configureRouting(
     reservationService: ReservationService,
     borrowService: BorrowService,
     openHourService: OpenHourService,
-    openHourExceptionService: OpenHourExceptionService
+    specialOpenHourService: SpecialOpenHourService
 ) {
     routing {
         authRouting(registrationTokenService, passwordResetTokenService, refreshTokenService, userService)
@@ -40,16 +40,16 @@ fun Application.configureRouting(
         borrowRouting(userService, bookService, reservationService, borrowService)
         adminRouting(
             roleService, registrationTokenService, passwordResetTokenService,
-            refreshTokenService, userService, openHourService, openHourExceptionService
+            refreshTokenService, userService, openHourService, specialOpenHourService
         )
 
         authenticate("auth-jwt") {
             get("/") {
                 val principal = call.principal<JWTPrincipal>()!!
                 val userId = principal.payload.getClaim("id").asInt()
-                val name = userService.getById(userId).name
+                val user = userService.getReadableById(userId)
 
-                call.respondText("Auth succeeded, as $name authenticated you are.")
+                call.respondText("Auth succeeded, as ${user.name} authenticated you are. A ${user.role} you are.")
             }
         }
     }

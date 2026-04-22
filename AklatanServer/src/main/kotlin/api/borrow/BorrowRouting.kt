@@ -22,28 +22,29 @@ fun Route.borrowRouting(
             get {
                 val principal = call.principal<JWTPrincipal>()!!
                 val role = principal.payload.getClaim("role").asString()
-                if (role == "user") {
+
+                val reservations = if (role == "user") {
                     val userId = principal.payload.getClaim("id").asInt()
-                    val reservations = reservationService.getAllForUser(userId)
-                    call.respond(reservations)
+                    reservationService.getAllForUser(userId)
                 } else {
-                    val reservations = reservationService.getAll()
-                    call.respond(reservations)
+                    reservationService.getAll()
                 }
+                call.respond(reservations)
             }
 
             post {
                 val principal = call.principal<JWTPrincipal>()!!
                 val role = principal.payload.getClaim("role").asString()
-                if (role == "user") {
+
+                val (isbn, userId) = if (role == "user") {
                     val request = call.receive<ReserveBookRequest>()
-                    val userId = principal.payload.getClaim("id").asInt()
-                    reservationService.reserve(request.isbn, userId)
+                    Pair(request.isbn, principal.payload.getClaim("id").asInt())
                 } else {
                     val request = call.receive<ReserveBookAdminRequest>()
-                    val userId = userService.getIdByEmail(request.email)
-                    reservationService.reserve(request.isbn, userId)
+                    Pair(request.isbn, userService.getIdByEmail(request.email))
                 }
+
+                reservationService.reserve(isbn, userId)
                 call.respond(ApiResponse.Success())
             }
 
@@ -51,16 +52,16 @@ fun Route.borrowRouting(
                 val principal = call.principal<JWTPrincipal>()!!
                 val role = principal.payload.getClaim("role").asString()
                 val isbn = call.parameters["isbn"] ?: throw BadRequestException("Missing book ISBN")
-                if (role == "user") {
-                    val userId = principal.payload.getClaim("id").asInt()
-                    val reservationId = reservationService.getActiveIdByIsbnAndUserId(isbn, userId)
-                    reservationService.cancel(reservationId)
+
+                val userId = if (role == "user") {
+                    principal.payload.getClaim("id").asInt()
                 } else {
                     val request = call.receive<CancelBookReservationAdminRequest>()
-                    val userId = userService.getIdByEmail(request.email)
-                    val reservationId = reservationService.getActiveIdByIsbnAndUserId(isbn, userId)
-                    reservationService.cancel(reservationId)
+                    userService.getIdByEmail(request.email)
                 }
+                val reservationId = reservationService.getActiveIdByIsbnAndUserId(isbn, userId)
+
+                reservationService.cancel(reservationId)
                 call.respond(ApiResponse.Success())
             }
         }

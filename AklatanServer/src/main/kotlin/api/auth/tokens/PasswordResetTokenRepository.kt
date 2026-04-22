@@ -18,16 +18,9 @@ class PasswordResetTokenRepository {
     }
 
     suspend fun find(passwordResetToken: String): PasswordResetToken? = withTransaction {
-        PasswordResetTokenEntity
-            .find { PasswordResetTokens.tokenHash eq Hasher.sha256Hash(passwordResetToken) }
+        PasswordResetTokenEntity.find { PasswordResetTokens.tokenHash eq Hasher.sha256Hash(passwordResetToken) }
             .firstOrNull()
             ?.toPasswordResetToken()
-    }
-
-    suspend fun findAllForUser(userId: Int): List<PasswordResetToken> = withTransaction {
-        PasswordResetTokenEntity
-            .find { PasswordResetTokens.user eq userId }
-            .map { it.toPasswordResetToken() }
     }
 
     suspend fun deleteAllExpired() = withTransaction {

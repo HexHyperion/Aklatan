@@ -71,7 +71,7 @@ fun Application.configureExceptionHandling() {
                         is WeekDayNotFoundException -> {
                             call.respond(ApiError.WeekDayNotFound)
                         }
-                        is OpenHourExceptionNotFoundException -> {
+                        is SpecialOpenHourNotFoundException -> {
                             call.respond(ApiError.OpenHourExceptionNotFound)
                         }
                     }

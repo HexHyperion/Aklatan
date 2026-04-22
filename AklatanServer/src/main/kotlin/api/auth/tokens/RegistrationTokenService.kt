@@ -1,6 +1,7 @@
 package com.hexhyperion.aklatan.api.auth.tokens
 
 import com.hexhyperion.aklatan.utility.Hasher
+import com.hexhyperion.aklatan.utility.exception.BadDeeplinkTokenException
 import io.ktor.server.config.*
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
@@ -19,8 +20,9 @@ class RegistrationTokenService(
         return token
     }
 
-    suspend fun getUserIdOrNull(token: String): Int? {
-        val registrationToken = registrationTokenRepository.find(token) ?: return null
+    suspend fun getUserId(token: String): Int {
+        val registrationToken = registrationTokenRepository.find(token)
+            ?: throw BadDeeplinkTokenException()
         return registrationToken.userId
     }
 

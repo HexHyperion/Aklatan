@@ -30,7 +30,8 @@ fun Route.authRouting(
         EmailMessage.VerifyEmailMessage(email, name, confirmationLink).send()
     }
 
-    fun generateAccessToken(userId: Int, roleName: String): String {
+    suspend fun generateAccessToken(userId: Int): String {
+        val roleName = userService.getRoleNameById(userId)
         val secret = getEnv("JWT_SECRET")
         val issuer = environment.config.property("jwt.issuer").getString()
         val audience = environment.config.property("jwt.audience").getString()
@@ -50,12 +51,10 @@ fun Route.authRouting(
         post("/login") {
             val request = call.receive<LoginRequest>()
             val user = userService.authenticate(request.email, request.password)
-            val userId = userService.getIdByEmail(request.email)
 
             if (user.verified) {
-                val roleName = userService.getRoleNameById(userId)
-                val accessToken = generateAccessToken(userId, roleName)
-                val refreshToken = refreshTokenService.generate(userId)
+                val accessToken = generateAccessToken(user.id)
+                val refreshToken = refreshTokenService.generate(user.id)
 
                 call.response.cookies.append(
                     Cookie(
@@ -66,7 +65,6 @@ fun Route.authRouting(
                         path = "/",
                     )
                 )
-
                 call.respond(ApiResponse.SuccessWithData(mapOf("token" to accessToken)))
             } else {
                 throw UserNotVerifiedException()
@@ -79,18 +77,14 @@ fun Route.authRouting(
                 throw UserExistsException()
             }
 
-            userService.create(
+            val user = userService.create(
                 email = request.email,
                 name = request.name,
                 password = request.password,
                 role = "user"
             )
-
             call.application.launch { registrationTokenService.cleanupExpired() }
-            call.application.launch {
-                val userId = userService.getIdByEmail(request.email)
-                sendVerificationEmail(userId, request.email, request.name)
-            }
+            call.application.launch { sendVerificationEmail(user.id, request.email, request.name) }
 
             call.respond(ApiResponse.Success(HttpStatusCode.Created))
         }
@@ -98,18 +92,14 @@ fun Route.authRouting(
         post("/request-email-verification") {
             run {
                 val request = call.receive<RequestEmailVerificationRequest>()
-                val userId = userService.getIdByEmailOrNull(request.email)
-                    ?: return@run
-
+                val userId = userService.getIdByEmailOrNull(request.email) ?: return@run
                 val user = userService.getById(userId)
                 if (user.verified) {
                     return@run
                 }
-
                 call.application.launch { registrationTokenService.cleanupExpired() }
                 call.application.launch { sendVerificationEmail(userId, request.email, user.name) }
             }
-
             call.respond(ApiResponse.Success())
         }
 
@@ -118,10 +108,9 @@ fun Route.authRouting(
             val token = request.token
 
             if (registrationTokenService.validate(token)) {
-                val userId = registrationTokenService.getUserIdOrNull(token)!!
+                val userId = registrationTokenService.getUserId(token)
                 registrationTokenService.revokeAllForUser(userId)
                 userService.verifyEmail(userId)
-
                 call.respond(ApiResponse.Success())
             } else {
                 throw BadDeeplinkTokenException()
@@ -131,10 +120,9 @@ fun Route.authRouting(
         post("/request-password-reset") {
             run {
                 val request = call.receive<RequestPasswordResetRequest>()
-                val userId = userService.getIdByEmailOrNull(request.email)
-                    ?: return@run
-
+                val userId = userService.getIdByEmailOrNull(request.email) ?: return@run
                 val user = userService.getById(userId)
+
                 passwordResetTokenService.revokeAllForUser(userId)
                 val token = passwordResetTokenService.generate(userId)
                 val resetLink = "${getEnv("RESET_PASSWORD_URL")}?token=$token"
@@ -144,7 +132,6 @@ fun Route.authRouting(
                     EmailMessage.ResetPasswordMessage(request.email, user.name, resetLink).send()
                 }
             }
-
             call.respond(ApiResponse.Success())
         }
 
@@ -154,10 +141,9 @@ fun Route.authRouting(
             val password = request.password
 
             if (passwordResetTokenService.validate(token)) {
-                val userId = passwordResetTokenService.getUserIdOrNull(token)!!
+                val userId = passwordResetTokenService.getUserId(token)
                 passwordResetTokenService.revokeAllForUser(userId)
                 userService.changePassword(userId, password)
-
                 call.respond(ApiResponse.Success())
             } else {
                 throw BadDeeplinkTokenException()
@@ -167,16 +153,13 @@ fun Route.authRouting(
         post("/refresh") {
             call.application.launch { refreshTokenService.cleanupExpired() }
 
-            val refreshToken = call.request.cookies["refreshToken"]
-                ?: throw BadRefreshTokenException()
+            val refreshToken = call.request.cookies["refreshToken"] ?: throw BadRefreshTokenException()
 
             if (refreshTokenService.validate(refreshToken)) {
-                val userId = refreshTokenService.getUserIdOrNull(refreshToken)!!
-                val roleName = userService.getRoleNameById(userId)
-
+                val userId = refreshTokenService.getUserId(refreshToken)
                 refreshTokenService.revoke(refreshToken)
                 val newRefreshToken = refreshTokenService.generate(userId)
-                val newAccessToken = generateAccessToken(userId, roleName)
+                val newAccessToken = generateAccessToken(userId)
 
                 call.response.cookies.append(
                     Cookie(
@@ -188,7 +171,6 @@ fun Route.authRouting(
                         maxAge = 0,
                     )
                 )
-
                 call.respond(ApiResponse.SuccessWithData(mapOf("token" to newAccessToken)))
             } else {
                 throw BadRefreshTokenException()
@@ -196,8 +178,7 @@ fun Route.authRouting(
         }
 
         post("/logout") {
-            val refreshToken = call.request.cookies["refreshToken"]
-                ?: throw BadRefreshTokenException()
+            val refreshToken = call.request.cookies["refreshToken"] ?: throw BadRefreshTokenException()
 
             if (refreshTokenService.validate(refreshToken)) {
                 refreshTokenService.revoke(refreshToken)
@@ -212,7 +193,6 @@ fun Route.authRouting(
                         maxAge = 0
                     )
                 )
-
                 call.respond(ApiResponse.Success())
             } else {
                 throw BadRefreshTokenException()

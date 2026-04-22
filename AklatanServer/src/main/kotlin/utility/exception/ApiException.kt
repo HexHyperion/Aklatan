@@ -43,4 +43,4 @@ class BorrowNotFoundException(message: String? = null) : NotFoundException(messa
 
 class WeekDayNotFoundException(message: String? = null) : NotFoundException(message)
 
-class OpenHourExceptionNotFoundException(message: String? = null) : NotFoundException(message)
+class SpecialOpenHourNotFoundException(message: String? = null) : NotFoundException(message)

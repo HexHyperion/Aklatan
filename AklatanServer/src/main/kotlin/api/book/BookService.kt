@@ -32,18 +32,6 @@ class BookService(private val bookRepository: BookRepository) {
         return books
     }
 
-    suspend fun getManyByTitle(title: String): List<Book> {
-        val books = bookRepository.findByTitle(title)
-        if (books.isEmpty()) throw BookNotFoundException()
-        return books
-    }
-
-    suspend fun getManyByAuthor(author: String): List<Book> {
-        val books = bookRepository.findByAuthor(author)
-        if (books.isEmpty()) throw BookNotFoundException()
-        return books
-    }
-
     suspend fun search(isbn: String?, titles: List<String>?, authors: List<String>?, year: String?, yearFrom: String?, yearTo: String?): List<Book> {
         val books = bookRepository.find(isbn, titles, authors, year, yearFrom, yearTo)
         if (books.isEmpty()) throw BookNotFoundException()
@@ -58,12 +46,6 @@ class BookService(private val bookRepository: BookRepository) {
 
     suspend fun getAll(): List<Book> {
         return bookRepository.findAll()
-    }
-
-    suspend fun getIdsByIsbn(isbn: String): List<Int> {
-        val bookIds = bookRepository.findIdsByIsbn(isbn)
-        if (bookIds.isEmpty()) throw BookNotFoundException()
-        return bookIds
     }
 
     suspend fun editById(id: Int, isbn: String?, title: String?, author: String?, year: String?) {
