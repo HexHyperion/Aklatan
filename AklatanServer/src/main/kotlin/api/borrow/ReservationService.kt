@@ -1,7 +1,6 @@
 package com.hexhyperion.aklatan.api.borrow
 
 import com.hexhyperion.aklatan.api.book.BookRepository
-import com.hexhyperion.aklatan.api.user.UserRepository
 import com.hexhyperion.aklatan.db.Reservation
 import com.hexhyperion.aklatan.utility.exception.BookAlreadyReservedException
 import com.hexhyperion.aklatan.utility.exception.BookNotFoundException
@@ -12,7 +11,6 @@ import kotlin.time.Duration.Companion.days
 
 class ReservationService (
     private val reservationRepository: ReservationRepository,
-    private val userRepository: UserRepository,
     private val bookRepository: BookRepository,
     private val config: ApplicationConfig
 ) {
@@ -38,10 +36,8 @@ class ReservationService (
         return reservations
     }
 
-    suspend fun getAllActiveForIsbn(isbn: String): List<Reservation> {
-        val reservations = reservationRepository.findActiveByIsbn(isbn)
-        if (reservations.isEmpty()) throw ReservationNotFoundException()
-        return reservations
+    suspend fun getActiveById(id: Int): Reservation {
+        return reservationRepository.findActiveById(id) ?: throw ReservationNotFoundException()
     }
 
     suspend fun getAllActivePrioritizedForIsbn(isbn: String): List<Reservation> {
@@ -52,10 +48,6 @@ class ReservationService (
 
     suspend fun getAll(): List<Reservation> {
         return reservationRepository.findAll()
-    }
-
-    suspend fun getActiveIdByIsbnAndUserId(isbn: String, userId: Int): Int {
-        return reservationRepository.findActiveIdByIsbnAndUserId(isbn, userId) ?: throw ReservationNotFoundException()
     }
 
     suspend fun cancel(id: Int) {

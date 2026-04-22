@@ -17,9 +17,10 @@ import com.hexhyperion.aklatan.api.user.UserRepository
 import com.hexhyperion.aklatan.api.user.UserService
 import com.hexhyperion.aklatan.plugins.*
 import io.ktor.server.application.*
+import io.ktor.server.netty.*
 
 fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
+    EngineMain.main(args)
 }
 
 fun Application.module() {
@@ -40,13 +41,9 @@ fun Application.module() {
     val bookRepository = BookRepository()
     val bookService = BookService(bookRepository)
     val reservationRepository = ReservationRepository()
-    val reservationService = ReservationService(
-        reservationRepository, userRepository, bookRepository, environment.config
-    )
+    val reservationService = ReservationService(reservationRepository, bookRepository, environment.config)
     val borrowRepository = BorrowRepository()
-    val borrowService = BorrowService(
-        borrowRepository, userRepository, bookRepository, reservationRepository, environment.config
-    )
+    val borrowService = BorrowService(borrowRepository, bookRepository, reservationRepository, environment.config)
 
     val openHourRepository = OpenHourRepository()
     val openHourService = OpenHourService(openHourRepository)

@@ -1,7 +1,6 @@
 package com.hexhyperion.aklatan.api.borrow
 
 import com.hexhyperion.aklatan.api.book.BookRepository
-import com.hexhyperion.aklatan.api.user.UserRepository
 import com.hexhyperion.aklatan.db.Borrow
 import com.hexhyperion.aklatan.utility.exception.*
 import io.ktor.server.config.*
@@ -10,7 +9,6 @@ import kotlin.time.Duration.Companion.days
 
 class BorrowService (
     private val borrowRepository: BorrowRepository,
-    private val userRepository: UserRepository,
     private val bookRepository: BookRepository,
     private val reservationRepository: ReservationRepository,
     private val config: ApplicationConfig
@@ -51,12 +49,16 @@ class BorrowService (
         return borrow
     }
 
-    suspend fun getByUserId(userId: Int): List<Borrow> {
-        return borrowRepository.findByUserId(userId)
+    suspend fun getById(id: Int): Borrow {
+        return borrowRepository.findById(id) ?: throw BorrowNotFoundException()
     }
 
-    suspend fun getByBookId(bookId: Int): Borrow {
-        return borrowRepository.findActiveByBookId(bookId) ?: throw BorrowNotFoundException()
+    suspend fun getAllForBookId(bookId: Int): List<Borrow> {
+        return borrowRepository.findByBookId(bookId)
+    }
+
+    suspend fun getAllForUserId(userId: Int): List<Borrow> {
+        return borrowRepository.findByUserId(userId)
     }
 
     private suspend fun checkExtensionPossible(bookId: Int): Boolean {
@@ -68,16 +70,16 @@ class BorrowService (
         return reservationCount == 0 || availableIds.size > reservationCount
     }
 
-    suspend fun extend(bookId: Int): Borrow {
-        val borrow = borrowRepository.findActiveByBookId(bookId) ?: throw BorrowNotFoundException()
+    suspend fun extend(id: Int): Borrow {
+        val borrow = borrowRepository.findActiveById(id) ?: throw BorrowNotFoundException()
         val now = Clock.System.now()
         val isOverdue = borrow.endsAt < now
-        if (!checkExtensionPossible(bookId) || isOverdue) {
+        if (!checkExtensionPossible(borrow.bookId) || isOverdue) {
             throw BorrowExtensionForbiddenException()
         }
         val extensionDays = config.property("books.borrowDurationDays").getString().toInt()
         val endsAt = now + extensionDays.days
-        return borrowRepository.updateEndsAt(bookId, endsAt) ?: throw BorrowNotFoundException()
+        return borrowRepository.updateEndsAt(id, endsAt) ?: throw BorrowNotFoundException()
     }
 
     private fun calculateFeeForBorrow(borrow: Borrow): Double {
@@ -91,14 +93,14 @@ class BorrowService (
         }
     }
 
-    suspend fun calculateReturnFee(bookId: Int): Double {
-        val borrow = borrowRepository.findActiveByBookId(bookId) ?: throw BorrowNotFoundException()
+    suspend fun calculateReturnFee(id: Int): Double {
+        val borrow = borrowRepository.findActiveById(id) ?: throw BorrowNotFoundException()
         return calculateFeeForBorrow(borrow)
     }
 
-    suspend fun returnAndGetFee(bookId: Int): Double {
+    suspend fun returnAndGetFee(id: Int): Double {
         val returnedAt = Clock.System.now()
-        val borrow = borrowRepository.updateReturnedAt(bookId, returnedAt) ?: throw BorrowNotFoundException()
+        val borrow = borrowRepository.updateReturnedAt(id, returnedAt) ?: throw BorrowNotFoundException()
         return calculateFeeForBorrow(borrow)
     }
 }

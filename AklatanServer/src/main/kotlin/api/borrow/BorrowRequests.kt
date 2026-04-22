@@ -14,11 +14,6 @@ data class ReserveBookAdminRequest (
 )
 
 @Serializable
-data class CancelBookReservationAdminRequest (
-    val email: String
-)
-
-@Serializable
 data class BorrowBookAdminRequest (
     val isbn: String,
     val email: String
