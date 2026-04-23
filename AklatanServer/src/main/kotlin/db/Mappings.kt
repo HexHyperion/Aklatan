@@ -6,11 +6,17 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
+import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.inTopLevelSuspendTransaction
 import kotlin.time.Instant
 
 suspend fun <T> withTransaction(block: suspend JdbcTransaction.() -> T): T = withContext(Dispatchers.IO) {
-    inTopLevelSuspendTransaction { block() }
+    val currentTransaction = TransactionManager.currentOrNull()
+    if (currentTransaction != null) {
+        currentTransaction.block()
+    } else {
+        inTopLevelSuspendTransaction { block() }
+    }
 }
 
 @Serializable

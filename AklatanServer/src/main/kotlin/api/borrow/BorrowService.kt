@@ -2,6 +2,7 @@ package com.hexhyperion.aklatan.api.borrow
 
 import com.hexhyperion.aklatan.api.book.BookRepository
 import com.hexhyperion.aklatan.db.Borrow
+import com.hexhyperion.aklatan.db.withTransaction
 import com.hexhyperion.aklatan.utility.exception.*
 import io.ktor.server.config.*
 import kotlin.time.Clock
@@ -40,34 +41,38 @@ class BorrowService (
     }
 
     suspend fun borrow(isbn: String, userId: Int): Borrow {
-        val (bookId, currentReservationId) = findBorrowableBookAndCurrentReservationId(isbn, userId)
-        val borrowDays = config.property("books.borrowDurationDays").getString().toInt()
-        val endsAt = Clock.System.now() + borrowDays.days
-        val borrow = borrowRepository.create(bookId, userId, endsAt)
-        if (currentReservationId != null) {
-            reservationRepository.updateCanceled(currentReservationId)
+        return withTransaction {
+            val (bookId, currentReservationId) = findBorrowableBookAndCurrentReservationId(isbn, userId)
+            val borrowDays = config.property("books.borrowDurationDays").getString().toInt()
+            val endsAt = Clock.System.now() + borrowDays.days
+            val borrow = borrowRepository.create(bookId, userId, endsAt)
+            if (currentReservationId != null) {
+                reservationRepository.updateCanceled(currentReservationId)
+            }
+            return@withTransaction borrow
         }
-        return borrow
     }
 
     suspend fun borrowMany(isbns: Set<String>, userId: Int): List<Borrow> {
-        val books = bookRepository.findByIsbns(isbns).distinctBy { it.isbn }
-        if (books.size != isbns.size) {
-            throw BookNotFoundException()
-        }
-        val bookAndReservationIds = isbns.map { isbn ->
-            findBorrowableBookAndCurrentReservationId(isbn, userId)
-        }
-        val borrowDays = config.property("books.borrowDurationDays").getString().toInt()
-        val endsAt = Clock.System.now() + borrowDays.days
-        val borrows = bookAndReservationIds.map { (bookId, reservationId) ->
-            val borrow = borrowRepository.create(bookId, userId, endsAt)
-            if (reservationId != null) {
-                reservationRepository.updateCanceled(reservationId)
+        return withTransaction {
+            val books = bookRepository.findByIsbns(isbns).distinctBy { it.isbn }
+            if (books.size != isbns.size) {
+                throw BookNotFoundException()
             }
-            borrow
+            val bookAndReservationIds = isbns.map { isbn ->
+                findBorrowableBookAndCurrentReservationId(isbn, userId)
+            }
+            val borrowDays = config.property("books.borrowDurationDays").getString().toInt()
+            val endsAt = Clock.System.now() + borrowDays.days
+            val borrows = bookAndReservationIds.map { (bookId, reservationId) ->
+                val borrow = borrowRepository.create(bookId, userId, endsAt)
+                if (reservationId != null) {
+                    reservationRepository.updateCanceled(reservationId)
+                }
+                return@map borrow
+            }
+            return@withTransaction borrows
         }
-        return borrows
     }
 
     suspend fun getById(id: Int): Borrow {

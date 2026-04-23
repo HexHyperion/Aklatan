@@ -2,6 +2,7 @@ package com.hexhyperion.aklatan.api.borrow
 
 import com.hexhyperion.aklatan.api.book.BookRepository
 import com.hexhyperion.aklatan.db.Reservation
+import com.hexhyperion.aklatan.db.withTransaction
 import com.hexhyperion.aklatan.utility.exception.BookAlreadyReservedException
 import com.hexhyperion.aklatan.utility.exception.BookNotFoundException
 import com.hexhyperion.aklatan.utility.exception.ReservationNotFoundException
@@ -15,34 +16,38 @@ class ReservationService (
     private val config: ApplicationConfig
 ) {
     suspend fun reserve(isbn: String, userId: Int): Reservation {
-        if (reservationRepository.findActiveByIsbn(isbn).find { it.userId == userId } != null) {
-            throw BookAlreadyReservedException()
+        return withTransaction {
+            if (reservationRepository.findActiveByIsbn(isbn).find { it.userId == userId } != null) {
+                throw BookAlreadyReservedException()
+            }
+            if (bookRepository.findByIsbn(isbn).isEmpty()) {
+                throw BookNotFoundException()
+            }
+            val reservationDays = config.property("books.reservationDurationDays").getString().toInt()
+            val expiresAt = Clock.System.now() + reservationDays.days
+            return@withTransaction reservationRepository.create(isbn, userId, expiresAt)
         }
-        if (bookRepository.findByIsbn(isbn).isEmpty()) {
-            throw BookNotFoundException()
-        }
-        val reservationDays = config.property("books.reservationDurationDays").getString().toInt()
-        val expiresAt = Clock.System.now() + reservationDays.days
-        return reservationRepository.create(isbn, userId, expiresAt)
     }
 
     suspend fun reserveMany(isbns: Set<String>, userId: Int): List<Reservation> {
-        val books = bookRepository.findByIsbns(isbns)
-        val currentReservationIsbns = reservationRepository.findActiveByIsbns(isbns)
-            .filter { it.userId == userId }
-            .map { it.isbn }
+        return withTransaction {
+            val books = bookRepository.findByIsbns(isbns)
+            val currentReservationIsbns = reservationRepository.findActiveByIsbns(isbns)
+                .filter { it.userId == userId }
+                .map { it.isbn }
 
-        isbns.forEach { isbn ->
-            if (isbn in currentReservationIsbns) {
-                throw BookAlreadyReservedException()
+            isbns.forEach { isbn ->
+                if (isbn in currentReservationIsbns) {
+                    throw BookAlreadyReservedException()
+                }
+                if (books.find { it.isbn == isbn } == null) {
+                    throw BookNotFoundException()
+                }
             }
-            if (books.find { it.isbn == isbn } == null) {
-                throw BookNotFoundException()
-            }
+            val reservationDays = config.property("books.reservationDurationDays").getString().toInt()
+            val expiresAt = Clock.System.now() + reservationDays.days
+            return@withTransaction isbns.map { reservationRepository.create(it, userId, expiresAt) }
         }
-        val reservationDays = config.property("books.reservationDurationDays").getString().toInt()
-        val expiresAt = Clock.System.now() + reservationDays.days
-        return isbns.map { reservationRepository.create(it, userId, expiresAt) }
     }
 
     suspend fun getById(id: Int): Reservation {
