@@ -178,6 +178,14 @@ fun Route.borrowRouting(
                     call.respond(ApiResponse.SuccessWithData(borrows))
                 }
 
+                get("/fee") {
+                    val borrowId = call.parameters["borrowId"]?.toIntOrNull()
+                        ?: throw BadRequestException("Invalid borrow ID")
+
+                    val fee = borrowService.calculateReturnFee(borrowId)
+                    call.respond(ApiResponse.SuccessWithData(mapOf("fee" to fee)))
+                }
+
                 patch("/return") {
                     val borrowId = call.parameters["borrowId"]?.toIntOrNull()
                         ?: throw BadRequestException("Invalid borrow ID")

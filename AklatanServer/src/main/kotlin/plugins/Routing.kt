@@ -36,7 +36,7 @@ fun Application.configureRouting(
     routing {
         authRouting(registrationTokenService, passwordResetTokenService, refreshTokenService, userService)
         userRouting(userService)
-        bookRouting(bookService)
+        bookRouting(bookService, borrowService)
         borrowRouting(reservationService, borrowService)
         adminRouting(
             roleService, registrationTokenService, passwordResetTokenService,

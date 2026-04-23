@@ -1,6 +1,7 @@
 package com.hexhyperion.aklatan.api.book
 
 import com.hexhyperion.aklatan.db.Book
+import com.hexhyperion.aklatan.db.BookReadable
 import com.hexhyperion.aklatan.utility.exception.BookNotFoundException
 
 class BookService(private val bookRepository: BookRepository) {
@@ -26,24 +27,36 @@ class BookService(private val bookRepository: BookRepository) {
         return books
     }
 
+    suspend fun getReadableByIsbn(isbn: String): BookReadable {
+        val books = bookRepository.findByIsbn(isbn)
+        if (books.isEmpty()) throw BookNotFoundException()
+        return books.first().toReadable()
+    }
+
     suspend fun getAll(): List<Book> {
         return bookRepository.findAll()
     }
 
-    suspend fun getAllUnique(): List<Book> {
-        return bookRepository.findAll().distinctBy { it.isbn }
+    suspend fun getAllReadable(): List<BookReadable> {
+        return bookRepository.findAll()
+            .distinctBy { it.isbn }
+            .map { it.toReadable() }
     }
 
-    suspend fun search(isbn: String?, titles: List<String>?, authors: List<String>?, year: String?, yearFrom: String?, yearTo: String?): List<Book> {
+    suspend fun search(
+        isbn: String?, titles: List<String>?, authors: List<String>?, year: String?, yearFrom: String?, yearTo: String?
+    ): List<Book> {
         val books = bookRepository.find(isbn, titles, authors, year, yearFrom, yearTo)
         if (books.isEmpty()) throw BookNotFoundException()
         return books
     }
 
-    suspend fun searchUnique(isbn: String?, titles: List<String>?, authors: List<String>?, year: String?, yearFrom: String?, yearTo: String?): List<Book> {
+    suspend fun searchReadable(
+        isbn: String?, titles: List<String>?, authors: List<String>?, year: String?, yearFrom: String?, yearTo: String?
+    ): List<BookReadable> {
         val books = search(isbn, titles, authors, year, yearFrom, yearTo)
-        if (books.isEmpty()) throw BookNotFoundException()
         return books.distinctBy { it.isbn }
+            .map { it.toReadable() }
     }
 
     suspend fun editById(id: Int, isbn: String?, title: String?, author: String?, year: String?) {

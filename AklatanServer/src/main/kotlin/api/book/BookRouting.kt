@@ -1,5 +1,6 @@
 package com.hexhyperion.aklatan.api.book
 
+import com.hexhyperion.aklatan.api.borrow.BorrowService
 import com.hexhyperion.aklatan.utility.ApiResponse
 import com.hexhyperion.aklatan.utility.respond
 import io.ktor.http.*
@@ -10,7 +11,8 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 
 fun Route.bookRouting(
-    bookService: BookService
+    bookService: BookService,
+    borrowService: BorrowService
 ) {
     route("/inventory") {
         authenticate("auth-jwt") {
@@ -18,7 +20,7 @@ fun Route.bookRouting(
                 val principal = call.principal<JWTPrincipal>()!!
                 val role = principal.payload.getClaim("role").asString()
                 val books = if (role == "user") {
-                    bookService.getAllUnique()
+                    bookService.getAllReadable()
                 } else {
                     bookService.getAll()
                 }
@@ -32,8 +34,31 @@ fun Route.bookRouting(
                 val year = call.request.queryParameters["year"]
                 val yearFrom = call.request.queryParameters["yearFrom"]
                 val yearTo = call.request.queryParameters["yearTo"]
-                val books = bookService.searchUnique(isbn, title, author, year, yearFrom, yearTo)
+                val books = bookService.searchReadable(isbn, title, author, year, yearFrom, yearTo)
                 call.respond(ApiResponse.SuccessWithData(books))
+            }
+
+            route("/isbn/{isbn}") {
+                get {
+                    val principal = call.principal<JWTPrincipal>()!!
+                    val role = principal.payload.getClaim("role").asString()
+                    val isbn = call.parameters["isbn"] ?: throw BadRequestException("Missing book ISBN")
+                    val books = if (role == "user") {
+                        bookService.getReadableByIsbn(isbn)
+                    } else {
+                        bookService.getManyByIsbn(isbn)
+                    }
+                    call.respond(ApiResponse.SuccessWithData(books))
+                }
+
+                get("/availability") {
+                    val isbn = call.parameters["isbn"] ?: throw BadRequestException("Missing book ISBN")
+                    val (availableCount, reservedCount) = borrowService.getTotalAvailableAndReservedCountForIsbn(isbn)
+                    call.respond(ApiResponse.SuccessWithData(mapOf(
+                        "available" to availableCount,
+                        "reserved" to reservedCount
+                    )))
+                }
             }
         }
 
@@ -71,19 +96,11 @@ fun Route.bookRouting(
                 }
             }
 
-            route("/isbn/{isbn}") {
-                get {
-                    val isbn = call.parameters["isbn"] ?: throw BadRequestException("Missing book ISBN")
-                    val books = bookService.getManyByIsbn(isbn)
-                    call.respond(ApiResponse.SuccessWithData(books))
-                }
-
-                patch {
-                    val isbn = call.parameters["isbn"] ?: throw BadRequestException("Missing book ISBN")
-                    val request = call.receive<EditBookRequest>()
-                    bookService.editManyByIsbn(isbn, request.isbn, request.title, request.author, request.year)
-                    call.respond(ApiResponse.Success())
-                }
+            patch("/isbn/{isbn}") {
+                val isbn = call.parameters["isbn"] ?: throw BadRequestException("Missing book ISBN")
+                val request = call.receive<EditBookRequest>()
+                bookService.editManyByIsbn(isbn, request.isbn, request.title, request.author, request.year)
+                call.respond(ApiResponse.Success())
             }
         }
     }

@@ -82,6 +82,14 @@ class BorrowService (
         return borrowRepository.findByUserId(userId)
     }
 
+    suspend fun getTotalAvailableAndReservedCountForIsbn(isbn: String): Pair<Int, Int> {
+        val totalCount = bookRepository.findByIsbn(isbn).size
+        val borrowedCount = borrowRepository.findActiveByIsbn(isbn).size
+        val reservedCount = reservationRepository.findActiveByIsbn(isbn).size
+        val availableCount = totalCount - borrowedCount
+        return Pair(availableCount, reservedCount)
+    }
+
     private suspend fun checkExtensionPossible(bookId: Int): Boolean {
         val isbn = bookRepository.findById(bookId)?.isbn ?: throw BookNotFoundException()
         val bookIds = bookRepository.findIdsByIsbn(isbn)

@@ -68,6 +68,16 @@ data class Book (
     val title: String?,
     val author: String?,
     val year: String?
+) {
+    fun toReadable() = BookReadable(isbn, title, author, year)
+}
+
+@Serializable
+data class BookReadable (
+    val isbn: String,
+    val title: String?,
+    val author: String?,
+    val year: String?
 )
 
 @Serializable
