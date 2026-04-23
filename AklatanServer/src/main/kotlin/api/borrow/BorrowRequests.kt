@@ -8,13 +8,30 @@ data class ReserveBookRequest (
 )
 
 @Serializable
+data class BatchReserveBookRequest (
+    val isbns: Set<String>
+)
+
+@Serializable
 data class ReserveBookAdminRequest (
     val isbn: String,
-    val email: String
+    val userId: Int
+)
+
+@Serializable
+data class BatchReserveBookAdminRequest (
+    val isbns: Set<String>,
+    val userId: Int
 )
 
 @Serializable
 data class BorrowBookAdminRequest (
     val isbn: String,
-    val email: String
+    val userId: Int
+)
+
+@Serializable
+data class BatchBorrowBookAdminRequest (
+    val isbns: Set<String>,
+    val userId: Int
 )

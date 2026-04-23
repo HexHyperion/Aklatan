@@ -30,13 +30,8 @@ class BookRepository {
             .map { it.toBook() }
     }
 
-    suspend fun findByTitle(title: String): List<Book> = withTransaction {
-        return@withTransaction BookEntity.find { Books.title ilike "%$title%" }
-            .map { it.toBook() }
-    }
-
-    suspend fun findByAuthor(author: String): List<Book> = withTransaction {
-        return@withTransaction BookEntity.find { Books.author ilike "%$author%" }
+    suspend fun findByIsbns(isbns: Set<String>): List<Book> = withTransaction {
+        return@withTransaction BookEntity.find { Books.isbn inList isbns }
             .map { it.toBook() }
     }
 

@@ -13,12 +13,11 @@ class BorrowService (
     private val reservationRepository: ReservationRepository,
     private val config: ApplicationConfig
 ) {
-    suspend fun borrow(isbn: String, userId: Int): Borrow {
+    private suspend fun findBorrowableBookAndCurrentReservationId(isbn: String, userId: Int): Pair<Int, Int?> {
         val bookIds = bookRepository.findIdsByIsbn(isbn)
         if (bookIds.isEmpty()) {
             throw BookNotFoundException()
         }
-
         val currentReservationId = reservationRepository.findActiveIdByIsbnAndUserId(isbn, userId)
         val reservations = reservationRepository.findActiveOrderedByDateByIsbn(isbn)
         val blockingReservationCount = if (currentReservationId != null) {
@@ -31,15 +30,17 @@ class BorrowService (
         } else {
             reservations.size
         }
-
         val borrows = borrowRepository.findActiveByIsbn(isbn)
         val borrowedIds = borrows.map { it.bookId }
         val availableBookIds = bookIds.filter { it !in borrowedIds }
         if (availableBookIds.size <= blockingReservationCount) {
             throw NoBorrowableBooksLeftException()
         }
+        return Pair(availableBookIds.first(), currentReservationId)
+    }
 
-        val bookId = availableBookIds.first()
+    suspend fun borrow(isbn: String, userId: Int): Borrow {
+        val (bookId, currentReservationId) = findBorrowableBookAndCurrentReservationId(isbn, userId)
         val borrowDays = config.property("books.borrowDurationDays").getString().toInt()
         val endsAt = Clock.System.now() + borrowDays.days
         val borrow = borrowRepository.create(bookId, userId, endsAt)
@@ -47,6 +48,26 @@ class BorrowService (
             reservationRepository.updateCanceled(currentReservationId)
         }
         return borrow
+    }
+
+    suspend fun borrowMany(isbns: Set<String>, userId: Int): List<Borrow> {
+        val books = bookRepository.findByIsbns(isbns).distinctBy { it.isbn }
+        if (books.size != isbns.size) {
+            throw BookNotFoundException()
+        }
+        val bookAndReservationIds = isbns.map { isbn ->
+            findBorrowableBookAndCurrentReservationId(isbn, userId)
+        }
+        val borrowDays = config.property("books.borrowDurationDays").getString().toInt()
+        val endsAt = Clock.System.now() + borrowDays.days
+        val borrows = bookAndReservationIds.map { (bookId, reservationId) ->
+            val borrow = borrowRepository.create(bookId, userId, endsAt)
+            if (reservationId != null) {
+                reservationRepository.updateCanceled(reservationId)
+            }
+            borrow
+        }
+        return borrows
     }
 
     suspend fun getById(id: Int): Borrow {

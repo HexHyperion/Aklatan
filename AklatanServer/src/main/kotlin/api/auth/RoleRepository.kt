@@ -7,11 +7,6 @@ import com.hexhyperion.aklatan.db.withTransaction
 import org.jetbrains.exposed.v1.core.eq
 
 class RoleRepository {
-    suspend fun create(name: String): Role = withTransaction {
-        RoleEntity.new { this.name = name }
-            .toRole()
-    }
-
     suspend fun findByName(name: String): Role? = withTransaction {
         RoleEntity.find { Roles.name eq name }
             .firstOrNull()

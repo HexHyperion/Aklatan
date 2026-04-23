@@ -10,10 +10,7 @@ import org.jetbrains.exposed.v1.core.eq
 
 class SpecialOpenHourRepository {
     suspend fun create(
-        date: LocalDate,
-        openTime: LocalTime?,
-        closeTime: LocalTime?,
-        comment: String?
+        date: LocalDate, openTime: LocalTime?, closeTime: LocalTime?, comment: String?
     ): SpecialOpenHour = withTransaction {
         return@withTransaction SpecialOpenHourEntity.new {
             this.date = date

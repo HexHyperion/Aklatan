@@ -25,7 +25,7 @@ fun Application.configureAuthentication(userService: UserService, roleService: R
             val userId = credential.payload.getClaim("id").asInt()
             val user = userService.getByIdOrNull(userId) ?: return null
             val tokenRoleName = credential.payload.getClaim("role").asString()
-            val serviceRoleName = roleService.getById(user.roleId).name
+            val serviceRoleName = roleService.getNameById(user.roleId)
             if (tokenRoleName != serviceRoleName) return null
             if (requiredRoles != null && tokenRoleName !in requiredRoles) return null
             return JWTPrincipal(credential.payload)

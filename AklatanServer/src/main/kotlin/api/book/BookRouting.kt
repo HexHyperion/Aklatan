@@ -1,26 +1,27 @@
 package com.hexhyperion.aklatan.api.book
 
-import com.hexhyperion.aklatan.api.borrow.BorrowService
-import com.hexhyperion.aklatan.api.borrow.ReservationService
-import com.hexhyperion.aklatan.api.user.UserService
 import com.hexhyperion.aklatan.utility.ApiResponse
 import com.hexhyperion.aklatan.utility.respond
 import io.ktor.http.*
 import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 
 fun Route.bookRouting(
-    userService: UserService,
-    bookService: BookService,
-    reservationService: ReservationService,
-    borrowService: BorrowService
+    bookService: BookService
 ) {
     route("/inventory") {
         authenticate("auth-jwt") {
             get {
-                val books = bookService.getAll()
+                val principal = call.principal<JWTPrincipal>()!!
+                val role = principal.payload.getClaim("role").asString()
+                val books = if (role == "user") {
+                    bookService.getAllUnique()
+                } else {
+                    bookService.getAll()
+                }
                 call.respond(ApiResponse.SuccessWithData(books))
             }
 

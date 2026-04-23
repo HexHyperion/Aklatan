@@ -7,10 +7,7 @@ import kotlinx.datetime.LocalTime
 
 class SpecialOpenHourService(private val specialOpenHourRepository: SpecialOpenHourRepository) {
     suspend fun changeOrCreate(
-        date: LocalDate,
-        openTime: LocalTime?,
-        closeTime: LocalTime?,
-        comment: String?
+        date: LocalDate, openTime: LocalTime?, closeTime: LocalTime?, comment: String?
     ): SpecialOpenHour {
         return if (specialOpenHourRepository.findByDate(date) != null) {
             specialOpenHourRepository.update(date, openTime, closeTime, comment)

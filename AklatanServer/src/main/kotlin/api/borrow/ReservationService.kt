@@ -26,6 +26,25 @@ class ReservationService (
         return reservationRepository.create(isbn, userId, expiresAt)
     }
 
+    suspend fun reserveMany(isbns: Set<String>, userId: Int): List<Reservation> {
+        val books = bookRepository.findByIsbns(isbns)
+        val currentReservationIsbns = reservationRepository.findActiveByIsbns(isbns)
+            .filter { it.userId == userId }
+            .map { it.isbn }
+
+        isbns.forEach { isbn ->
+            if (isbn in currentReservationIsbns) {
+                throw BookAlreadyReservedException()
+            }
+            if (books.find { it.isbn == isbn } == null) {
+                throw BookNotFoundException()
+            }
+        }
+        val reservationDays = config.property("books.reservationDurationDays").getString().toInt()
+        val expiresAt = Clock.System.now() + reservationDays.days
+        return isbns.map { reservationRepository.create(it, userId, expiresAt) }
+    }
+
     suspend fun getById(id: Int): Reservation {
         return reservationRepository.findById(id) ?: throw ReservationNotFoundException()
     }

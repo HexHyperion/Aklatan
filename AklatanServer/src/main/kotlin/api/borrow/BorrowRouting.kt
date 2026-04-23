@@ -1,7 +1,5 @@
 package com.hexhyperion.aklatan.api.borrow
 
-import com.hexhyperion.aklatan.api.book.BookService
-import com.hexhyperion.aklatan.api.user.UserService
 import com.hexhyperion.aklatan.utility.ApiResponse
 import com.hexhyperion.aklatan.utility.exception.BorrowNotFoundException
 import com.hexhyperion.aklatan.utility.exception.ReservationNotFoundException
@@ -14,8 +12,6 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 
 fun Route.borrowRouting(
-    userService: UserService,
-    bookService: BookService,
     reservationService: ReservationService,
     borrowService: BorrowService
 ) {
@@ -43,31 +39,64 @@ fun Route.borrowRouting(
                     Pair(request.isbn, principal.payload.getClaim("id").asInt())
                 } else {
                     val request = call.receive<ReserveBookAdminRequest>()
-                    Pair(request.isbn, userService.getIdByEmail(request.email))
+                    Pair(request.isbn, request.userId)
                 }
                 reservationService.reserve(isbn, userId)
                 call.respond(ApiResponse.Success(HttpStatusCode.Created))
             }
 
-            patch("/{reservationId}/cancel") {
+            post("/batch") {
                 val principal = call.principal<JWTPrincipal>()!!
-                val userId = principal.payload.getClaim("id").asInt()
                 val role = principal.payload.getClaim("role").asString()
-                val reservationId = call.parameters["reservationId"]?.toIntOrNull()
-                    ?: throw BadRequestException("Invalid reservation ID")
 
-                val reservation = reservationService.getActiveById(reservationId)
-                if (role == "user" && reservation.userId != userId) {
-                    throw ReservationNotFoundException()
+                val (isbns, userId) = if (role == "user") {
+                    val request = call.receive<BatchReserveBookRequest>()
+                    Pair(request.isbns, principal.payload.getClaim("id").asInt())
+                } else {
+                    val request = call.receive<BatchReserveBookAdminRequest>()
+                    Pair(request.isbns, request.userId)
                 }
-                reservationService.cancel(reservationId)
-                call.respond(ApiResponse.Success())
+                reservationService.reserveMany(isbns, userId)
+                call.respond(ApiResponse.Success(HttpStatusCode.Created))
+            }
+
+            route("/{reservationId}") {
+                get {
+                    val principal = call.principal<JWTPrincipal>()!!
+                    val userId = principal.payload.getClaim("id").asInt()
+                    val role = principal.payload.getClaim("role").asString()
+                    val reservationId = call.parameters["reservationId"]?.toIntOrNull()
+                        ?: throw BadRequestException("Invalid reservation ID")
+
+                    val reservation = reservationService.getById(reservationId)
+                    if (role == "user" && reservation.userId != userId) {
+                        throw ReservationNotFoundException()
+                    }
+                    call.respond(ApiResponse.SuccessWithData(reservation))
+                }
+
+                patch("/cancel") {
+                    val principal = call.principal<JWTPrincipal>()!!
+                    val userId = principal.payload.getClaim("id").asInt()
+                    val role = principal.payload.getClaim("role").asString()
+                    val reservationId = call.parameters["reservationId"]?.toIntOrNull()
+                        ?: throw BadRequestException("Invalid reservation ID")
+
+                    val reservation = reservationService.getActiveById(reservationId)
+                    if (role == "user" && reservation.userId != userId) {
+                        throw ReservationNotFoundException()
+                    }
+                    reservationService.cancel(reservationId)
+                    call.respond(ApiResponse.Success())
+                }
             }
         }
 
         authenticate("auth-jwt-librarian") {
             get("/isbn/{isbn}") {
-                val isbn = call.parameters["isbn"] ?: throw BadRequestException("Invalid ISBN")
+                val isbn = call.parameters["isbn"]
+                    ?: throw BadRequestException("Invalid ISBN")
+
                 val reservations = reservationService.getAllActivePrioritizedForIsbn(isbn)
                 call.respond(ApiResponse.SuccessWithData(reservations))
             }
@@ -130,9 +159,13 @@ fun Route.borrowRouting(
 
             post {
                 val request = call.receive<BorrowBookAdminRequest>()
-                val isbn = request.isbn
-                val userId = userService.getIdByEmail(request.email)
-                borrowService.borrow(isbn, userId)
+                borrowService.borrow(request.isbn, request.userId)
+                call.respond(ApiResponse.Success(HttpStatusCode.Created))
+            }
+
+            post("/batch") {
+                val request = call.receive<BatchBorrowBookAdminRequest>()
+                borrowService.borrowMany(request.isbns, request.userId)
                 call.respond(ApiResponse.Success(HttpStatusCode.Created))
             }
 
