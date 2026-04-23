@@ -35,7 +35,9 @@ class BookRepository {
             .map { it.toBook() }
     }
 
-    suspend fun find(isbn: String?, titles: List<String>?, authors: List<String>?, year: String?, yearFrom: String?, yearTo: String?): List<Book> = withTransaction {
+    suspend fun find(
+        isbn: String?, titles: Set<String>?, authors: Set<String>?, year: String?, yearFrom: String?, yearTo: String?
+    ): List<Book> = withTransaction {
         var condition: Op<Boolean> = Books.id greaterEq 0
         if (isbn != null)
             condition = condition.and(Books.isbn eq isbn)

@@ -32,10 +32,7 @@ class SpecialOpenHourRepository {
     }
 
     suspend fun update(
-        date: LocalDate,
-        openTime: LocalTime?,
-        closeTime: LocalTime?,
-        comment: String?
+        date: LocalDate, openTime: LocalTime?, closeTime: LocalTime?, comment: String?
     ): SpecialOpenHour? = withTransaction {
         SpecialOpenHourEntity.find { SpecialOpenHours.date eq date }
             .firstOrNull()

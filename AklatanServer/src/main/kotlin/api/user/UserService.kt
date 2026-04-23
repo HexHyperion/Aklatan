@@ -45,19 +45,18 @@ class UserService(private val userRepository: UserRepository, private val roleRe
 
     suspend fun getAllReadable(): List<UserReadable> {
         val usersRaw = userRepository.findAll()
-        val users = mutableListOf<UserReadable>()
-        for (userRaw in usersRaw) {
-            val userRole = roleRepository.findById(userRaw.roleId)?.name ?: throw RoleNotFoundException()
-            users.add(UserReadable(
+        val rolesById = roleRepository.findAll().associate { it.id to it.name }
+        return usersRaw.map { userRaw ->
+            val userRole = rolesById[userRaw.roleId] ?: throw RoleNotFoundException()
+            UserReadable(
                 id = userRaw.id,
                 name = userRaw.name,
                 email = userRaw.email,
                 role = userRole,
                 registeredAt = userRaw.registeredAt,
                 verified = userRaw.verified
-            ))
+            )
         }
-        return users
     }
 
     suspend fun getIdByEmail(email: String): Int {

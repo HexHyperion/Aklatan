@@ -21,23 +21,19 @@ class BorrowService (
         }
         val currentReservationId = reservationRepository.findActiveIdByIsbnAndUserId(isbn, userId)
         val reservations = reservationRepository.findActiveOrderedByDateByIsbn(isbn)
+        val userIdToPriority = reservations.mapIndexed { index, reservation -> reservation.userId to index }.toMap()
         val blockingReservationCount = if (currentReservationId != null) {
-            val priority = reservations.indexOfFirst { it.userId == userId }
-            if (priority < 0) {
-                throw ReservationNotFoundException()
-            }
-            val priorReservations = reservations.slice(0 until priority)
-            priorReservations.size
+            userIdToPriority[userId] ?: throw ReservationNotFoundException()
         } else {
             reservations.size
         }
         val borrows = borrowRepository.findActiveByIsbn(isbn)
-        val borrowedIds = borrows.map { it.bookId }
-        val availableBookIds = bookIds.filter { it !in borrowedIds }
-        if (availableBookIds.size <= blockingReservationCount) {
+        val borrowedIds = borrows.map { it.bookId }.toHashSet()
+        val availableIds = bookIds.filter { it !in borrowedIds }
+        if (availableIds.size <= blockingReservationCount) {
             throw NoBorrowableBooksLeftException()
         }
-        return Pair(availableBookIds.first(), currentReservationId)
+        return Pair(availableIds.first(), currentReservationId)
     }
 
     suspend fun borrow(isbn: String, userId: Int): Borrow {
@@ -97,11 +93,11 @@ class BorrowService (
 
     private suspend fun checkExtensionPossible(bookId: Int): Boolean {
         val isbn = bookRepository.findById(bookId)?.isbn ?: throw BookNotFoundException()
-        val bookIds = bookRepository.findIdsByIsbn(isbn)
-        val borrowedIds = borrowRepository.findActiveByIsbn(isbn).map { it.bookId }
-        val availableIds = bookIds.filter { it !in borrowedIds }
+        val totalCount = bookRepository.findByIsbn(isbn).size
+        val borrowedCount = borrowRepository.findActiveByIsbn(isbn).size
+        val availableCount = totalCount - borrowedCount
         val reservationCount = reservationRepository.findActiveByIsbn(isbn).size
-        return reservationCount == 0 || availableIds.size > reservationCount
+        return reservationCount == 0 || availableCount > reservationCount
     }
 
     suspend fun extend(id: Int): Borrow {

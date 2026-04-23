@@ -29,8 +29,8 @@ fun Route.bookRouting(
 
             get("/search") {
                 val isbn = call.request.queryParameters["isbn"]
-                val title = call.request.queryParameters["title"]?.split(",")
-                val author = call.request.queryParameters["author"]?.split(",")
+                val title = call.request.queryParameters["title"]?.split(",")?.toHashSet()
+                val author = call.request.queryParameters["author"]?.split(",")?.toHashSet()
                 val year = call.request.queryParameters["year"]
                 val yearFrom = call.request.queryParameters["yearFrom"]
                 val yearTo = call.request.queryParameters["yearTo"]

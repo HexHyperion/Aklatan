@@ -13,12 +13,12 @@ data class BookWithCount (
 
 @Serializable
 data class AddMultipleBooksRequest (
-    val books: List<BookWithCount>
+    val books: Set<BookWithCount>
 )
 
 @Serializable
 data class RemoveMultipleBooksRequest (
-    val ids: List<Int>
+    val ids: Set<Int>
 )
 
 @Serializable

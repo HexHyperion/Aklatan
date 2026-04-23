@@ -17,7 +17,7 @@ class ReservationService (
 ) {
     suspend fun reserve(isbn: String, userId: Int): Reservation {
         return withTransaction {
-            if (reservationRepository.findActiveByIsbn(isbn).find { it.userId == userId } != null) {
+            if (reservationRepository.findActiveIdByIsbnAndUserId(isbn, userId) != null) {
                 throw BookAlreadyReservedException()
             }
             if (bookRepository.findByIsbn(isbn).isEmpty()) {
@@ -31,16 +31,17 @@ class ReservationService (
 
     suspend fun reserveMany(isbns: Set<String>, userId: Int): List<Reservation> {
         return withTransaction {
-            val books = bookRepository.findByIsbns(isbns)
+            val booksByIsbn = bookRepository.findByIsbns(isbns).associateBy { it.isbn }
             val currentReservationIsbns = reservationRepository.findActiveByIsbns(isbns)
                 .filter { it.userId == userId }
                 .map { it.isbn }
+                .toHashSet()
 
             isbns.forEach { isbn ->
                 if (isbn in currentReservationIsbns) {
                     throw BookAlreadyReservedException()
                 }
-                if (books.find { it.isbn == isbn } == null) {
+                if (booksByIsbn[isbn] == null) {
                     throw BookNotFoundException()
                 }
             }

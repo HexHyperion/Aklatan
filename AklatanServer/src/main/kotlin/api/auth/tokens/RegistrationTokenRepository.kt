@@ -5,6 +5,7 @@ import com.hexhyperion.aklatan.utility.Hasher
 import com.hexhyperion.aklatan.utility.exception.UserNotFoundException
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.less
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -24,17 +25,14 @@ class RegistrationTokenRepository {
     }
 
     suspend fun deleteAllExpired() = withTransaction {
-        RegistrationTokenEntity.find { RegistrationTokens.expiresAt less Clock.System.now() }
-            .forEach { it.delete() }
+        RegistrationTokens.deleteWhere { RegistrationTokens.expiresAt less Clock.System.now() }
     }
 
     suspend fun delete(registrationToken: String) = withTransaction {
-        RegistrationTokenEntity.find { RegistrationTokens.tokenHash eq Hasher.sha256Hash(registrationToken) }
-            .forEach { it.delete() }
+        RegistrationTokens.deleteWhere { RegistrationTokens.tokenHash eq Hasher.sha256Hash(registrationToken) }
     }
 
     suspend fun deleteAllForUser(userId: Int) = withTransaction {
-        RegistrationTokenEntity.find { RegistrationTokens.user eq userId }
-            .forEach { it.delete() }
+        RegistrationTokens.deleteWhere { RegistrationTokens.user eq userId }
     }
 }

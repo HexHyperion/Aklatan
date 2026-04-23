@@ -42,11 +42,9 @@ class BorrowRepository {
 
     suspend fun findActiveByIsbn(isbn: String): List<Borrow> = withTransaction {
         val bookIds = BookEntity.find { Books.isbn eq isbn }.map { it.id.value }
-        val borrows = BorrowEntity.find {
-            (Borrows.book inList bookIds) and
-            Borrows.returnedAt.isNull()
-        }
-        return@withTransaction borrows.map { it.toBorrow() }
+        return@withTransaction BorrowEntity.find {
+            (Borrows.book inList bookIds) and Borrows.returnedAt.isNull()
+        }.map { it.toBorrow() }
     }
 
     suspend fun updateEndsAt(id: Int, endsAt: Instant): Borrow? = withTransaction {

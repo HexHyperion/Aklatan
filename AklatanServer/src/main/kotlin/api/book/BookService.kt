@@ -9,7 +9,7 @@ class BookService(private val bookRepository: BookRepository) {
         return bookRepository.create(isbn, title, author, year)
     }
 
-    suspend fun addMany(books: List<BookWithCount>) {
+    suspend fun addMany(books: Set<BookWithCount>) {
         books.forEach { book ->
             repeat(book.quantity) {
                 bookRepository.create(book.isbn, book.title, book.author, book.year)
@@ -44,7 +44,7 @@ class BookService(private val bookRepository: BookRepository) {
     }
 
     suspend fun search(
-        isbn: String?, titles: List<String>?, authors: List<String>?, year: String?, yearFrom: String?, yearTo: String?
+        isbn: String?, titles: Set<String>?, authors: Set<String>?, year: String?, yearFrom: String?, yearTo: String?
     ): List<Book> {
         val books = bookRepository.find(isbn, titles, authors, year, yearFrom, yearTo)
         if (books.isEmpty()) throw BookNotFoundException()
@@ -52,7 +52,7 @@ class BookService(private val bookRepository: BookRepository) {
     }
 
     suspend fun searchReadable(
-        isbn: String?, titles: List<String>?, authors: List<String>?, year: String?, yearFrom: String?, yearTo: String?
+        isbn: String?, titles: Set<String>?, authors: Set<String>?, year: String?, yearFrom: String?, yearTo: String?
     ): List<BookReadable> {
         val books = search(isbn, titles, authors, year, yearFrom, yearTo)
         return books.distinctBy { it.isbn }
@@ -77,7 +77,7 @@ class BookService(private val bookRepository: BookRepository) {
         bookRepository.delete(id)
     }
 
-    suspend fun removeMany(ids: List<Int>) {
+    suspend fun removeMany(ids: Set<Int>) {
         ids.forEach { id ->
             bookRepository.findById(id) ?: throw BookNotFoundException()
         }
