@@ -96,8 +96,8 @@ class BorrowService (
         val totalCount = bookRepository.findByIsbn(isbn).size
         val borrowedCount = borrowRepository.findActiveByIsbn(isbn).size
         val availableCount = totalCount - borrowedCount
-        val reservationCount = reservationRepository.findActiveByIsbn(isbn).size
-        return reservationCount == 0 || availableCount > reservationCount
+        val reservedCount = reservationRepository.findActiveByIsbn(isbn).size
+        return reservedCount == 0 || availableCount > reservedCount
     }
 
     suspend fun extend(id: Int): Borrow {
