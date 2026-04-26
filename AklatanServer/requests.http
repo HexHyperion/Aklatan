@@ -1,0 +1,234 @@
+### USER CREATION AND AUTH
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@aklatan.com",
+  "name": "Anakin Skywalker",
+  "password": "tatooine"
+}
+
+###
+POST http://localhost:8080/auth/verify-email
+Content-Type: application/json
+
+{
+  "token": "pmC2cphzJkQw_ltK-MqW47ZIhDcyLenK"
+}
+
+###
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@aklatan.com",
+  "password": "deathstar"
+}
+
+###
+POST http://localhost:8080/auth/refresh
+
+###
+POST http://localhost:8080/auth/request-email-verification
+Content-Type: application/json
+
+{
+  "email": "user2@aklatan.com"
+}
+###
+
+POST http://localhost:8080/auth/request-password-reset
+Content-Type: application/json
+
+{
+  "email": "user@aklatan.com"
+}
+
+###
+POST http://localhost:8080/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "K3Gy4q-AKiV40qIF4iX6PP1qW5SJuyGY",
+  "password": "coruscant"
+}
+
+###
+POST http://localhost:8080/auth/logout
+
+
+### USER ACCOUNT MANAGEMENT
+GET http://localhost:8080/account
+Authorization: Bearer <ANY_TOKEN>
+
+###
+PATCH http://localhost:8080/account
+Content-Type: application/json
+Authorization: Bearer <ANY_TOKEN>
+
+{
+  "newName": "Darth Vader",
+  "password": "coruscant",
+  "newPassword": "deathstar"
+}
+
+
+### MANAGER ACCOUNT MANAGEMENT
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "manager@aklatan.com",
+  "password": "password"
+}
+
+###
+GET http://localhost:8080/admin/roles
+Authorization: Bearer <MANAGER_TOKEN>
+
+###
+GET http://localhost:8080/admin/users
+Authorization: Bearer <MANAGER_TOKEN>
+
+###
+POST http://localhost:8080/admin/users
+Content-Type: application/json
+Authorization: Bearer <MANAGER_TOKEN>
+
+{
+  "email": "librarian@aklatan.com",
+  "name": "Admiral Thrawn",
+  "password": "defender",
+  "role": "librarian"
+}
+
+###
+PATCH http://localhost:8080/admin/users/32
+Content-Type: application/json
+Authorization: Bearer <MANAGER_TOKEN>
+
+{
+  "newName": "Grand Admiral Thrawn",
+  "newPassword": "peridea",
+  "verified": false
+}
+
+###
+DELETE http://localhost:8080/admin/users/32
+Authorization: Bearer <MANAGER_TOKEN>
+
+
+### OPEN HOURS
+GET http://localhost:8080/open-hours/3
+
+###
+GET http://localhost:8080/open-hours/exceptions
+
+###
+PATCH http://localhost:8080/open-hours/3
+Content-Type: application/json
+Authorization: Bearer <MANAGER_TOKEN>
+
+{
+  "openTime": "08:00",
+  "closeTime": "17:00"
+}
+
+###
+PUT http://localhost:8080/open-hours/exceptions/2026-05-04
+Content-Type: application/json
+Authorization: Bearer <MANAGER_TOKEN>
+
+{
+  "openTime": "20:00",
+  "closeTime": "23:59",
+  "comment": "May the 4th be with you!"
+}
+
+
+### INVENTORY
+GET http://localhost:8080/inventory
+Authorization: Bearer <ANY_TOKEN>
+
+###
+GET http://localhost:8080/inventory/search?title=star&author=zahn
+
+<> 2026-04-26T162447.200.json
+
+###
+GET http://localhost:8080/inventory/isbn/9781448136759/availability
+Authorization: Bearer <ANY_TOKEN>
+
+###
+GET http://localhost:8080/inventory/isbn/9781448136759
+Authorization: Bearer <ANY_TOKEN>
+
+###
+PATCH http://localhost:8080/inventory/id/638290
+Content-Type: application/json
+Authorization: Bearer <LIBRARIAN_TOKEN>
+
+{
+  "year": "2013"
+}
+
+
+### RESERVATIONS
+GET http://localhost:8080/reservations
+Authorization: Bearer <ANY_TOKEN>
+
+###
+POST http://localhost:8080/reservations/batch
+Content-Type: application/json
+Authorization: Bearer <ANY_TOKEN>
+
+{
+  "userId": 29,
+  "isbns": [
+    "9781448136759",
+    "9788363842130"
+  ]
+}
+
+###
+PATCH http://localhost:8080/reservations/18/cancel
+Authorization: Bearer <ANY_TOKEN>
+
+###
+GET http://localhost:8080/reservations/isbn/9781448136759
+Authorization: Bearer <LIBRARIAN_TOKEN>
+
+
+### BORROWING
+GET http://localhost:8080/borrows
+Authorization: Bearer <ANY_TOKEN>
+
+###
+POST http://localhost:8080/borrows/batch
+Content-Type: application/json
+Authorization: Bearer <LIBRARIAN_TOKEN>
+
+{
+  "userId": 29,
+  "isbns": [
+    "9781448136759",
+    "9788363842130"
+  ]
+}
+
+###
+GET http://localhost:8080/borrows/62
+Authorization: Bearer <ANY_TOKEN>
+
+###
+PATCH http://localhost:8080/borrows/62/return
+Authorization: Bearer <LIBRARIAN_TOKEN>
+
+
+### INTERNAL ENDPOINTS
+POST http://localhost:8080/internal/send-email-notifications
+Authorization: Bearer <INTERNAL_API_TOKEN>
+
+###
+POST http://localhost:8080/internal/cleanup-expired-tokens
+Authorization: Bearer <INTERNAL_API_TOKEN>

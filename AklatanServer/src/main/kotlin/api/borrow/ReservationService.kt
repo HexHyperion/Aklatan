@@ -57,6 +57,12 @@ class ReservationService (
         return reservationRepository.findById(id) ?: throw ReservationNotFoundException()
     }
 
+    suspend fun getAllForIsbn(isbn: String): List<Reservation> {
+        val reservations = reservationRepository.findByIsbn(isbn)
+        if (reservations.isEmpty()) throw ReservationNotFoundException()
+        return reservations
+    }
+
     suspend fun getAllForUser(userId: Int): List<Reservation> {
         val reservations = reservationRepository.findByUserId(userId)
         if (reservations.isEmpty()) throw ReservationNotFoundException()
@@ -65,12 +71,6 @@ class ReservationService (
 
     suspend fun getActiveById(id: Int): Reservation {
         return reservationRepository.findActiveById(id) ?: throw ReservationNotFoundException()
-    }
-
-    suspend fun getAllActivePrioritizedForIsbn(isbn: String): List<Reservation> {
-        val reservations = reservationRepository.findActiveOrderedByDateByIsbn(isbn)
-        if (reservations.isEmpty()) throw ReservationNotFoundException()
-        return reservations
     }
 
     suspend fun getAll(): List<Reservation> {

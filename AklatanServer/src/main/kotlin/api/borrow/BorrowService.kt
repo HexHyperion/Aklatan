@@ -86,6 +86,10 @@ class BorrowService (
         return borrowRepository.findByUserId(userId)
     }
 
+    suspend fun getAll(): List<Borrow> {
+        return borrowRepository.findAll()
+    }
+
     suspend fun getTotalAvailableAndReservedCountForIsbn(isbn: String): Pair<Int, Int> {
         val totalCount = bookRepository.findByIsbn(isbn).size
         val borrowedCount = borrowRepository.findActiveByIsbn(isbn).size

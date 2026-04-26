@@ -20,6 +20,11 @@ class ReservationRepository {
         return@withTransaction ReservationEntity.findById(id)?.toReservation()
     }
 
+    suspend fun findByIsbn(isbn: String): List<Reservation> = withTransaction {
+        return@withTransaction ReservationEntity.find { Reservations.isbn eq isbn }
+            .map { it.toReservation() }
+    }
+
     suspend fun findByUserId(userId: Int): List<Reservation> = withTransaction {
         return@withTransaction ReservationEntity.find { Reservations.user eq userId }
             .map { it.toReservation() }

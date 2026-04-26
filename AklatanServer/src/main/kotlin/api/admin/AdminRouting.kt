@@ -93,56 +93,60 @@ fun Route.adminRouting(
                     }
                 }
             }
+        }
 
-            route("/open-hours") {
-                get("/{day}") {
-                    val weekDay = call.parameters["day"]?.toIntOrNull() ?: throw BadRequestException("Invalid day")
-                    val openHour = openHourService.getByDay(weekDay)
-                    call.respond(ApiResponse.SuccessWithData(openHour))
-                }
+        route("/open-hours") {
+            patch("/{day}") {
+                val weekDay = call.parameters["day"]?.toIntOrNull() ?: throw BadRequestException("Invalid day")
+                val request = call.receive<EditOpenHoursRequest>()
+                val openTime = request.openTime?.let { LocalTime.parse(it) }
+                val closeTime = request.closeTime?.let { LocalTime.parse(it) }
 
-                patch("/{day}") {
-                    val weekDay = call.parameters["day"]?.toIntOrNull() ?: throw BadRequestException("Invalid day")
-                    val request = call.receive<EditOpenHoursRequest>()
+                openHourService.change(weekDay, openTime, closeTime)
+                call.respond(ApiResponse.Success())
+            }
+
+            route("/exceptions") {
+                put("/{date}") {
+                    val dateString = call.parameters["date"] ?: throw BadRequestException("Missing date parameter")
+                    val date = LocalDate.parse(dateString)
+
+                    val request = call.receive<EditSpecialOpenHourRequest>()
                     val openTime = request.openTime?.let { LocalTime.parse(it) }
                     val closeTime = request.closeTime?.let { LocalTime.parse(it) }
 
-                    openHourService.change(weekDay, openTime, closeTime)
+                    specialOpenHourService.changeOrCreate(date, openTime, closeTime, request.comment)
                     call.respond(ApiResponse.Success())
-                }
-
-                route("/exceptions") {
-                    get {
-                        val exceptions = specialOpenHourService.getAll()
-                        call.respond(ApiResponse.SuccessWithData(exceptions))
-                    }
-
-                    get("/{date}") {
-                        val dateString = call.parameters["date"] ?: throw BadRequestException("Missing date parameter")
-                        val date = LocalDate.parse(dateString)
-
-                        val specialOpenHour = specialOpenHourService.getByDate(date)
-                        call.respond(ApiResponse.SuccessWithData(specialOpenHour))
-                    }
-
-                    put("/{date}") {
-                        val dateString = call.parameters["date"] ?: throw BadRequestException("Missing date parameter")
-                        val date = LocalDate.parse(dateString)
-
-                        val request = call.receive<EditSpecialOpenHourRequest>()
-                        val openTime = request.openTime?.let { LocalTime.parse(it) }
-                        val closeTime = request.closeTime?.let { LocalTime.parse(it) }
-
-                        specialOpenHourService.changeOrCreate(date, openTime, closeTime, request.comment)
-                        call.respond(ApiResponse.Success())
-                    }
                 }
             }
         }
     }
 
-    get("/open-hours") {
-        val openHours = openHourService.getAll()
-        call.respond(ApiResponse.SuccessWithData(openHours))
+    route("/open-hours") {
+        get {
+            val openHours = openHourService.getAll()
+            call.respond(ApiResponse.SuccessWithData(openHours))
+        }
+
+        get("/{day}") {
+            val weekDay = call.parameters["day"]?.toIntOrNull() ?: throw BadRequestException("Invalid day")
+            val openHour = openHourService.getByDay(weekDay)
+            call.respond(ApiResponse.SuccessWithData(openHour))
+        }
+
+        route("/exceptions") {
+            get {
+                val exceptions = specialOpenHourService.getAll()
+                call.respond(ApiResponse.SuccessWithData(exceptions))
+            }
+
+            get("/{date}") {
+                val dateString = call.parameters["date"] ?: throw BadRequestException("Missing date parameter")
+                val date = LocalDate.parse(dateString)
+
+                val specialOpenHour = specialOpenHourService.getByDate(date)
+                call.respond(ApiResponse.SuccessWithData(specialOpenHour))
+            }
+        }
     }
 }

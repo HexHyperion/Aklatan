@@ -72,6 +72,10 @@ class BorrowRepository {
         }.map { it.toBorrow() }
     }
 
+    suspend fun findAll(): List<Borrow> = withTransaction {
+        return@withTransaction BorrowEntity.all().map { it.toBorrow() }
+    }
+
     suspend fun updateEndsAt(id: Int, endsAt: Instant): Borrow? = withTransaction {
         BorrowEntity.findById(id)
             ?.takeIf { it.returnedAt == null }

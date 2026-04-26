@@ -15,6 +15,17 @@ fun Route.bookRouting(
     borrowService: BorrowService
 ) {
     route("/inventory") {
+        get("/search") {
+            val isbn = call.request.queryParameters["isbn"]
+            val title = call.request.queryParameters["title"]?.split(",")?.toHashSet()
+            val author = call.request.queryParameters["author"]?.split(",")?.toHashSet()
+            val year = call.request.queryParameters["year"]
+            val yearFrom = call.request.queryParameters["yearFrom"]
+            val yearTo = call.request.queryParameters["yearTo"]
+            val books = bookService.searchReadable(isbn, title, author, year, yearFrom, yearTo)
+            call.respond(ApiResponse.SuccessWithData(books))
+        }
+
         authenticate("auth-jwt") {
             get {
                 val principal = call.principal<JWTPrincipal>()!!
@@ -24,17 +35,6 @@ fun Route.bookRouting(
                 } else {
                     bookService.getAll()
                 }
-                call.respond(ApiResponse.SuccessWithData(books))
-            }
-
-            get("/search") {
-                val isbn = call.request.queryParameters["isbn"]
-                val title = call.request.queryParameters["title"]?.split(",")?.toHashSet()
-                val author = call.request.queryParameters["author"]?.split(",")?.toHashSet()
-                val year = call.request.queryParameters["year"]
-                val yearFrom = call.request.queryParameters["yearFrom"]
-                val yearTo = call.request.queryParameters["yearTo"]
-                val books = bookService.searchReadable(isbn, title, author, year, yearFrom, yearTo)
                 call.respond(ApiResponse.SuccessWithData(books))
             }
 

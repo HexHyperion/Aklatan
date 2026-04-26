@@ -97,7 +97,7 @@ fun Route.borrowRouting(
                 val isbn = call.parameters["isbn"]
                     ?: throw BadRequestException("Invalid ISBN")
 
-                val reservations = reservationService.getAllActivePrioritizedForIsbn(isbn)
+                val reservations = reservationService.getAllForIsbn(isbn)
                 call.respond(ApiResponse.SuccessWithData(reservations))
             }
 
@@ -112,31 +112,68 @@ fun Route.borrowRouting(
     }
 
     route("/borrows") {
-        authenticate("auth-jwt-user") {
+        authenticate("auth-jwt") {
             get {
                 val principal = call.principal<JWTPrincipal>()!!
-                val userId = principal.payload.getClaim("id").asInt()
-                val borrows = borrowService.getAllForUserId(userId)
+                val role = principal.payload.getClaim("role").asString()
+
+                val borrows = if (role == "user") {
+                    val userId = principal.payload.getClaim("id").asInt()
+                    borrowService.getAllForUserId(userId)
+                } else {
+                    borrowService.getAll()
+                }
                 call.respond(ApiResponse.SuccessWithData(borrows))
             }
-        }
 
-        authenticate("auth-jwt") {
-            patch("/{borrowId}/extend") {
-                val principal = call.principal<JWTPrincipal>()!!
-                val userId = principal.payload.getClaim("id").asInt()
-                val role = principal.payload.getClaim("role").asString()
-                val borrowId = call.parameters["borrowId"]?.toIntOrNull()
-                    ?: throw BadRequestException("Invalid borrow ID")
+            route("/{borrowId}") {
+                get {
+                    val principal = call.principal<JWTPrincipal>()!!
+                    val userId = principal.payload.getClaim("id").asInt()
+                    val role = principal.payload.getClaim("role").asString()
+                    val borrowId = call.parameters["borrowId"]?.toIntOrNull()
+                        ?: throw BadRequestException("Invalid borrow ID")
 
-                if (role == "user") {
                     val borrow = borrowService.getById(borrowId)
-                    if (borrow.userId != userId) {
-                        throw BorrowNotFoundException()
+                    if (role == "user" && borrow.userId != userId) {
+                        throw ReservationNotFoundException()
                     }
+                    call.respond(ApiResponse.SuccessWithData(borrow))
                 }
-                borrowService.extend(borrowId)
-                call.respond(ApiResponse.Success())
+
+                get("/fee") {
+                    val principal = call.principal<JWTPrincipal>()!!
+                    val userId = principal.payload.getClaim("id").asInt()
+                    val role = principal.payload.getClaim("role").asString()
+                    val borrowId = call.parameters["borrowId"]?.toIntOrNull()
+                        ?: throw BadRequestException("Invalid borrow ID")
+
+                    if (role == "user") {
+                        val borrow = borrowService.getById(borrowId)
+                        if (borrow.userId != userId) {
+                            throw BorrowNotFoundException()
+                        }
+                    }
+                    val fee = borrowService.calculateReturnFee(borrowId)
+                    call.respond(ApiResponse.SuccessWithData(mapOf("fee" to fee)))
+                }
+
+                patch("/extend") {
+                    val principal = call.principal<JWTPrincipal>()!!
+                    val userId = principal.payload.getClaim("id").asInt()
+                    val role = principal.payload.getClaim("role").asString()
+                    val borrowId = call.parameters["borrowId"]?.toIntOrNull()
+                        ?: throw BadRequestException("Invalid borrow ID")
+
+                    if (role == "user") {
+                        val borrow = borrowService.getById(borrowId)
+                        if (borrow.userId != userId) {
+                            throw BorrowNotFoundException()
+                        }
+                    }
+                    borrowService.extend(borrowId)
+                    call.respond(ApiResponse.Success())
+                }
             }
         }
 
@@ -169,30 +206,12 @@ fun Route.borrowRouting(
                 call.respond(ApiResponse.Success(HttpStatusCode.Created))
             }
 
-            route("/{borrowId}") {
-                get {
-                    val borrowId = call.parameters["borrowId"]?.toIntOrNull()
-                        ?: throw BadRequestException("Invalid borrow ID")
+            patch("/{borrowId}/return") {
+            val borrowId = call.parameters["borrowId"]?.toIntOrNull()
+                    ?: throw BadRequestException("Invalid borrow ID")
 
-                    val borrows = borrowService.getById(borrowId)
-                    call.respond(ApiResponse.SuccessWithData(borrows))
-                }
-
-                get("/fee") {
-                    val borrowId = call.parameters["borrowId"]?.toIntOrNull()
-                        ?: throw BadRequestException("Invalid borrow ID")
-
-                    val fee = borrowService.calculateReturnFee(borrowId)
-                    call.respond(ApiResponse.SuccessWithData(mapOf("fee" to fee)))
-                }
-
-                patch("/return") {
-                    val borrowId = call.parameters["borrowId"]?.toIntOrNull()
-                        ?: throw BadRequestException("Invalid borrow ID")
-
-                    val fee = borrowService.returnAndGetFee(borrowId)
-                    call.respond(ApiResponse.SuccessWithData(mapOf("fee" to fee)))
-                }
+                val fee = borrowService.returnAndGetFee(borrowId)
+                call.respond(ApiResponse.SuccessWithData(mapOf("fee" to fee)))
             }
         }
     }

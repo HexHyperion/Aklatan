@@ -112,7 +112,7 @@ open class EmailMessage (
         subject = "Your book is overdue!",
         body = """
             <p>Hello there, $name!</p>
-            <p>Your borrow for the book <i>$bookName</i> has ended! Your overdue penalty is currently $fee. Please return the book as soon as possible to avoid further costs.</p>
+            <p>Your borrow for the book <i>$bookName</i> has ended! Your overdue penalty is currently $fee PLN. Please return the book as soon as possible to avoid further costs.</p>
             <p>May the words be with you,<br>
             Aklatan team</p>
         """.trimIndent()

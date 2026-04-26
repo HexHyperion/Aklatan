@@ -79,6 +79,9 @@ fun Application.configureExceptionHandling() {
                 is DateTimeParseException -> {
                     call.respond(ApiError.InvalidDateTimeFormat)
                 }
+                is ContentTransformationException -> {
+                    call.respond(ApiError.InvalidRequest)
+                }
                 is BadRequestException -> {
                     call.respond(ApiError.InvalidRequest)
                 }
