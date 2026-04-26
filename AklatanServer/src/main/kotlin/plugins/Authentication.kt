@@ -4,8 +4,8 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.hexhyperion.aklatan.api.auth.RoleService
 import com.hexhyperion.aklatan.api.user.UserService
+import com.hexhyperion.aklatan.utility.Env
 import com.hexhyperion.aklatan.utility.exception.BadAccessTokenException
-import com.hexhyperion.aklatan.utility.getEnv
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
@@ -16,7 +16,7 @@ fun Application.configureAuthentication(userService: UserService, roleService: R
         val audience = this@configureAuthentication.environment.config.property("jwt.audience").getString()
 
         val jwtVerifier = JWT
-            .require(Algorithm.HMAC256(getEnv("JWT_SECRET")))
+            .require(Algorithm.HMAC256(Env.getVar("JWT_SECRET")))
             .withAudience(audience)
             .withIssuer(issuer)
             .build()
@@ -65,6 +65,17 @@ fun Application.configureAuthentication(userService: UserService, roleService: R
                 validateCredential(credential, listOf("manager"))
             }
             challenge { _, _ -> throw BadAccessTokenException() }
+        }
+
+        bearer("auth-internal-api-key") {
+            realm = "Access to internal mailing endpoints"
+            authenticate { credential ->
+                if (credential.token == Env.getVar("MAILING_API_KEY")) {
+                    UserIdPrincipal("cron-mailing-job")
+                } else {
+                    null
+                }
+            }
         }
     }
 }

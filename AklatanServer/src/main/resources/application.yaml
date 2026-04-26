@@ -21,6 +21,7 @@ auth:
 books:
   reservationDurationDays: 7
   borrowDurationDays: 28
+  notificationBeforeBorrowEndDays: 3
   feePerDayPln: 0.35
 
 db:

@@ -1,7 +1,9 @@
 package com.hexhyperion.aklatan.api.borrow
 
 import com.hexhyperion.aklatan.api.book.BookRepository
+import com.hexhyperion.aklatan.api.user.UserRepository
 import com.hexhyperion.aklatan.db.Borrow
+import com.hexhyperion.aklatan.db.Reservation
 import com.hexhyperion.aklatan.db.withTransaction
 import com.hexhyperion.aklatan.utility.exception.*
 import io.ktor.server.config.*
@@ -10,6 +12,7 @@ import kotlin.time.Duration.Companion.days
 
 class BorrowService (
     private val borrowRepository: BorrowRepository,
+    private val userRepository: UserRepository,
     private val bookRepository: BookRepository,
     private val reservationRepository: ReservationRepository,
     private val config: ApplicationConfig
@@ -91,6 +94,58 @@ class BorrowService (
         return Pair(availableCount, reservedCount)
     }
 
+    suspend fun getAllBorrowableReservations(): List<Reservation> {
+        val reservations = reservationRepository.findAllActiveOrderedByDate()
+        if (reservations.isEmpty()) return emptyList()
+
+        val isbns = reservations.map { it.isbn }.toHashSet()
+        val books = bookRepository.findByIsbns(isbns)
+        val totalCountByIsbn = books.groupingBy { it.isbn }.eachCount()
+
+        val bookIdToIsbn = books.associate { it.id to it.isbn }
+        val borrows = borrowRepository.findActiveByIsbns(isbns)
+        val borrowedCountByIsbn = borrows
+            .mapNotNull { borrow -> bookIdToIsbn[borrow.bookId] }
+            .groupingBy { isbn -> isbn }
+            .eachCount()
+
+        return reservations
+            .groupBy { it.isbn }
+            .flatMap { (isbn, reservationsForIsbn) ->
+                val totalCount = totalCountByIsbn[isbn] ?: 0
+                val borrowedCount = borrowedCountByIsbn[isbn] ?: 0
+                val availableCount = totalCount - borrowedCount
+                if (availableCount <= 0) emptyList()
+                else reservationsForIsbn.take(availableCount)
+            }
+    }
+
+    suspend fun getAllEndingBorrows(): List<Borrow> {
+        val notificationBeforeEndDays = config.property("books.notificationBeforeBorrowEndDays").getString().toInt()
+        return borrowRepository.findEndingInDays(notificationBeforeEndDays)
+    }
+
+    suspend fun getAllOverdueBorrows(): List<Borrow> {
+        return borrowRepository.findOverdue()
+    }
+
+    suspend fun getExternalBorrowsData(borrows: List<Borrow>): List<ExternalReservationOrBorrowData> {
+        val bookIds = mutableListOf<Int>()
+        val userIds = mutableListOf<Int>()
+        borrows.forEach {
+            bookIds.add(it.bookId)
+            userIds.add(it.userId)
+        }
+        val isbns = bookRepository.findIsbnsByIds(bookIds)
+        val bookNames = bookRepository.findNamesWithAuthorByIsbns(isbns.map { it ?: "" })
+        val userNamesAndEmails = userRepository.findNamesAndEmailsByIds(userIds)
+
+        return bookNames.zip(userNamesAndEmails) { bookName, userNameAndEmail ->
+            if (bookName == null || userNameAndEmail == null) return@zip null
+            ExternalReservationOrBorrowData(userNameAndEmail.second, userNameAndEmail.first, bookName)
+        }.filterNotNull()
+    }
+
     private suspend fun checkExtensionPossible(bookId: Int): Boolean {
         val isbn = bookRepository.findById(bookId)?.isbn ?: throw BookNotFoundException()
         val totalCount = bookRepository.findByIsbn(isbn).size
@@ -121,6 +176,12 @@ class BorrowService (
             val feePerDay = config.property("books.feePerDayPln").getString().toDouble()
             return overdueDays * feePerDay
         }
+    }
+
+    suspend fun calculateDaysLeft(id: Int): Int {
+        val now = Clock.System.now()
+        val borrow = borrowRepository.findById(id) ?: throw BorrowNotFoundException()
+        return (borrow.endsAt - now).inWholeDays.coerceAtLeast(0).toInt()
     }
 
     suspend fun calculateReturnFee(id: Int): Double {

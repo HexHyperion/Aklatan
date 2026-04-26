@@ -64,6 +64,15 @@ class ReservationRepository {
         return@withTransaction ReservationEntity.all().map { it.toReservation() }
     }
 
+    suspend fun findAllActiveOrderedByDate(): List<Reservation> = withTransaction {
+        val now = Clock.System.now()
+        return@withTransaction ReservationEntity.find {
+            (Reservations.canceled eq false) and
+            (Reservations.expiresAt greaterEq now)
+        }.orderBy(Reservations.reservedAt to SortOrder.ASC)
+        .map { it.toReservation() }
+    }
+
     suspend fun findActiveIdByIsbnAndUserId(isbn: String, userId: Int): Int? = withTransaction {
         return@withTransaction ReservationEntity.find {
             (Reservations.isbn eq isbn) and

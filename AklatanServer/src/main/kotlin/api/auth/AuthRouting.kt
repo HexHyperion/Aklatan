@@ -6,11 +6,14 @@ import com.hexhyperion.aklatan.api.auth.tokens.PasswordResetTokenService
 import com.hexhyperion.aklatan.api.auth.tokens.RefreshTokenService
 import com.hexhyperion.aklatan.api.auth.tokens.RegistrationTokenService
 import com.hexhyperion.aklatan.api.user.UserService
-import com.hexhyperion.aklatan.utility.*
+import com.hexhyperion.aklatan.utility.ApiResponse
+import com.hexhyperion.aklatan.utility.EmailMessage
+import com.hexhyperion.aklatan.utility.Env
 import com.hexhyperion.aklatan.utility.exception.BadDeeplinkTokenException
 import com.hexhyperion.aklatan.utility.exception.BadRefreshTokenException
 import com.hexhyperion.aklatan.utility.exception.UserExistsException
 import com.hexhyperion.aklatan.utility.exception.UserNotVerifiedException
+import com.hexhyperion.aklatan.utility.respond
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
@@ -25,14 +28,14 @@ fun Route.authRouting(
 ) {
     suspend fun sendVerificationEmail(userId: Int, email: String, name: String) {
         val token = registrationTokenService.generate(userId)
-        val confirmationLink = "${getEnv("VERIFY_EMAIL_URL")}?token=$token"
+        val confirmationLink = "${Env.getVar("VERIFY_EMAIL_URL")}?token=$token"
 
         EmailMessage.VerifyEmailMessage(email, name, confirmationLink).send()
     }
 
     suspend fun generateAccessToken(userId: Int): String {
         val roleName = userService.getRoleNameById(userId)
-        val secret = getEnv("JWT_SECRET")
+        val secret = Env.getVar("JWT_SECRET")
         val issuer = environment.config.property("jwt.issuer").getString()
         val audience = environment.config.property("jwt.audience").getString()
         val expiryMinutes = environment.config.property("jwt.accessTokenTimeoutMinutes").getString().toInt()
@@ -61,7 +64,7 @@ fun Route.authRouting(
                         name = "refreshToken",
                         value = refreshToken,
                         httpOnly = true,
-                        secure = isProduction(),
+                        secure = Env.isProduction(),
                         path = "/",
                     )
                 )
@@ -83,7 +86,6 @@ fun Route.authRouting(
                 password = request.password,
                 role = "user"
             )
-            call.application.launch { registrationTokenService.cleanupExpired() }
             call.application.launch { sendVerificationEmail(user.id, request.email, request.name) }
 
             call.respond(ApiResponse.Success(HttpStatusCode.Created))
@@ -97,7 +99,6 @@ fun Route.authRouting(
                 if (user.verified) {
                     return@run
                 }
-                call.application.launch { registrationTokenService.cleanupExpired() }
                 call.application.launch { sendVerificationEmail(userId, request.email, user.name) }
             }
             call.respond(ApiResponse.Success())
@@ -125,9 +126,8 @@ fun Route.authRouting(
 
                 passwordResetTokenService.revokeAllForUser(userId)
                 val token = passwordResetTokenService.generate(userId)
-                val resetLink = "${getEnv("RESET_PASSWORD_URL")}?token=$token"
+                val resetLink = "${Env.getVar("RESET_PASSWORD_URL")}?token=$token"
 
-                call.application.launch { passwordResetTokenService.cleanupExpired() }
                 call.application.launch {
                     EmailMessage.ResetPasswordMessage(request.email, user.name, resetLink).send()
                 }
@@ -151,8 +151,6 @@ fun Route.authRouting(
         }
 
         post("/refresh") {
-            call.application.launch { refreshTokenService.cleanupExpired() }
-
             val refreshToken = call.request.cookies["refreshToken"] ?: throw BadRefreshTokenException()
 
             if (refreshTokenService.validate(refreshToken)) {
@@ -166,7 +164,7 @@ fun Route.authRouting(
                         name = "refreshToken",
                         value = newRefreshToken,
                         httpOnly = true,
-                        secure = isProduction(),
+                        secure = Env.isProduction(),
                         path = "/",
                         maxAge = 0,
                     )
@@ -188,7 +186,7 @@ fun Route.authRouting(
                         name = "refreshToken",
                         value = "",
                         httpOnly = true,
-                        secure = isProduction(),
+                        secure = Env.isProduction(),
                         path = "/auth/refresh",
                         maxAge = 0
                     )

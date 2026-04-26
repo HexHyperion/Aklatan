@@ -2,6 +2,7 @@ package com.hexhyperion.aklatan.api.user
 
 import com.hexhyperion.aklatan.db.*
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.inList
 import kotlin.time.Clock
 
 class UserRepository {
@@ -35,6 +36,14 @@ class UserRepository {
         UserEntity.find { Users.email eq email }
             .firstOrNull()
             ?.id?.value
+    }
+
+    suspend fun findNamesAndEmailsByIds(ids: List<Int>): List<Pair<String, String>?> = withTransaction {
+        if (ids.isEmpty()) return@withTransaction emptyList()
+        val usersById = UserEntity.find { Users.id inList ids }.associateBy { it.id.value }
+        return@withTransaction ids.map { id ->
+            usersById[id]?.let { Pair(it.name, it.email) }
+        }
     }
 
     suspend fun updateVerified(id: Int, verified: Boolean) = withTransaction {

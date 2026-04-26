@@ -13,6 +13,7 @@ import com.hexhyperion.aklatan.api.book.bookRouting
 import com.hexhyperion.aklatan.api.borrow.BorrowService
 import com.hexhyperion.aklatan.api.borrow.ReservationService
 import com.hexhyperion.aklatan.api.borrow.borrowRouting
+import com.hexhyperion.aklatan.api.internal.internalRouting
 import com.hexhyperion.aklatan.api.user.UserService
 import com.hexhyperion.aklatan.api.user.userRouting
 import io.ktor.server.application.*
@@ -41,6 +42,10 @@ fun Application.configureRouting(
         adminRouting(
             roleService, registrationTokenService, passwordResetTokenService,
             refreshTokenService, userService, openHourService, specialOpenHourService
+        )
+        internalRouting(
+            registrationTokenService, passwordResetTokenService,
+            refreshTokenService, reservationService, borrowService
         )
 
         authenticate("auth-jwt") {

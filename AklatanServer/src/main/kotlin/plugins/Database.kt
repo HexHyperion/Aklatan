@@ -1,6 +1,6 @@
 package com.hexhyperion.aklatan.plugins
 
-import com.hexhyperion.aklatan.db.Users
+import com.hexhyperion.aklatan.db.*
 import io.ktor.server.application.*
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
@@ -21,6 +21,9 @@ fun Application.configureDatabase() {
     )
 
     transaction {
-        SchemaUtils.create(Users)
+        SchemaUtils.create(
+            Roles, Users, RegistrationTokens, PasswordResetTokens, RefreshTokens,
+            Books, Reservations, Borrows, OpenHours, SpecialOpenHours
+        )
     }
 }

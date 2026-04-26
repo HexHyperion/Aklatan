@@ -91,7 +91,7 @@ class RefreshTokenEntity(id: EntityID<Int>) : IntEntity(id) {
 }
 
 object Books : IntIdTable() {
-    val isbn = text("isbn").uniqueIndex()
+    val isbn = text("isbn")
     val title = text("title").nullable()
     val author = text("author").nullable()
     val year = text("year").nullable()

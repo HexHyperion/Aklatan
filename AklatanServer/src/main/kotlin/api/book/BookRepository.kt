@@ -70,6 +70,24 @@ class BookRepository {
             .map { it.id.value }
     }
 
+    suspend fun findIsbnsByIds(ids: List<Int>): List<String?> = withTransaction {
+        if (ids.isEmpty()) return@withTransaction emptyList()
+        val booksById = BookEntity.find { Books.id inList ids.distinct() }
+            .associateBy { it.id.value }
+        return@withTransaction ids.map { id -> booksById[id]?.isbn }
+    }
+
+    suspend fun findNamesWithAuthorByIsbns(isbns: List<String>): List<String?> = withTransaction {
+        if (isbns.isEmpty()) return@withTransaction emptyList()
+        val booksByIsbn = BookEntity.find { Books.isbn inList isbns.distinct() }
+            .associateBy { it.isbn }
+        return@withTransaction isbns.map { isbn ->
+            booksByIsbn[isbn]?.let {
+                "${it.author ?: "[Unknown author]"} - ${it.title ?: "[Unknown title]"}"
+            }
+        }
+    }
+
     suspend fun update(id: Int, isbn: String?, title: String?, author: String?, year: String?): Unit = withTransaction {
         BookEntity.findById(id)
             ?.apply {
