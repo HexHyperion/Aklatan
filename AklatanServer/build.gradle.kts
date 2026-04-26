@@ -20,6 +20,12 @@ kotlin {
     jvmToolchain(21)
 }
 
+ktor {
+    docker {
+        localImageName.set("aklatan")
+    }
+}
+
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty")
@@ -32,7 +38,6 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.0")
     implementation("io.ktor:ktor-server-content-negotiation:3.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
-    implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")

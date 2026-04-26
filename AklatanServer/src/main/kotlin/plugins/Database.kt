@@ -1,10 +1,7 @@
 package com.hexhyperion.aklatan.plugins
 
-import com.hexhyperion.aklatan.db.*
 import io.ktor.server.application.*
 import org.jetbrains.exposed.v1.jdbc.Database
-import org.jetbrains.exposed.v1.jdbc.SchemaUtils
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 fun Application.configureDatabase() {
     val dbHost = environment.config.property("db.host").getString()
@@ -19,11 +16,4 @@ fun Application.configureDatabase() {
         user = dbUser,
         password = dbPassword
     )
-
-    transaction {
-        SchemaUtils.create(
-            Roles, Users, RegistrationTokens, PasswordResetTokens, RefreshTokens,
-            Books, Reservations, Borrows, OpenHours, SpecialOpenHours
-        )
-    }
 }

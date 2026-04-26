@@ -1,3 +1,7 @@
+### INIT
+GET http://localhost:8080
+
+
 ### USER CREATION AND AUTH
 POST http://localhost:8080/auth/register
 Content-Type: application/json

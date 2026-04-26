@@ -48,14 +48,16 @@ fun Application.configureRouting(
             refreshTokenService, reservationService, borrowService
         )
 
-        authenticate("auth-jwt") {
-            get("/") {
-                val principal = call.principal<JWTPrincipal>()!!
+        get("/") {
+            val principal = call.principal<JWTPrincipal>()
+            val text = if (principal != null) {
                 val userId = principal.payload.getClaim("id").asInt()
                 val user = userService.getReadableById(userId)
-
-                call.respondText("Aklatan, a library management service this is. Auth succeeded, as ${user.name} authenticated you are. A ${user.role} you are.")
+                "Auth succeeded, as ${user.name} authenticated you are. A ${user.role} you are."
+            } else {
+                "Not authenticated you are. To find out more, read the documentation you should."
             }
+            call.respondText("Aklatan, a library management service this is. $text")
         }
     }
 }
