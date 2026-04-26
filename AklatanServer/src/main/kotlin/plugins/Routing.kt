@@ -54,7 +54,7 @@ fun Application.configureRouting(
                 val userId = principal.payload.getClaim("id").asInt()
                 val user = userService.getReadableById(userId)
 
-                call.respondText("Auth succeeded, as ${user.name} authenticated you are. A ${user.role} you are.")
+                call.respondText("Aklatan, a library management service this is. Auth succeeded, as ${user.name} authenticated you are. A ${user.role} you are.")
             }
         }
     }

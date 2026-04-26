@@ -42,5 +42,6 @@ dependencies {
     implementation("org.mindrot:jbcrypt:0.4")
     implementation("com.sun.mail:jakarta.mail:2.0.2")
     testImplementation("io.ktor:ktor-server-test-host")
+    testImplementation("io.ktor:ktor-server-test-host-jvm:3.4.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
 }
