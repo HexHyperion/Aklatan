@@ -28,7 +28,7 @@ books:
 db:
   host: db
   port: 5432
-  database: ${POSTGRES_DB:aklatan}
-  username: ${POSTGRES_USER:aklatan}
-  password: ${POSTGRES_PASSWORD:aklatan}
+  database: ${POSTGRES_DB}
+  username: ${POSTGRES_USER}
+  password: ${POSTGRES_PASSWORD}
   driver: "org.postgresql.Driver"
