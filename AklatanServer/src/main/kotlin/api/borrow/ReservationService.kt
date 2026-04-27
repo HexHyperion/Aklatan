@@ -59,13 +59,11 @@ class ReservationService (
 
     suspend fun getAllForIsbn(isbn: String): List<Reservation> {
         val reservations = reservationRepository.findByIsbn(isbn)
-        if (reservations.isEmpty()) throw ReservationNotFoundException()
         return reservations
     }
 
     suspend fun getAllForUser(userId: Int): List<Reservation> {
         val reservations = reservationRepository.findByUserId(userId)
-        if (reservations.isEmpty()) throw ReservationNotFoundException()
         return reservations
     }
 

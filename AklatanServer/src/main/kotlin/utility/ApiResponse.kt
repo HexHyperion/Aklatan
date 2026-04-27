@@ -46,7 +46,7 @@ object ApiError {
     )
     val DeeplinkTokenInvalid = ApiResponse.Error(
         "DEEPLINK_TOKEN_INVALID",
-        "Invalid or expired, the provided token is. Request a new one, you must.",
+        "Invalid or expired, the provided deeplink token is. Request a new one, you must.",
         HttpStatusCode.Unauthorized
     )
     val RefreshTokenInvalid = ApiResponse.Error(
@@ -103,12 +103,12 @@ object ApiError {
     )
     val ReservationNotFound = ApiResponse.Error(
         "RESERVATION_NOT_FOUND",
-        "Exist, a reservation with ID provided does not.",
+        "Exist, the reservation does not.",
         HttpStatusCode.NotFound
     )
     val BorrowNotFound = ApiResponse.Error(
         "BORROW_NOT_FOUND",
-        "Exist, a borrow with ID provided does not.",
+        "Exist, the borrow does not.",
         HttpStatusCode.NotFound
     )
     val WeekDayNotFound = ApiResponse.Error(
@@ -118,7 +118,7 @@ object ApiError {
     )
     val OpenHourExceptionNotFound = ApiResponse.Error(
         "OPEN_HOUR_EXCEPTION_NOT_FOUND",
-        "Exist, an open hour exception on date provided does not.",
+        "Exist, an open hour exception on provided date does not.",
         HttpStatusCode.NotFound
     )
 

@@ -23,13 +23,11 @@ class BookService(private val bookRepository: BookRepository) {
 
     suspend fun getManyByIsbn(isbn: String): List<Book> {
         val books = bookRepository.findByIsbn(isbn)
-        if (books.isEmpty()) throw BookNotFoundException()
         return books
     }
 
     suspend fun getReadableByIsbn(isbn: String): BookReadable {
         val books = bookRepository.findByIsbn(isbn)
-        if (books.isEmpty()) throw BookNotFoundException()
         return books.first().toReadable()
     }
 
@@ -47,7 +45,6 @@ class BookService(private val bookRepository: BookRepository) {
         isbn: String?, titles: Set<String>?, authors: Set<String>?, year: String?, yearFrom: String?, yearTo: String?
     ): List<Book> {
         val books = bookRepository.find(isbn, titles, authors, year, yearFrom, yearTo)
-        if (books.isEmpty()) throw BookNotFoundException()
         return books
     }
 

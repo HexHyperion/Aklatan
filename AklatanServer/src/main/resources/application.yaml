@@ -4,7 +4,7 @@ ktor:
       - com.hexhyperion.aklatan.ApplicationKt.module
   deployment:
     port: 8080
-  development: false
+  development: true
 
 jwt:
   issuer: "com.hexhyperion"

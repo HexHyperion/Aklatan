@@ -136,7 +136,7 @@ fun Route.borrowRouting(
 
                     val borrow = borrowService.getById(borrowId)
                     if (role == "user" && borrow.userId != userId) {
-                        throw ReservationNotFoundException()
+                        throw BorrowNotFoundException()
                     }
                     call.respond(ApiResponse.SuccessWithData(borrow))
                 }

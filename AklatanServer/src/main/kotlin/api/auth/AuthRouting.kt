@@ -64,7 +64,7 @@ fun Route.authRouting(
                         name = "refreshToken",
                         value = refreshToken,
                         httpOnly = true,
-                        secure = Env.isProduction(),
+                        secure = !application.developmentMode,
                         path = "/",
                     )
                 )
@@ -164,7 +164,7 @@ fun Route.authRouting(
                         name = "refreshToken",
                         value = newRefreshToken,
                         httpOnly = true,
-                        secure = Env.isProduction(),
+                        secure = !application.developmentMode,
                         path = "/",
                         maxAge = 0,
                     )
@@ -186,7 +186,7 @@ fun Route.authRouting(
                         name = "refreshToken",
                         value = "",
                         httpOnly = true,
-                        secure = Env.isProduction(),
+                        secure = !application.developmentMode,
                         path = "/auth/refresh",
                         maxAge = 0
                     )

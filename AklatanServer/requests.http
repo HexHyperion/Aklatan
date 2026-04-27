@@ -157,8 +157,6 @@ Authorization: Bearer <ANY_TOKEN>
 ###
 GET http://localhost:8080/inventory/search?title=star&author=zahn
 
-<> 2026-04-26T162447.200.json
-
 ###
 GET http://localhost:8080/inventory/isbn/9781448136759/availability
 Authorization: Bearer <ANY_TOKEN>

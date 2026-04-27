@@ -45,9 +45,9 @@ open class EmailMessage (
         subject = "Verify your Aklatan account",
         body = """
             <p>Welcome to Aklatan, $name!</p>
-            <p>Click the link below to finish creating your account and start using our library services:</p>
+            <p>To finish creating your account and start using our library services, the link below you should click:</p>
             <a href="$confirmationLink">Confirm account</a>
-            <p>If you did not create this account, you can ignore this email.</p>
+            <p>If create this account you did not, ignore this email, you can.</p>
             <p>May the words be with you,<br>
             Aklatan team</p>
         """.trimIndent()
@@ -62,9 +62,9 @@ open class EmailMessage (
         subject = "Reset your Aklatan password",
         body = """
             <p>Hello there, $name!</p>
-            <p>Click the link below to reset your Aklatan password:</p>
+            <p>To reset your Aklatan password, the link below you should click:</p>
             <a href="$resetLink">Reset your password</a>
-            <p>If you did not request a password change, you can safely ignore this email.</p>
+            <p>If request a password change you did not, safely ignore this email, you can.</p>
             <p>May the words be with you,<br>
             Aklatan team</p>
         """.trimIndent()
@@ -77,10 +77,10 @@ open class EmailMessage (
         val reservationEndDate: String,
     ) : EmailMessage(
         to = email,
-        subject = "Your reserved book is now available!",
+        subject = "Available, your reserved book now is!",
         body = """
             <p>Hello there, $name!</p>
-            <p>We're happy to inform that your reserved book, <i>$bookName</i>, is now available in our library! Come before your reservation ends ($reservationEndDate) to pick it up.</p>
+            <p>Happy to inform we are, that your reserved book, <i>$bookName</i>, now available in our library is! Come and borrow it before your reservation ends on $reservationEndDate, you can.</p>
             <p>May the words be with you,<br>
             Aklatan team</p>
         """.trimIndent()
@@ -93,10 +93,10 @@ open class EmailMessage (
         val daysLeft: String,
     ) : EmailMessage(
         to = email,
-        subject = "Your borrow is about to end!",
+        subject = "About to end, your borrow is!",
         body = """
             <p>Hello there, $name!</p>
-            <p>Your borrow for the book <i>$bookName</i> ends in $daysLeft days. Please return the book on time to avoid fees, or extend the borrow if you're still reading.</p>
+            <p>End in $daysLeft days, your borrow for the book <i>$bookName</i> does. To avoid fees, return the book on time, you must, or extend the borrow, if still reading you are.</p>
             <p>May the words be with you,<br>
             Aklatan team</p>
         """.trimIndent()
@@ -109,10 +109,10 @@ open class EmailMessage (
         val fee: String,
     ) : EmailMessage(
         to = email,
-        subject = "Your book is overdue!",
+        subject = "Overdue, your book is!",
         body = """
             <p>Hello there, $name!</p>
-            <p>Your borrow for the book <i>$bookName</i> has ended! Your overdue penalty is currently $fee PLN. Please return the book as soon as possible to avoid further costs.</p>
+            <p>Ended, your borrow for the book <i>$bookName</i> has! $fee PLN, your current overdue penalty is. To avoid further costs, return the book as soon as possible, you must.</p>
             <p>May the words be with you,<br>
             Aklatan team</p>
         """.trimIndent()

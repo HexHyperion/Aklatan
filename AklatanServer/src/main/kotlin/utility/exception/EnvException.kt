@@ -4,5 +4,5 @@ open class EnvException(message: String?) : Exception(message)
 
 class EnvVariableMissingException(
     variableName: String,
-    message: String? = "Required environment variable '$variableName' is missing. Please add it to the .env file."
+    message: String? = "Missing, the required environment variable '$variableName' is. Add it to the .env file, you must."
 ) : EnvException(message)

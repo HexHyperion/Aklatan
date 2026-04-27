@@ -22,14 +22,6 @@ class UserService(private val userRepository: UserRepository, private val roleRe
         return userRepository.findById(id)
     }
 
-    suspend fun getByEmail(email: String): User {
-        return userRepository.findByEmail(email) ?: throw UserNotFoundException()
-    }
-
-    suspend fun getByEmailOrNull(email: String): User? {
-        return userRepository.findByEmail(email)
-    }
-
     suspend fun getReadableById(id: Int): UserReadable {
         val userRaw = userRepository.findById(id) ?: throw UserNotFoundException()
         val userRole = roleRepository.findById(userRaw.roleId)?.name ?: throw RoleNotFoundException()
@@ -57,10 +49,6 @@ class UserService(private val userRepository: UserRepository, private val roleRe
                 verified = userRaw.verified
             )
         }
-    }
-
-    suspend fun getIdByEmail(email: String): Int {
-        return userRepository.findIdByEmail(email) ?: throw UserNotFoundException()
     }
 
     suspend fun getIdByEmailOrNull(email: String): Int? {
