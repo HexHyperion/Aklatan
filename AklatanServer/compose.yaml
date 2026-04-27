@@ -1,12 +1,10 @@
 services:
-  web:
+  server:
     build: .
     ports:
       - "8080:8080"
     env_file:
       - .env
-    environment:
-      - DEBUG=false
     depends_on:
       db:
         condition: service_healthy
@@ -25,3 +23,13 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U aklatan" ]
       interval: 1s
+
+  cron:
+    image: imega/supercronic
+    env_file:
+      - .env
+    volumes:
+      - ./crontab:/etc/crontab
+    command: [ "/etc/crontab" ]
+    environment:
+      - TZ=Europe/Warsaw

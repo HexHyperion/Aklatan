@@ -68,10 +68,10 @@ fun Application.configureAuthentication(userService: UserService, roleService: R
         }
 
         bearer("auth-internal-api-key") {
-            realm = "Access to internal mailing endpoints"
+            realm = "Access to internal endpoints"
             authenticate { credential ->
-                if (credential.token == Env.getVar("MAILING_API_KEY")) {
-                    UserIdPrincipal("cron-mailing-job")
+                if (credential.token == Env.getVar("INTERNAL_API_KEY")) {
+                    UserIdPrincipal("cron-internal-job")
                 } else {
                     null
                 }
