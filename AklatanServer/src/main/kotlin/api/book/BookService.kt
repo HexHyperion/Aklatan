@@ -28,6 +28,7 @@ class BookService(private val bookRepository: BookRepository) {
 
     suspend fun getReadableByIsbn(isbn: String): BookReadable {
         val books = bookRepository.findByIsbn(isbn)
+        if (books.isEmpty()) throw BookNotFoundException()
         return books.first().toReadable()
     }
 
@@ -42,16 +43,16 @@ class BookService(private val bookRepository: BookRepository) {
     }
 
     suspend fun search(
-        isbn: String?, titles: Set<String>?, authors: Set<String>?, year: String?, yearFrom: String?, yearTo: String?
+        isbns: Set<String>?, titles: Set<String>?, authors: Set<String>?, years: Set<String>?, yearFrom: String?, yearTo: String?
     ): List<Book> {
-        val books = bookRepository.find(isbn, titles, authors, year, yearFrom, yearTo)
+        val books = bookRepository.find(isbns, titles, authors, years, yearFrom, yearTo)
         return books
     }
 
     suspend fun searchReadable(
-        isbn: String?, titles: Set<String>?, authors: Set<String>?, year: String?, yearFrom: String?, yearTo: String?
+        isbns: Set<String>?, titles: Set<String>?, authors: Set<String>?, years: Set<String>?, yearFrom: String?, yearTo: String?
     ): List<BookReadable> {
-        val books = search(isbn, titles, authors, year, yearFrom, yearTo)
+        val books = search(isbns, titles, authors, years, yearFrom, yearTo)
         return books.distinctBy { it.isbn }
             .map { it.toReadable() }
     }

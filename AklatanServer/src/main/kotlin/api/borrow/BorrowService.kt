@@ -92,6 +92,7 @@ class BorrowService (
 
     suspend fun getTotalAvailableAndReservedCountForIsbn(isbn: String): Pair<Int, Int> {
         val totalCount = bookRepository.findByIsbn(isbn).size
+        if (totalCount == 0) throw BookNotFoundException()
         val borrowedCount = borrowRepository.findActiveByIsbn(isbn).size
         val reservedCount = reservationRepository.findActiveByIsbn(isbn).size
         val availableCount = totalCount - borrowedCount

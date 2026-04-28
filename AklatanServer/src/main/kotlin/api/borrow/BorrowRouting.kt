@@ -1,6 +1,9 @@
 package com.hexhyperion.aklatan.api.borrow
 
+import com.hexhyperion.aklatan.api.book.BookService
+import com.hexhyperion.aklatan.api.user.UserService
 import com.hexhyperion.aklatan.utility.ApiResponse
+import com.hexhyperion.aklatan.utility.exception.BookNotFoundException
 import com.hexhyperion.aklatan.utility.exception.BorrowNotFoundException
 import com.hexhyperion.aklatan.utility.exception.ReservationNotFoundException
 import com.hexhyperion.aklatan.utility.respond
@@ -13,6 +16,8 @@ import io.ktor.server.routing.*
 
 fun Route.borrowRouting(
     reservationService: ReservationService,
+    userService: UserService,
+    bookService: BookService,
     borrowService: BorrowService
 ) {
     route("/reservations") {
@@ -97,6 +102,7 @@ fun Route.borrowRouting(
                 val isbn = call.parameters["isbn"]
                     ?: throw BadRequestException("Invalid ISBN")
 
+                if (bookService.getManyByIsbn(isbn).isEmpty()) throw BookNotFoundException()
                 val reservations = reservationService.getAllForIsbn(isbn)
                 call.respond(ApiResponse.SuccessWithData(reservations))
             }
@@ -105,6 +111,7 @@ fun Route.borrowRouting(
                 val userId = call.parameters["userId"]?.toIntOrNull()
                     ?: throw BadRequestException("Invalid user ID")
 
+                userService.getById(userId)
                 val reservations = reservationService.getAllForUser(userId)
                 call.respond(ApiResponse.SuccessWithData(reservations))
             }
@@ -182,6 +189,7 @@ fun Route.borrowRouting(
                 val bookId = call.parameters["bookId"]?.toIntOrNull()
                     ?: throw BadRequestException("Invalid book ID")
 
+                bookService.getById(bookId)
                 val borrows = borrowService.getAllForBookId(bookId)
                 call.respond(ApiResponse.SuccessWithData(borrows))
             }
@@ -190,6 +198,7 @@ fun Route.borrowRouting(
                 val userId = call.parameters["userId"]?.toIntOrNull()
                     ?: throw BadRequestException("Invalid user ID")
 
+                userService.getById(userId)
                 val borrows = borrowService.getAllForUserId(userId)
                 call.respond(ApiResponse.SuccessWithData(borrows))
             }
@@ -207,7 +216,7 @@ fun Route.borrowRouting(
             }
 
             patch("/{borrowId}/return") {
-            val borrowId = call.parameters["borrowId"]?.toIntOrNull()
+                val borrowId = call.parameters["borrowId"]?.toIntOrNull()
                     ?: throw BadRequestException("Invalid borrow ID")
 
                 val fee = borrowService.returnAndGetFee(borrowId)

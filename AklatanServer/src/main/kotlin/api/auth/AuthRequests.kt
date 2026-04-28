@@ -34,5 +34,5 @@ data class RequestPasswordResetRequest (
 @Serializable
 data class ResetPasswordRequest (
     val token: String,
-    val password: String
+    val newPassword: String
 )

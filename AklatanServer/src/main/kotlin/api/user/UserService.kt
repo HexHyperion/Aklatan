@@ -6,6 +6,7 @@ import com.hexhyperion.aklatan.db.UserReadable
 import com.hexhyperion.aklatan.utility.Hasher
 import com.hexhyperion.aklatan.utility.exception.BadCredentialsException
 import com.hexhyperion.aklatan.utility.exception.RoleNotFoundException
+import com.hexhyperion.aklatan.utility.exception.UserExistsException
 import com.hexhyperion.aklatan.utility.exception.UserNotFoundException
 
 class UserService(private val userRepository: UserRepository, private val roleRepository: RoleRepository) {
@@ -81,6 +82,7 @@ class UserService(private val userRepository: UserRepository, private val roleRe
 
     suspend fun changeEmail(id: Int, email: String) {
         userRepository.findById(id) ?: throw UserNotFoundException()
+        if (userRepository.findByEmail(email) != null) throw UserExistsException()
         userRepository.updateEmail(id, email)
     }
 

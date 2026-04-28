@@ -29,7 +29,7 @@ suspend fun <T> ApplicationCall.respond(response: ApiResponse<T>) = when (respon
     )
     is ApiResponse.Error -> respond(
         response.code,
-        mapOf("error" to response.name, "message" to response.message)
+        mapOf("error" to mapOf("code" to response.name, "message" to response.message))
     )
 }
 
@@ -41,7 +41,7 @@ object ApiError {
     )
     val AccessTokenInvalid = ApiResponse.Error(
         "ACCESS_TOKEN_INVALID",
-        "Invalid or expired, the provided access token in. Refresh it and try again, you should.",
+        "Invalid or expired, the provided access token is. Refresh it and try again, you should.",
         HttpStatusCode.Unauthorized
     )
     val DeeplinkTokenInvalid = ApiResponse.Error(
@@ -68,11 +68,6 @@ object ApiError {
     val BookAlreadyReserved = ApiResponse.Error(
         "BOOK_ALREADY_RESERVED",
         "Already reserved by this user, the book is.",
-        HttpStatusCode.Conflict
-    )
-    val BookAlreadyBorrowed = ApiResponse.Error(
-        "BOOK_ALREADY_BORROWED",
-        "Already borrowed, the book is.",
         HttpStatusCode.Conflict
     )
     val NoBorrowableBooksLeft = ApiResponse.Error(
@@ -122,8 +117,8 @@ object ApiError {
         HttpStatusCode.NotFound
     )
 
-    val InvalidDateTimeFormat = ApiResponse.Error(
-        "INVALID_DATE_TIME_FORMAT",
+    val DateTimeFormatInvalid = ApiResponse.Error(
+        "DATE_TIME_FORMAT_INVALID",
         "Invalid, the provided date or time format is. Check the API documentation, you should.",
         HttpStatusCode.BadRequest
     )

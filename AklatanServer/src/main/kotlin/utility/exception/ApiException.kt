@@ -22,8 +22,6 @@ open class BorrowException(message: String? = null) : ApiException(message)
 
 class BookAlreadyReservedException(message: String? = null) : BorrowException(message)
 
-class BookAlreadyBorrowedException(message: String? = null) : BorrowException(message)
-
 class NoBorrowableBooksLeftException(message: String? = null) : BorrowException(message)
 
 class BorrowExtensionForbiddenException(message: String? = null) : BorrowException(message)

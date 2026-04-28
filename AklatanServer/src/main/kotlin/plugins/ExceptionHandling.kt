@@ -40,9 +40,6 @@ fun Application.configureExceptionHandling() {
                         is BookAlreadyReservedException -> {
                             call.respond(ApiError.BookAlreadyReserved)
                         }
-                        is BookAlreadyBorrowedException -> {
-                            call.respond(ApiError.BookAlreadyBorrowed)
-                        }
                         is NoBorrowableBooksLeftException -> {
                             call.respond(ApiError.NoBorrowableBooksLeft)
                         }
@@ -77,7 +74,7 @@ fun Application.configureExceptionHandling() {
                     }
                 }
                 is DateTimeParseException -> {
-                    call.respond(ApiError.InvalidDateTimeFormat)
+                    call.respond(ApiError.DateTimeFormatInvalid)
                 }
                 is ContentTransformationException -> {
                     call.respond(ApiError.InvalidRequest)

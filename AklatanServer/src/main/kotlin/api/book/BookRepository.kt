@@ -36,11 +36,13 @@ class BookRepository {
     }
 
     suspend fun find(
-        isbn: String?, titles: Set<String>?, authors: Set<String>?, year: String?, yearFrom: String?, yearTo: String?
+        isbns: Set<String>?, titles: Set<String>?, authors: Set<String>?, years: Set<String>?, yearFrom: String?, yearTo: String?
     ): List<Book> = withTransaction {
         var condition: Op<Boolean> = Books.id greaterEq 0
-        if (isbn != null)
-            condition = condition.and(Books.isbn eq isbn)
+        if (!isbns.isNullOrEmpty()) {
+            val isbnCondition = isbns.map { Books.isbn eq it }.reduce { acc, op -> acc or op }
+            condition = condition.and(isbnCondition)
+        }
         if (!titles.isNullOrEmpty()) {
             val titleCondition = titles.map { Books.title ilike "%$it%" }.reduce { acc, op -> acc or op }
             condition = condition.and(titleCondition)
@@ -49,8 +51,10 @@ class BookRepository {
             val authorCondition = authors.map { Books.author ilike "%$it%" }.reduce { acc, op -> acc or op }
             condition = condition.and(authorCondition)
         }
-        if (year != null)
-            condition = condition.and(Books.year eq year)
+        if (!years.isNullOrEmpty()) {
+            val yearCondition = years.map { Books.year eq it }.reduce { acc, op -> acc or op }
+            condition = condition.and(yearCondition)
+        }
         if (yearFrom != null)
             condition = condition.and(Books.year greaterEq yearFrom)
         if (yearTo != null)

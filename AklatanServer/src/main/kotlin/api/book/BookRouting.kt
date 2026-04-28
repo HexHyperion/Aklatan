@@ -16,10 +16,10 @@ fun Route.bookRouting(
 ) {
     route("/inventory") {
         get("/search") {
-            val isbn = call.request.queryParameters["isbn"]
+            val isbn = call.request.queryParameters["isbn"]?.split(",")?.toHashSet()
             val title = call.request.queryParameters["title"]?.split(",")?.toHashSet()
             val author = call.request.queryParameters["author"]?.split(",")?.toHashSet()
-            val year = call.request.queryParameters["year"]
+            val year = call.request.queryParameters["year"]?.split(",")?.toHashSet()
             val yearFrom = call.request.queryParameters["yearFrom"]
             val yearTo = call.request.queryParameters["yearTo"]
             val books = bookService.searchReadable(isbn, title, author, year, yearFrom, yearTo)
@@ -75,7 +75,7 @@ fun Route.bookRouting(
                 call.respond(ApiResponse.Success())
             }
 
-            route("/id/{bookId}") {
+            route("/{bookId}") {
                 get {
                     val bookId = call.parameters["bookId"]?.toIntOrNull() ?: throw BadRequestException("Invalid book ID")
                     val book = bookService.getById(bookId)

@@ -138,7 +138,7 @@ fun Route.authRouting(
         post("/reset-password") {
             val request = call.receive<ResetPasswordRequest>()
             val token = request.token
-            val password = request.password
+            val password = request.newPassword
 
             if (passwordResetTokenService.validate(token)) {
                 val userId = passwordResetTokenService.getUserId(token)

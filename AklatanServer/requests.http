@@ -54,7 +54,7 @@ Content-Type: application/json
 
 {
   "token": "K3Gy4q-AKiV40qIF4iX6PP1qW5SJuyGY",
-  "password": "coruscant"
+  "newPassword": "coruscant"
 }
 
 ###
@@ -92,7 +92,7 @@ Authorization: Bearer <MANAGER_TOKEN>
 
 ###
 GET http://localhost:8080/admin/users
-Authorization: Bearer <MANAGER_TOKEN>
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjb20uaGV4aHlwZXJpb24iLCJhdWQiOiJjb20uaGV4aHlwZXJpb24uYWtsYXRhbiIsImlkIjoxLCJyb2xlIjoibWFuYWdlciIsImV4cCI6MTc3NzMwMDA0OH0.fLSAr04arO7WlVcxhS0MdDpUyKld-QJssB3uFSe0_I4
 
 ###
 POST http://localhost:8080/admin/users
@@ -166,7 +166,7 @@ GET http://localhost:8080/inventory/isbn/9781448136759
 Authorization: Bearer <ANY_TOKEN>
 
 ###
-PATCH http://localhost:8080/inventory/id/638290
+PATCH http://localhost:8080/inventory/638290
 Content-Type: application/json
 Authorization: Bearer <LIBRARIAN_TOKEN>
 

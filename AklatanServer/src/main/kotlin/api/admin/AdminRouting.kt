@@ -98,7 +98,7 @@ fun Route.adminRouting(
         route("/open-hours") {
             patch("/{day}") {
                 val weekDay = call.parameters["day"]?.toIntOrNull() ?: throw BadRequestException("Invalid day")
-                val request = call.receive<EditOpenHoursRequest>()
+                val request = call.receive<EditOpenHourRequest>()
                 val openTime = request.openTime?.let { LocalTime.parse(it) }
                 val closeTime = request.closeTime?.let { LocalTime.parse(it) }
 
@@ -110,12 +110,18 @@ fun Route.adminRouting(
                 put("/{date}") {
                     val dateString = call.parameters["date"] ?: throw BadRequestException("Missing date parameter")
                     val date = LocalDate.parse(dateString)
-
                     val request = call.receive<EditSpecialOpenHourRequest>()
                     val openTime = request.openTime?.let { LocalTime.parse(it) }
                     val closeTime = request.closeTime?.let { LocalTime.parse(it) }
 
                     specialOpenHourService.changeOrCreate(date, openTime, closeTime, request.comment)
+                    call.respond(ApiResponse.Success())
+                }
+
+                delete("/{date}") {
+                    val dateString = call.parameters["date"] ?: throw BadRequestException("Missing date parameter")
+                    val date = LocalDate.parse(dateString)
+                    specialOpenHourService.delete(date)
                     call.respond(ApiResponse.Success())
                 }
             }
@@ -143,7 +149,6 @@ fun Route.adminRouting(
             get("/{date}") {
                 val dateString = call.parameters["date"] ?: throw BadRequestException("Missing date parameter")
                 val date = LocalDate.parse(dateString)
-
                 val specialOpenHour = specialOpenHourService.getByDate(date)
                 call.respond(ApiResponse.SuccessWithData(specialOpenHour))
             }

@@ -12,7 +12,7 @@ data class EditAccountAdminRequest (
 )
 
 @Serializable
-data class EditOpenHoursRequest (
+data class EditOpenHourRequest (
     val openTime: String? = null,
     val closeTime: String? = null
 )
