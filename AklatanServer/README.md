@@ -62,7 +62,7 @@ Note that almost every endpoint can also return `400 INVALID_REQUEST` if the req
 
 ## General
 
-### `GET /` (Public):
+### `GET` `/` (Public):
 Check if the server is running by receiving a human-readable welcome message with authentication state.
 - Expected responses:
   - `200 OK` with a text message indicating whether the request includes a valid JWT token.
@@ -70,7 +70,7 @@ Check if the server is running by receiving a human-readable welcome message wit
 
 ## User Registration & Authentication
 
-### `POST /auth/register` (Public):
+### `POST` `/auth/register` (Public):
 Register a new user account and send a verification email upon successful registration.
 - Request body parameters:
   - `email` (string, required): The user's email address.
@@ -80,7 +80,7 @@ Register a new user account and send a verification email upon successful regist
   - `201 Created` if the registration is successful and the verification email is sent.
   - `409 USER_ALREADY_EXISTS` if an account with the provided email already exists.
 
-### `POST /auth/login` (User, Librarian, Manager):
+### `POST` `/auth/login` (User, Librarian, Manager):
 Authenticate a user and return a short-lived JWT token in the response body, and a long-lived refresh token in an HTTP-only cookie.
 - Request body parameters:
   - `email` (string, required): The user's email address.
@@ -91,14 +91,14 @@ Authenticate a user and return a short-lived JWT token in the response body, and
   - `401 INCORRECT_USER_CREDENTIALS` if the credentials are incorrect or the email is not verified.
   - `401 USER_NOT_VERIFIED` if the email is not verified.
 
-### `POST /auth/request-email-verification` (Public):
+### `POST` `/auth/request-email-verification` (Public):
 Resend the email verification link if the account exists.
 - Request body parameters:
   - `email` (string, required): The email address of the account to verify.
 - Expected responses:
   - `200 OK` even if the account doesn't exist to prevent enumeration.
 
-### `POST /auth/verify-email` (Public):
+### `POST` `/auth/verify-email` (Public):
 Verify a user's email using the token sent in the verification email.
 - Request body parameters:
   - `token` (string, required): The verification token from the email.
@@ -106,14 +106,14 @@ Verify a user's email using the token sent in the verification email.
   - `200 OK` if the email is successfully verified.
   - `401 DEEPLINK_TOKEN_INVALID` if the token is invalid or expired.
 
-### `POST /auth/request-password-reset` (Public):
+### `POST` `/auth/request-password-reset` (Public):
 Request a password reset link to be sent to the user's email.
 - Request body parameters:
   - `email` (string, required): The email address of the account to reset the password for.
 - Expected responses:
   - `200 OK` even if the account doesn't exist to prevent enumeration.
 
-### `POST /auth/reset-password` (Public):
+### `POST` `/auth/reset-password` (Public):
 Reset a user's password using the token sent in the password reset email.
 - Request body parameters:
   - `token` (string, required): The password reset token from the email.
@@ -122,14 +122,14 @@ Reset a user's password using the token sent in the password reset email.
   - `200 OK` if the password is successfully reset.
   - `401 DEEPLINK_TOKEN_INVALID` if the token is invalid or expired.
 
-### `POST /auth/refresh` (User, Librarian, Manager):
+### `POST` `/auth/refresh` (User, Librarian, Manager):
 Rotate both authentication tokens using the refresh token from the cookie.
 - Expected responses:
   - `200 OK` with a new refresh token in a cookie if the refresh token is valid.
     - `token` (string): The new JWT token to be used for requests.
   - `401 REFRESH_TOKEN_INVALID` if the refresh token is invalid or expired.
 
-### `POST /auth/logout` (User, Librarian, Manager):
+### `POST` `/auth/logout` (User, Librarian, Manager):
 Invalidate the refresh token to log the user out.
 - Expected responses:
   - `200 OK` if the logout is successful.
@@ -138,7 +138,7 @@ Invalidate the refresh token to log the user out.
 
 ## User Account Management
 
-### `GET /account` (User, Librarian, Manager):
+### `GET` `/account` (User, Librarian, Manager):
 Get the authenticated user's account details.
 - Expected responses:
   - `200 OK` with the user's account information if authenticated.
@@ -149,7 +149,7 @@ Get the authenticated user's account details.
     - `registeredAt` (instant): The timestamp of when the account was created.
     - `verified` (boolean): Whether the user's email is verified.
 
-### `PATCH /account` (User, Librarian, Manager):
+### `PATCH` `/account` (User, Librarian, Manager):
 Update the authenticated user's account details.
 - Request body parameters:
     - `newName` (string, optional): The user's new full name.
@@ -163,7 +163,7 @@ Update the authenticated user's account details.
 
 ## Administrator Account Management
 
-### `GET /admin/roles` (Manager):
+### `GET` `/admin/roles` (Manager):
 Get a list of all available roles in the system.
 - Expected responses:
   - `200 OK` with a list of roles.
@@ -171,7 +171,7 @@ Get a list of all available roles in the system.
       - `id` (int): The role's unique identifier.
       - `name` (string): The name of the role.
 
-### `GET /admin/users` (Manager):
+### `GET` `/admin/users` (Manager):
 Get a list of all user accounts in the system.
 - Expected responses:
   - `200 OK` with a list of user accounts.
@@ -183,7 +183,7 @@ Get a list of all user accounts in the system.
       - `registeredAt` (instant): The timestamp of when the account was created.
       - `verified` (boolean): Whether the user's email is verified.
     
-### `POST /admin/users` (Manager):
+### `POST` `/admin/users` (Manager):
 Create a new user account with a specified role and immediately verify their email.
 - Request body parameters:
   - `email` (string, required): The new user's email address.
@@ -195,7 +195,7 @@ Create a new user account with a specified role and immediately verify their ema
   - `404 ROLE_NOT_FOUND` if the provided role name does not exist.
   - `409 USER_ALREADY_EXISTS` if an account with the provided email already exists.
 
-### `GET /admin/users/{userId}` (Manager):
+### `GET` `/admin/users/{userId}` (Manager):
 Get the details of a specific user account by ID.
 - Path parameters:
   - `userId` (int, required): The unique identifier of the user account.
@@ -210,7 +210,7 @@ Get the details of a specific user account by ID.
   - `400 INVALID_REQUEST` if the provided ID is not a valid integer.
   - `404 USER_NOT_FOUND` if no account with the provided ID exists.
 
-### `PATCH /admin/users/{userId}` (Manager):
+### `PATCH` `/admin/users/{userId}` (Manager):
 Update the details of a specific user account by ID, including changing their role and email.
 - Path parameters:
   - `userId` (int, required): The unique identifier of the user account.
@@ -227,7 +227,7 @@ Update the details of a specific user account by ID, including changing their ro
   - `404 ROLE_NOT_FOUND` if the provided new role name does not exist.
   - `409 USER_ALREADY_EXISTS` if the new email is already in use by another account.
 
-### `DELETE /admin/users/{userId}` (Manager):
+### `DELETE` `/admin/users/{userId}` (Manager):
 Delete a specific user account by ID.
 - Path parameters:
   - `userId` (int, required): The unique identifier of the user account.
@@ -239,7 +239,7 @@ Delete a specific user account by ID.
 
 ## Open Hours & Holidays
 
-### `GET /open-hours` (Public):
+### `GET` `/open-hours` (Public):
 Get the library's open hours for each day of the week.
 - Expected responses:
   - `200 OK` with the open hours information.
@@ -248,7 +248,7 @@ Get the library's open hours for each day of the week.
       - `openTime` (localtime): The opening time in HH:mm format or null if closed.
       - `closeTime` (localtime): The closing time in HH:mm format or null if closed.
 
-### `GET /open-hours/{day}` (Public):
+### `GET` `/open-hours/{day}` (Public):
 Get the library's open hours for a specific day of the week.
 - Path parameters:
   - `day` (int, required): The day of the week (1 for Monday, 7 for Sunday).
@@ -260,7 +260,7 @@ Get the library's open hours for a specific day of the week.
   - `400 INVALID_REQUEST` if the provided day is not a valid integer.
   - `404 WEEK_DAY_NOT_FOUND` if the provided day is not between 1 and 7.
 
-### `PATCH /open-hours/{day}` (Manager):
+### `PATCH` `/open-hours/{day}` (Manager):
 Update the library's open hours for a specific day of the week.
 - Path parameters:
     - `day` (int, required): The day of the week (1 for Monday, 7 for Sunday).
@@ -273,7 +273,7 @@ Update the library's open hours for a specific day of the week.
     - `400 DATE_TIME_FORMAT_INVALID` if the hours' time formats are invalid.
     - `404 WEEK_DAY_NOT_FOUND` if the provided day is not between 1 and 7.
 
-### `GET /open-hours/exceptions` (Public):
+### `GET` `/open-hours/exceptions` (Public):
 Get a list of all holiday exceptions when the open hours are changed.
 - Expected responses:
   - `200 OK` with a list of holiday exceptions.
@@ -283,7 +283,7 @@ Get a list of all holiday exceptions when the open hours are changed.
       - `closeTime` (localtime): The closing time for the exception in HH:mm format or null if closed.
       - `comment` (string): A comment describing the reason for the exception.
 
-### `GET /open-hours/exceptions/{date}` (Public):
+### `GET` `/open-hours/exceptions/{date}` (Public):
 Get the holiday exception for a specific date.
 - Path parameters:
   - `date` (localdate, required): The date of the exception in YYYY-MM-DD format.
@@ -296,7 +296,7 @@ Get the holiday exception for a specific date.
   - `400 DATE_TIME_FORMAT_INVALID` if the provided date is not in a valid format.
   - `404 OPEN_HOUR_EXCEPTION_NOT_FOUND` if no exception exists for the provided date.
 
-### `PUT /open-hours/exceptions/{date}` (Manager):
+### `PUT` `/open-hours/exceptions/{date}` (Manager):
 Create or update a holiday exception for a specific date.
 - Path parameters:
   - `date` (localdate, required): The date of the exception in YYYY-MM-DD format.
@@ -308,7 +308,7 @@ Create or update a holiday exception for a specific date.
   - `200 OK` if the holiday exception is successfully created or updated.
   - `400 DATE_TIME_FORMAT_INVALID` if the provided date or time formats are invalid.
   
-### `DELETE /open-hours/exceptions/{date}` (Manager):
+### `DELETE` `/open-hours/exceptions/{date}` (Manager):
 Delete a holiday exception for a specific date.
 - Path parameters:
   - `date` (localdate, required): The date of the exception in YYYY-MM-DD format.
@@ -320,7 +320,7 @@ Delete a holiday exception for a specific date.
 
 ## Inventory Search & Management
 
-### `GET /inventory/search` (Public):
+### `GET` `/inventory/search` (Public):
 Search for books in the inventory by title, author, year or ISBN.
 - Query parameters:
   - `isbn` (string, optional): Search for books with ISBNs matching strings created by separating this string by commas.
@@ -337,7 +337,7 @@ Search for books in the inventory by title, author, year or ISBN.
       - `author` (string): The author of the book.
       - `year` (string): The publication year of the book.
 
-### `GET /inventory` (User, Librarian, Manager):
+### `GET` `/inventory` (User, Librarian, Manager):
 Get a list of all books in the inventory, with different levels of detail based on the user's role.
 - Expected responses:
   - `200 OK` with a list of books.
@@ -353,7 +353,7 @@ Get a list of all books in the inventory, with different levels of detail based 
       - `author` (string): The author of the book.
       - `year` (string): The publication year of the book.
 
-### `POST /inventory` (Librarian, Manager):
+### `POST` `/inventory` (Librarian, Manager):
 Add a set of book copies to the inventory by providing their ISBNs, data and quantity.
 - Request body parameters:
   - `books` (set, required) of objects consisting of:
@@ -365,7 +365,7 @@ Add a set of book copies to the inventory by providing their ISBNs, data and qua
 - Expected responses:
   - `201 Created` if the book copies are successfully added to the inventory.
 
-### `DELETE /inventory` (Librarian, Manager):
+### `DELETE` `/inventory` (Librarian, Manager):
 Remove a set of book copies from the inventory by providing their IDs.
 - Request body parameters:
   - `ids` (set:int, required): The unique identifiers of the book copies to remove.
@@ -373,7 +373,7 @@ Remove a set of book copies from the inventory by providing their IDs.
   - `200 OK` if the book copies are successfully removed from the inventory.
   - `404 BOOK_NOT_FOUND` if any of the provided IDs do not correspond to existing book copies.
 
-### `GET /inventory/{bookId}` (Librarian, Manager):
+### `GET` `/inventory/{bookId}` (Librarian, Manager):
 Get information about a specific book copy by its ID.
 - Path parameters:
   - `bookId` (int, required): The unique identifier of the book copy.
@@ -387,7 +387,7 @@ Get information about a specific book copy by its ID.
   - `400 INVALID_REQUEST` if the provided ID is not a valid integer.
   - `404 BOOK_NOT_FOUND` if no book copy with the provided ID exists in the inventory.
 
-### `PATCH /inventory/{bookId}` (Librarian, Manager):
+### `PATCH` `/inventory/{bookId}` (Librarian, Manager):
 Update the information of a specific book copy by its ID.
 - Path parameters:
   - `bookId` (int, required): The unique identifier of the book copy.
@@ -401,7 +401,7 @@ Update the information of a specific book copy by its ID.
   - `400 INVALID_REQUEST` if the provided ID is not a valid integer.
   - `404 BOOK_NOT_FOUND` if no book copy with the provided ID exists in the inventory.
 
-### `DELETE /inventory/{bookId}` (Librarian, Manager):
+### `DELETE` `/inventory/{bookId}` (Librarian, Manager):
 Remove a specific book copy from the inventory by its ID.
 - Path parameters:
   - `bookId` (int, required): The unique identifier of the book copy.
@@ -410,7 +410,7 @@ Remove a specific book copy from the inventory by its ID.
   - `400 INVALID_REQUEST` if the provided ID is not a valid integer.
   - `404 BOOK_NOT_FOUND` if no book copy with the provided ID exists in the inventory.
 
-### `GET /inventory/isbn/{isbn}` (User, Librarian, Manager):
+### `GET` `/inventory/isbn/{isbn}` (User, Librarian, Manager):
 Get information about a book by its ISBN, with different levels of detail based on the user's role.
 - Path parameters:
   - `isbn` (string, required): The book's ISBN.
@@ -431,7 +431,7 @@ Get information about a book by its ISBN, with different levels of detail based 
   - `404 BOOK_NOT_FOUND` if no book with the provided ISBN exists in the inventory and the request is from a user.
 
 
-### `GET /inventory/isbn/{isbn}/availability` (User, Librarian, Manager):
+### `GET` `/inventory/isbn/{isbn}/availability` (User, Librarian, Manager):
 Get the availability information of a book by its ISBN, including the number of available copies and the number of users currently waiting for it.
 - Path parameters:
   - `isbn` (string, required): The book's ISBN.
@@ -441,7 +441,7 @@ Get the availability information of a book by its ISBN, including the number of 
     - `reserved` (int): The number of active reservations for the book.
   - `404 BOOK_NOT_FOUND` if no book with the provided ISBN exists in the inventory.
 
-### `PATCH /inventory/isbn/{isbn}` (Librarian, Manager):
+### `PATCH` `/inventory/isbn/{isbn}` (Librarian, Manager):
 Update the information of a book by its ISBN.
 - Path parameters:
   - `isbn` (string, required): The book's ISBN.
@@ -457,7 +457,7 @@ Update the information of a book by its ISBN.
 
 ## Reservations
 
-### `GET /reservations` (User, Librarian, Manager):
+### `GET` `/reservations` (User, Librarian, Manager):
 Get a list of the authenticated user's active and past reservations if the request is from a user, or of all reservations if the request is from a librarian or manager.
 - Expected responses:
   - `200 OK` with a list of reservations.
@@ -469,7 +469,7 @@ Get a list of the authenticated user's active and past reservations if the reque
       - `expiresAt` (instant): The timestamp of when the reservation expires if not picked up.
       - `canceled` (boolean): Whether the reservation was canceled by the user (also when borrowing the reserved book).
 
-### `POST /reservations` (User, Librarian, Manager):
+### `POST` `/reservations` (User, Librarian, Manager):
 Create a new reservation for a book by its ISBN.
 - Request body parameters:
   - `isbn` (string, required): The ISBN of the book to reserve.
@@ -479,7 +479,7 @@ Create a new reservation for a book by its ISBN.
   - `404 BOOK_NOT_FOUND` if no book with the provided ISBN exists in the inventory.
   - `409 BOOK_ALREADY_RESERVED` if the user already has an active reservation for the same book.
 
-### `POST /reservations/batch` (User, Librarian, Manager):
+### `POST` `/reservations/batch` (User, Librarian, Manager):
 Create multiple reservations for books by their ISBNs in a single request.
 - Request body parameters:
   - `isbns` (set:string, required): The ISBNs of the books to reserve.
@@ -489,7 +489,7 @@ Create multiple reservations for books by their ISBNs in a single request.
   - `404 BOOK_NOT_FOUND` if any of the provided ISBNs do not correspond to existing books in the inventory.
   - `409 BOOK_ALREADY_RESERVED` if the user already has an active reservation for any of the provided books.
 
-### `GET /reservations/{reservationId}` (User, Librarian, Manager):
+### `GET` `/reservations/{reservationId}` (User, Librarian, Manager):
 Get the details of a specific reservation by its ID if it belongs to the authenticated user or if the request is from a librarian or manager.
 - Path parameters:
   - `reservationId` (int, required): The unique identifier of the reservation.
@@ -504,7 +504,7 @@ Get the details of a specific reservation by its ID if it belongs to the authent
   - `400 INVALID_REQUEST` if the provided ID is not a valid integer.
   - `404 RESERVATION_NOT_FOUND` if no reservation with the provided ID exists or if it belongs to another user and the request is from a regular user.
 
-### `PATCH /reservations/{reservationId}/cancel` (User, Librarian, Manager):
+### `PATCH` `/reservations/{reservationId}/cancel` (User, Librarian, Manager):
 Cancel a specific reservation by its ID if it belongs to the authenticated user or if the request is from a librarian or manager.
 - Path parameters:
   - `reservationId` (int, required): The unique identifier of the reservation.
@@ -513,7 +513,7 @@ Cancel a specific reservation by its ID if it belongs to the authenticated user 
   - `400 INVALID_REQUEST` if the provided ID is not a valid integer.
   - `404 RESERVATION_NOT_FOUND` if no reservation with the provided ID exists, it belongs to another user and the request is from a regular user, or is already canceled.
 
-### `GET /reservations/isbn/{isbn}` (Librarian, Manager):
+### `GET` `/reservations/isbn/{isbn}` (Librarian, Manager):
 Get a list of all reservations for a book by its ISBN.
 - Path parameters:
   - `isbn` (string, required): The book's ISBN.
@@ -528,7 +528,7 @@ Get a list of all reservations for a book by its ISBN.
       - `canceled` (boolean): Whether the reservation was canceled by the user.
   - `404 BOOK_NOT_FOUND` if no book with the provided ISBN exists in the inventory.
 
-### `GET /reservations/user/{userId}` (Librarian, Manager):
+### `GET` `/reservations/user/{userId}` (Librarian, Manager):
 Get a list of all reservations made by a specific user.
 - Path parameters:
   - `userId` (int, required): The unique identifier of the user.
@@ -546,7 +546,7 @@ Get a list of all reservations made by a specific user.
 
 ## Borrowing & Returning
 
-### `GET /borrows` (User, Librarian, Manager):
+### `GET` `/borrows` (User, Librarian, Manager):
 Get a list of the authenticated user's active and past borrows if the request is from a user, or of all borrows if the request is from a librarian or manager.
 - Expected responses:
   - `200 OK` with a list of borrows.
@@ -558,7 +558,7 @@ Get a list of the authenticated user's active and past borrows if the request is
       - `endsAt` (instant): The timestamp of when the borrow is due.
       - `returnedAt` (instant): The timestamp of when the book was returned, or null if not returned yet.
 
-### `POST /borrows` (Librarian, Manager):
+### `POST` `/borrows` (Librarian, Manager):
 Create a new borrow for a book copy by its ID, if the book is available for the user.
 - Request body parameters:
   - `isbn` (string, required): The ISBN of the book to borrow, used to find an available copy.
@@ -568,7 +568,7 @@ Create a new borrow for a book copy by its ID, if the book is available for the 
   - `404 BOOK_NOT_FOUND` if no book with the provided ISBN exists in the inventory.
   - `409 NO_BORROWABLE_BOOKS_LEFT` if there are no available copies of the book to borrow.
 
-### `POST /borrows/batch` (Librarian, Manager):
+### `POST` `/borrows/batch` (Librarian, Manager):
 Create multiple borrows for book copies by their ISBNs in a single request, if the books are available for the user.
 - Request body parameters:
   - `isbns` (set:string, required): The ISBNs of the books to borrow, used to find available copies.
@@ -578,7 +578,7 @@ Create multiple borrows for book copies by their ISBNs in a single request, if t
   - `404 BOOK_NOT_FOUND` if any of the provided ISBNs do not correspond to existing books in the inventory.
   - `409 NO_BORROWABLE_BOOKS_LEFT` if there are not enough available copies of any of the books to borrow.
 
-### `GET /borrows/{borrowId}` (User, Librarian, Manager):
+### `GET` `/borrows/{borrowId}` (User, Librarian, Manager):
 Get the details of a specific borrow by its ID if it belongs to the authenticated user or if the request is from a librarian or manager.
 - Path parameters:
   - `borrowId` (int, required): The unique identifier of the borrow.
@@ -593,7 +593,7 @@ Get the details of a specific borrow by its ID if it belongs to the authenticate
   - `400 INVALID_REQUEST` if the provided ID is not a valid integer.
   - `404 BORROW_NOT_FOUND` if no borrow with the provided ID exists or if it belongs to another user and the request is from a regular user.
 
-### `GET /borrows/{borrowId}/fee` (User, Librarian, Manager):
+### `GET` `/borrows/{borrowId}/fee` (User, Librarian, Manager):
 Calculate the overdue fee for a specific borrow by its ID if it belongs to the authenticated user or if the request is from a librarian or manager.
 - Path parameters:
   - `borrowId` (int, required): The unique identifier of the borrow.
@@ -603,7 +603,7 @@ Calculate the overdue fee for a specific borrow by its ID if it belongs to the a
   - `400 INVALID_REQUEST` if the provided ID is not a valid integer.
   - `404 BORROW_NOT_FOUND` if no borrow with the provided ID exists or if it belongs to another user and the request is from a regular user.
 
-### `PATCH /borrows/{borrowId}/extend` (User, Librarian, Manager):
+### `PATCH` `/borrows/{borrowId}/extend` (User, Librarian, Manager):
 Extend the due date of a specific borrow by its ID if it belongs to the authenticated user or if the request is from a librarian or manager.
 - Path parameters:
   - `borrowId` (int, required): The unique identifier of the borrow.
@@ -613,7 +613,7 @@ Extend the due date of a specific borrow by its ID if it belongs to the authenti
   - `404 BORROW_NOT_FOUND` if no borrow with the provided ID exists or if it belongs to another user and the request is from a regular user.
   - `409 BORROW_EXTENSION_FORBIDDEN` if the borrow cannot be extended due to existing reservations and low availability of the book.
 
-### `PATCH /borrows/{borrowId}/return` (Librarian, Manager):
+### `PATCH` `/borrows/{borrowId}/return` (Librarian, Manager):
 Mark a specific borrow as returned by its ID.
 - Path parameters:
   - `borrowId` (int, required): The unique identifier of the borrow.
@@ -622,7 +622,7 @@ Mark a specific borrow as returned by its ID.
   - `400 INVALID_REQUEST` if the provided ID is not a valid integer.
   - `404 BORROW_NOT_FOUND` if no borrow with the provided ID exists or if it is already marked as returned.
 
-### `GET /borrows/book/{bookId}` (Librarian, Manager):
+### `GET` `/borrows/book/{bookId}` (Librarian, Manager):
 Get a list of all borrows for a specific book copy by its ID.
 - Path parameters:
   - `bookId` (int, required): The unique identifier of the book copy.
@@ -637,7 +637,7 @@ Get a list of all borrows for a specific book copy by its ID.
       - `returnedAt` (instant): The timestamp of when the book was returned, or null if not returned yet.
   - `404 BOOK_NOT_FOUND` if no book copy with the provided ID exists in the inventory.
 
-### `GET /borrows/user/{userId}` (Librarian, Manager):
+### `GET` `/borrows/user/{userId}` (Librarian, Manager):
 Get a list of all borrows made by a specific user.
 - Path parameters:
   - `userId` (int, required): The unique identifier of the user.
@@ -655,13 +655,13 @@ Get a list of all borrows made by a specific user.
 
 ## Internal API
 
-### `POST /internal/send-email-notifications` (Internal):
+### `POST` `/internal/send-email-notifications` (Internal):
 Send email notifications for available book reservations, upcoming return deadlines and overdue borrows.
 - Expected responses:
   - `200 OK` if the notifications are successfully sent.
   - `401 Unauthorized` if the request does not include a valid internal API key in the `Authorization` header.
 
-### `POST /internal/cleanup-expired-tokens` (Internal):
+### `POST` `/internal/cleanup-expired-tokens` (Internal):
 Delete expired refresh, email verification and password reset tokens from the database.
 - Expected responses:
   - `200 OK` if the expired tokens are successfully deleted.
