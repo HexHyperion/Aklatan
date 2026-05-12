@@ -59,6 +59,8 @@ The below sections describe the available API endpoints, their expected request 
 
 Note that almost every endpoint can also return `400 INVALID_REQUEST` if the request body doesn't conform to the expected format, `401 ACCESS_TOKEN_INVALID` if the JWT token is missing, different `404 *_NOT_FOUND` errors from various services (although if not specified as expected, they should be treated as internal/bugs) and `500 UNKNOWN_ERROR` if something unexpected happens on the server. **These errors are not mentioned below, but they should be handled by clients as well.**
 
+The `requests.http` file contains examples of requests to most of the endpoints as a demo, or as a starting point for manual testing.
+
 ## General
 
 ### `GET` `/` (Public):
