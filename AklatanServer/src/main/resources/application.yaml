@@ -3,8 +3,8 @@ ktor:
     modules:
       - com.hexhyperion.aklatan.ApplicationKt.module
   deployment:
-    port: 8080
-  development: true
+    port: ${SERVER_PORT}
+  development: ${DEVELOPMENT_MODE}
 
 jwt:
   issuer: "com.hexhyperion"
@@ -27,7 +27,7 @@ books:
 
 db:
   host: db
-  port: 5432
+  port: ${POSTGRES_PORT}
   database: ${POSTGRES_DB}
   username: ${POSTGRES_USER}
   password: ${POSTGRES_PASSWORD}

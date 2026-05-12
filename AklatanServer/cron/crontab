@@ -1,3 +1,3 @@
-0 10 * * * sh -c 'xh POST http://server:8080/internal/send-email-notifications "Authorization: Bearer $INTERNAL_API_KEY"'
+0 10 * * * sh -c 'xh POST http://server:$SERVER_PORT/internal/send-email-notifications "Authorization: Bearer $INTERNAL_API_KEY"'
 
-0 0 * * * sh -c 'xh POST http://server:8080/internal/cleanup-expired-tokens "Authorization: Bearer $INTERNAL_API_KEY"'
+0 0 * * * sh -c 'xh POST http://server:$SERVER_PORT/internal/cleanup-expired-tokens "Authorization: Bearer $INTERNAL_API_KEY"'

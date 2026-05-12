@@ -23,11 +23,10 @@ This will download/build the server, DB and scheduler images and run the necessa
 
 - `JWT_SECRET`: A random string used to sign JWT tokens, which you can generate using a password manager or an online generator. It shouldn't be shorter than 32 characters, and a longer one is more secure.
 - `INTERNAL_API_KEY`: A random string used to authenticate requests between the server and the scheduler, which you can also generate with different tools (or just smash the keyboard). It can be of any length, but obviously longer is safer.
+- `DEVELOPMENT_MODE`: Toggles the built-in Ktor development mode. Additionally, it determines whether the cookies are set with the `Secure` flag, which requires an HTTPS connection when using the server in production.
 - `VERIFY_EMAIL_URL` and `RESET_PASSWORD_URL`: The URLs included in the verification and password reset emails sent to users, pointing to frontend routes able to process the tokens. For an example frontend running at `http://localhost:3000`, they can look like `http://localhost:3000/verify-email` or `http://localhost:3000/reset-password`.
 
-The server also has a configuration file `application.yaml` in the `/src/main/resources` folder, where you can configure additional settings such as development mode, the server port, token expiration times, overdue fines and durations for various reservation and borrowing rules.
-
-**The development mode, aside from the default functions, controls whether the cookies are set with the `Secure` flag**, which requires an HTTPS connection when using the server in production.
+The server also has a configuration file `application.yaml` in the `/src/main/resources` folder, where you can configure additional settings such as token expiration times, overdue fines and durations for various reservation and borrowing rules.
 
 
 ## API Usage
