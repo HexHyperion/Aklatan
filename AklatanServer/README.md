@@ -66,7 +66,7 @@ The `requests.http` file contains examples of requests to most of the endpoints 
 ### `GET` `/` (Public):
 Check if the server is running by receiving a human-readable welcome message with authentication state.
 - Expected responses:
-  - `200 OK` with a text message indicating whether the request includes a valid JWT token.
+  - `200 OK` with a text message indicating whether the request comes from a user authenticated with a valid JWT.
 
 
 ## User Registration & Authentication
