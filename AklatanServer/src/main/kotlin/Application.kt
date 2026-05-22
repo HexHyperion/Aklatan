@@ -56,6 +56,7 @@ fun Application.module() {
 
     configureExceptionHandling()
     configureSerialization()
+    configureCORS()
     configureDatabase()
     configureAuthentication(userService, roleService)
     configureRouting(
