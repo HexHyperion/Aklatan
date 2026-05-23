@@ -20,7 +20,7 @@ Thank you
 - Information about library open hours and holidays
 
 ## Technologies
-- ??? for frontend
+- Svelte for frontend
 - Kotlin/Ktor for backend
 - PostgreSQL/Exposed for DB
 - Docker Compose for deployment
