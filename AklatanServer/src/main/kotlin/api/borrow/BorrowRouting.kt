@@ -44,7 +44,7 @@ fun Route.borrowRouting(
                     Pair(request.isbn, principal.payload.getClaim("id").asInt())
                 } else {
                     val request = call.receive<ReserveBookAdminRequest>()
-                    Pair(request.isbn, request.userId)
+                    Pair(request.isbn, userService.getIdByEmail(request.email))
                 }
                 reservationService.reserve(isbn, userId)
                 call.respond(ApiResponse.Success(HttpStatusCode.Created))
@@ -59,7 +59,7 @@ fun Route.borrowRouting(
                     Pair(request.isbns, principal.payload.getClaim("id").asInt())
                 } else {
                     val request = call.receive<BatchReserveBookAdminRequest>()
-                    Pair(request.isbns, request.userId)
+                    Pair(request.isbns, userService.getIdByEmail(request.email))
                 }
                 reservationService.reserveMany(isbns, userId)
                 call.respond(ApiResponse.Success(HttpStatusCode.Created))
@@ -107,11 +107,11 @@ fun Route.borrowRouting(
                 call.respond(ApiResponse.SuccessWithData(reservations))
             }
 
-            get("/user/{userId}") {
-                val userId = call.parameters["userId"]?.toIntOrNull()
-                    ?: throw BadRequestException("Invalid user ID")
+            get("/user/{email}") {
+                val email = call.parameters["email"]
+                    ?: throw BadRequestException("Invalid user email")
 
-                userService.getById(userId)
+                val userId = userService.getIdByEmail(email)
                 val reservations = reservationService.getAllForUser(userId)
                 call.respond(ApiResponse.SuccessWithData(reservations))
             }
@@ -194,24 +194,24 @@ fun Route.borrowRouting(
                 call.respond(ApiResponse.SuccessWithData(borrows))
             }
 
-            get("/user/{userId}") {
-                val userId = call.parameters["userId"]?.toIntOrNull()
-                    ?: throw BadRequestException("Invalid user ID")
+            get("/user/{email}") {
+                val email = call.parameters["email"]
+                    ?: throw BadRequestException("Invalid user email")
 
-                userService.getById(userId)
+                val userId = userService.getIdByEmail(email)
                 val borrows = borrowService.getAllForUserId(userId)
                 call.respond(ApiResponse.SuccessWithData(borrows))
             }
 
             post {
                 val request = call.receive<BorrowBookAdminRequest>()
-                borrowService.borrow(request.isbn, request.userId)
+                borrowService.borrow(request.isbn, userService.getIdByEmail(request.email))
                 call.respond(ApiResponse.Success(HttpStatusCode.Created))
             }
 
             post("/batch") {
                 val request = call.receive<BatchBorrowBookAdminRequest>()
-                borrowService.borrowMany(request.isbns, request.userId)
+                borrowService.borrowMany(request.isbns, userService.getIdByEmail(request.email))
                 call.respond(ApiResponse.Success(HttpStatusCode.Created))
             }
 

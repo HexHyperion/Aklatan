@@ -52,6 +52,10 @@ class UserService(private val userRepository: UserRepository, private val roleRe
         }
     }
 
+    suspend fun getIdByEmail(email: String): Int {
+        return userRepository.findIdByEmail(email) ?: throw UserNotFoundException()
+    }
+
     suspend fun getIdByEmailOrNull(email: String): Int? {
         return userRepository.findIdByEmail(email)
     }

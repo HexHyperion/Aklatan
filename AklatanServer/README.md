@@ -475,7 +475,7 @@ Get a list of the authenticated user's active and past reservations if the reque
 Create a new reservation for a book by its ISBN.
 - Request body parameters:
   - `isbn` (string, required): The ISBN of the book to reserve.
-  - `userId` (int, required for librarians): The unique identifier of the user for whom to create the reservation, required only if the request is from a librarian or manager.
+  - `email` (string, required for librarians): The email of the user for whom to create the reservation, required only if the request is from a librarian or manager.
 - Expected responses:
   - `201 Created` if the reservation is successfully created.
   - `404 BOOK_NOT_FOUND` if no book with the provided ISBN exists in the inventory.
@@ -485,7 +485,7 @@ Create a new reservation for a book by its ISBN.
 Create multiple reservations for books by their ISBNs in a single request.
 - Request body parameters:
   - `isbns` (set:string, required): The ISBNs of the books to reserve.
-  - `userId` (int, required for librarians): The unique identifier of the user for whom to create the reservation, required only if the request is from a librarian or manager.
+  - `email` (string, required for librarians): The email of the user for whom to create the reservation, required only if the request is from a librarian or manager.
 - Expected responses:
   - `201 Created` if the reservations are successfully created.
   - `404 BOOK_NOT_FOUND` if any of the provided ISBNs do not correspond to existing books in the inventory.
@@ -530,10 +530,10 @@ Get a list of all reservations for a book by its ISBN.
       - `canceled` (boolean): Whether the reservation was canceled by the user.
   - `404 BOOK_NOT_FOUND` if no book with the provided ISBN exists in the inventory.
 
-### `GET` `/reservations/user/{userId}` (Librarian, Manager):
+### `GET` `/reservations/user/{email}` (Librarian, Manager):
 Get a list of all reservations made by a specific user.
 - Path parameters:
-  - `userId` (int, required): The unique identifier of the user.
+  - `email` (string, required): The user's email.
 - Expected responses:
   - `200 OK` with a list of reservations made by the specified user if found.
     - list of reservations consisting of:
@@ -564,7 +564,7 @@ Get a list of the authenticated user's active and past borrows if the request is
 Create a new borrow for a book copy by its ID, if the book is available for the user.
 - Request body parameters:
   - `isbn` (string, required): The ISBN of the book to borrow, used to find an available copy.
-  - `userId` (int): The unique identifier of the user for whom to create the borrow.
+  - `email` (string): The email of the user for whom to create the borrow.
 - Expected responses:
   - `201 Created` if the borrow is successfully created.
   - `404 BOOK_NOT_FOUND` if no book with the provided ISBN exists in the inventory.
@@ -574,7 +574,7 @@ Create a new borrow for a book copy by its ID, if the book is available for the 
 Create multiple borrows for book copies by their ISBNs in a single request, if the books are available for the user.
 - Request body parameters:
   - `isbns` (set:string, required): The ISBNs of the books to borrow, used to find available copies.
-  - `userId` (int): The unique identifier of the user for whom to create the borrows.
+  - `email` (string): The email of the user for whom to create the borrows.
 - Expected responses:
   - `201 Created` if the borrows are successfully created.
   - `404 BOOK_NOT_FOUND` if any of the provided ISBNs do not correspond to existing books in the inventory.
@@ -639,10 +639,10 @@ Get a list of all borrows for a specific book copy by its ID.
       - `returnedAt` (instant): The timestamp of when the book was returned, or null if not returned yet.
   - `404 BOOK_NOT_FOUND` if no book copy with the provided ID exists in the inventory.
 
-### `GET` `/borrows/user/{userId}` (Librarian, Manager):
+### `GET` `/borrows/user/{email}` (Librarian, Manager):
 Get a list of all borrows made by a specific user.
 - Path parameters:
-  - `userId` (int, required): The unique identifier of the user.
+  - `email` (string, required): The user's email.
 - Expected responses:
   - `200 OK` with a list of borrows made by the specified user if found.
     - list of borrows consisting of:
