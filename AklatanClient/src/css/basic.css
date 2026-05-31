@@ -1,0 +1,34 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Courier New', Courier, monospace;
+}
+:root{
+    --background: #1b2929;
+    --primary: #4FE566;
+    --secondary: #06231D ;
+}
+body{
+    background-color: var(--background);
+    color: rgb(206, 206, 206);
+}
+.book-display{
+    display: flex;
+    flex-direction: column;
+    color: white;
+    text-transform: none;
+    li{
+        background-color: var(--primary);
+        padding: 5px;
+        border-radius: 5px ;
+    }
+    li:hover{
+        a{
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+    }
+    
+}
+

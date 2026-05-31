@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { setAuth,logout } from "$lib/auth";
+    import { goto } from '$app/navigation';
+
 
     import Header from "../../header.svelte";
 
@@ -6,6 +9,7 @@
     let register_name = '';
     let register_password = '';
     let register_password_2 = '';
+    let isRegistering = $state(false);
 
     let login_email = '';
     let login_password = '';
@@ -40,7 +44,8 @@
         });
 
         if (res.status === 201) {
-            window.alert("User registered, check your email")
+            window.alert("User registered, check your email to verify the account")
+            isRegistering = true
         } else {
             window.alert("User already exists")
         }
@@ -69,7 +74,9 @@
         if(res.status === 200){
             const data = await res.json();
             const jwtToken = data.token; 
-            console.log("JWT token:", jwtToken);
+            // console.log("JWT token:", jwtToken);
+            setAuth(jwtToken);
+            goto("/my-library")
         }else{
             if(res.status == 401){
                 const errorData = await res.json();
@@ -78,12 +85,10 @@
                     window.alert("Incorrect user credentials")
                 }
                 if(errorCode === 'USER_NOT_VERIFIED'){
-                    window.alert("Email is not verified")
+                    window.alert("The account is not verified")
                 }
                 
             }
-            console.log("nie jest g")
-            console.log(res)
         }
     }
 
@@ -98,11 +103,34 @@
         body: JSON.stringify({ email })
         });
         if(res.status===200){
-            console.log("spoko")
+            window.alert("Check your email for account verification link")
         }
         else{
             console.log(res.status)
         }
+    }
+
+    async function requestPassword() {
+        let email = login_email
+        if(email == ""){
+            window.alert("Enter your email")
+        }
+        const res = await fetch(`http://localhost:8080/auth/request-password-reset`, {
+        method: 'POST',
+        
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+        });
+        if(res.status===200){
+            console.log("spoko")
+            window.alert("Check your email for password reset link")
+        }
+        else{
+            console.log(res.status)
+        }
+
     }
 
     
@@ -111,14 +139,14 @@
 
 <h1>Welcome to Aklatan!</h1>
  
-<h3>Logowanie</h3>
+<h3>Sign in</h3>
 <input type="email" placeholder="Login" bind:value={login_email}>
 <input type="password" placeholder="Password" bind:value={login_password}>
 <input type="submit" value="Log in" onclick={sendLogin}>
 <br>
-<button>Forgot password</button>
+<button onclick={requestPassword}>Forgot password</button>
 
-<h3>Rejestracja</h3>
+<h3>Sign up</h3>
 <form>
     <input type="email" placeholder="Email" name="email" bind:value={register_email}>
     <input type="text" placeholder="Name" name="name" bind:value={register_name}>
@@ -126,7 +154,11 @@
     <input type="password" name="" id="" placeholder="pass2" bind:value={register_password_2}>
     <input type="submit" value="Sign in" onclick={sendRegister}>
 </form>
+{#if isRegistering}
 <button onclick={requestAgain}>Request the link again</button>
+{/if}
+
+
 
 
 

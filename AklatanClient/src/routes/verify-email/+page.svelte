@@ -3,6 +3,7 @@
     import { page } from '$app/state';
     import { redirect } from '@sveltejs/kit';
     import { goto } from '$app/navigation';
+    import Header from '../../header.svelte';
 
     onMount(async () => {
         const tokenFromUrl = page.url.searchParams.get('token');
@@ -32,5 +33,5 @@
         }
     });
 </script>
-
+<Header></Header>
 <h1>Verifying...</h1>
