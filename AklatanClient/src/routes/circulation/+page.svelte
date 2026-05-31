@@ -178,161 +178,160 @@
 </script>
 
 <Header></Header>
-<h1>Circulation desk</h1>
+<div class="main-container neutral-container">
+    <h1>Circulation desk</h1>
 
-{#if isLoading}
-    <h2>Loading desk data...</h2>
-{:else}
-    <div >
-        
-        <div>
-            <h3>Borrow a book to user form</h3>
-            <form onsubmit={handleBorrow}>
-                <div>
-                    <label>ISBN: <input type="text" bind:value={b_isbn} required></label>
-                </div>
-                <div >
-                    <label>User Email: <input type="email" bind:value={b_email} required></label>
-                </div>
-                <button type="submit">Borrow Book</button>
-            </form>
-        </div>
+    {#if isLoading}
+        <h2>Loading desk data...</h2>
+    {:else}
+        <div class="top-container space-out">
+            <div>
+                <h3>Borrow a book to user</h3>
+                <form onsubmit={handleBorrow} class="search-form">
+                    <div>
+                        <label>ISBN: <input type="text" bind:value={b_isbn} required></label>
+                    </div>
+                    <div >
+                        <label>User Email: <input type="email" bind:value={b_email} required></label>
+                    </div>
+                    <button type="submit">Borrow Book</button>
+                </form>
+            </div>
 
-        <div >
-            <h3>Get specific user's borrows</h3>
-            <form onsubmit={handleSearchByUser}>
-                <div style="margin-bottom: 8px;">
+            <div >
+                <h3>Get specific user's borrows</h3>
+                <form onsubmit={handleSearchByUser} class="search-form">
                     <input type="email" placeholder="Enter user email..." bind:value={searchEmail} required>
-                </div>
-                <button type="submit">Search User</button>
-                {#if searchEmail}
-                    <button type="button" onclick={clearUserSearch} >Clear</button>
-                {/if}
-            </form>
+                    <button type="submit">Search User</button>
+                    {#if searchEmail}
+                        <button type="button" onclick={clearUserSearch} >Clear</button>
+                    {/if}
+                    
+                </form>
+            </div>
+
         </div>
 
-    </div>
 
-    <hr>
-
-    <div style="margin-bottom: 30px;">
-        <h3>Active Borrows list</h3>
-        {#if activeBorrows.length === 0}
-            <p>No active borrows at the moment.</p>
-        {:else}
-            <table border="1" style="width: 100%; text-align: left; border-collapse: collapse;">
-                <thead>
-                    <tr style="background-color: #f2f2f2;">
-                        <th>ID</th>
-                        <th>Book Copy ID</th>
-                        <th>User ID</th>
-                        <th>Borrowed At</th>
-                        <th>Due Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each activeBorrows as borrow (borrow.id)}
+        <div class="tables-container" style="margin-bottom: 30px;">
+            <h3>Active Borrows list</h3>
+            {#if activeBorrows.length === 0}
+                <p>No active borrows at the moment.</p>
+            {:else}
+                <table border="1" style="width: 100%; text-align: left; border-collapse: collapse;">
+                    <thead>
                         <tr>
-                            <td>{borrow.id}</td>
-                            <td>{borrow.bookId}</td>
-                            <td>{borrow.userId}</td>
-                            <td>{new Date(borrow.borrowedAt).toLocaleString()}</td>
-                            <td>{new Date(borrow.endsAt).toLocaleDateString()}</td>
-                            <td>
-                                <button onclick={() => executeReturn(borrow.id)}>Mark as returned</button>
-                                <button onclick={() => openExtendDialog(borrow.id)} style="margin-left: 5px; background-color: #e7a400; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px;">
-                                    Extend Borrow
-                                </button>
-                            </td>
+                            <th>ID</th>
+                            <th>Book Copy ID</th>
+                            <th>User ID</th>
+                            <th>Borrowed At</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
                         </tr>
-                    {/each}
-                </tbody>
-            </table>
-        {/if}
-    </div>
-
-    <div style="margin-bottom: 30px;">
-        <h3>Overdue borrows list</h3>
-        {#if overdueBorrows.length === 0}
-            <p style="color: green; font-weight: bold;">No overdue borrows! Everyone is on time.</p>
-        {:else}
-            <table border="1" style="width: 100%; text-align: left; border-collapse: collapse; border-color: red;">
-                <thead>
-                    <tr style="background-color: #ffe6e6;">
-                        <th>ID</th>
-                        <th>Book Copy ID</th>
-                        <th>User ID</th>
-                        <th>Due Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each overdueBorrows as borrow (borrow.id)}
-                        <tr style="color: red;">
-                            <td><strong>{borrow.id}</strong></td>
-                            <td>{borrow.bookId}</td>
-                            <td>{borrow.userId}</td>
-                            <td>{new Date(borrow.endsAt).toLocaleDateString()} (Overdue)</td>
-                            <td>
-                                <button onclick={() => checkFee(borrow.id)}>Check Fee</button>
-                                <button onclick={() => executeReturn(borrow.id)} style="font-weight: bold; margin-left: 5px;">Mark as returned</button>
-                                <button onclick={() => openExtendDialog(borrow.id)} style="margin-left: 5px; background-color: #e7a400; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px;">
-                                    Extend Borrow
-                                </button>
-                            </td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-        {/if}
-    </div>
-
-    <div style="margin-bottom: 30px;">
-        <h3>Returned Borrows history</h3>
-        {#if returnedBorrows.length === 0}
-            <p style="color: #666;">No returned borrows found.</p>
-        {:else}
-            <table border="1" style="width: 100%; text-align: left; border-collapse: collapse; color: #555;">
-                <thead>
-                    <tr style="background-color: #e8f5e9;">
-                        <th>ID</th>
-                        <th>Book Copy ID</th>
-                        <th>User ID</th>
-                        <th>Borrowed At</th>
-                        <th>Returned At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each returnedBorrows as borrow (borrow.id)}
-                        <tr>
-                            <td>{borrow.id}</td>
-                            <td>{borrow.bookId}</td>
-                            <td>{borrow.userId}</td>
-                            <td>{new Date(borrow.borrowedAt).toLocaleString()}</td>
-                            <td style="color: green; font-weight: bold;">{new Date(borrow.returnedAt).toLocaleString()}</td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-        {/if}
-    </div>
-{/if}
-
-<dialog bind:this={extendDialog} style="padding: 20px; border-radius: 8px; border: 1px solid #ccc; width: 350px;">
-    <h2>Extend Borrow #{selectedBorrowId}</h2>
-    <form onsubmit={handleExtendSubmit}>
-        <p>Are you sure you want to extend the due date for this borrow record?</p>
-        <p style="font-size: 0.85em; color: #666;">
-            Note: The new due date will be calculated automatically by the system. Extension might be forbidden if other users are waiting for this book.
-        </p>
-        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-            <button type="button" onclick={() => extendDialog.close()} disabled={isSubmittingExtend} style="background: #ccc;">
-                Cancel
-            </button>
-            <button type="submit" disabled={isSubmittingExtend} style="background: #2196F3; color: white;">
-                {isSubmittingExtend ? "Extending..." : "Confirm Extension"}
-            </button>
+                    </thead>
+                    <tbody>
+                        {#each activeBorrows as borrow (borrow.id)}
+                            <tr>
+                                <td>{borrow.id}</td>
+                                <td>{borrow.bookId}</td>
+                                <td>{borrow.userId}</td>
+                                <td>{new Date(borrow.borrowedAt).toLocaleString()}</td>
+                                <td>{new Date(borrow.endsAt).toLocaleDateString()}</td>
+                                <td>
+                                    <button onclick={() => executeReturn(borrow.id)}>Mark as returned</button>
+                                    <button onclick={() => openExtendDialog(borrow.id)} style="margin-left: 5px;border: none; cursor: pointer; border-radius: 3px;">
+                                        Extend Borrow
+                                    </button>
+                                </td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            {/if}
         </div>
-    </form>
-</dialog>
+
+        <div class="tables-container" style="margin-bottom: 30px;">
+            <h3>Overdue borrows list</h3>
+            {#if overdueBorrows.length === 0}
+                <p style="color: green; font-weight: bold;">No overdue borrows! Everyone is on time.</p>
+            {:else}
+                <table border="1" style="width: 100%; text-align: left; border-collapse: collapse; border-color: red;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Book Copy ID</th>
+                            <th>User ID</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#each overdueBorrows as borrow (borrow.id)}
+                            <tr style="color: red;">
+                                <td><strong>{borrow.id}</strong></td>
+                                <td>{borrow.bookId}</td>
+                                <td>{borrow.userId}</td>
+                                <td>{new Date(borrow.endsAt).toLocaleDateString()} (Overdue)</td>
+                                <td>
+                                    <button onclick={() => checkFee(borrow.id)}>Check Fee</button>
+                                    <button onclick={() => executeReturn(borrow.id)} style="font-weight: bold; margin-left: 5px;">Mark as returned</button>
+                                    <button onclick={() => openExtendDialog(borrow.id)} style="margin-left: 5px; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px;">
+                                        Extend Borrow
+                                    </button>
+                                </td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            {/if}
+        </div>
+
+        <div class="tables-container" style="margin-bottom: 30px;">
+            <h3>Returned Borrows history</h3>
+            {#if returnedBorrows.length === 0}
+                <p style="color: #666;">No returned borrows found.</p>
+            {:else}
+                <table border="1" style="width: 100%; text-align: left; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Book Copy ID</th>
+                            <th>User ID</th>
+                            <th>Borrowed At</th>
+                            <th>Returned At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#each returnedBorrows as borrow (borrow.id)}
+                            <tr>
+                                <td>{borrow.id}</td>
+                                <td>{borrow.bookId}</td>
+                                <td>{borrow.userId}</td>
+                                <td>{new Date(borrow.borrowedAt).toLocaleString()}</td>
+                                <td style="color: green; font-weight: bold;">{new Date(borrow.returnedAt).toLocaleString()}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            {/if}
+        </div>
+    {/if}
+
+    <dialog bind:this={extendDialog} style="padding: 20px; border-radius: 8px; border: 1px solid #ccc; width: 350px;">
+        <h2>Extend Borrow #{selectedBorrowId}</h2>
+        <form onsubmit={handleExtendSubmit}>
+            <p>Are you sure you want to extend the due date for this borrow record?</p>
+            <p style="font-size: 0.85em; color: #666;">
+                Note: The new due date will be calculated automatically by the system. Extension might be forbidden if other users are waiting for this book.
+            </p>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" onclick={() => extendDialog.close()} disabled={isSubmittingExtend} style="background: #ccc;">
+                    Cancel
+                </button>
+                <button type="submit" disabled={isSubmittingExtend}>
+                    {isSubmittingExtend ? "Extending..." : "Confirm Extension"}
+                </button>
+            </div>
+        </form>
+    </dialog>
+</div>

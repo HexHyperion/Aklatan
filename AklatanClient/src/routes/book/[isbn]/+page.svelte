@@ -112,82 +112,84 @@
 </script>
 
 <Header></Header>
-
-<h1>Szczegóły książki</h1>
-<p>ISBN: <strong>{isbn}</strong></p>
-
-{#if bookDetails}
-{#if $role =="user"}
-    <div>
-        <h2>{bookDetails.title}</h2>
-        <p>Autor: {bookDetails.author}</p>
-        <p>Rok wydania: {bookDetails.year}</p>
-    </div>
-{:else}
-    <div>
-        <h2>{bookDetails[0].title}</h2>
-        <p>Autor: {bookDetails[0].author}</p>
-        <p>Rok wydania: {bookDetails[0].year}</p>
-    </div>
-{/if}
-{:else}
-    <p>Ładowanie danych książki...</p>
-{/if}
-
-{#if $role === "user"}
-    {#if available > 0}
-        <button onclick={createReservation} disabled={isLoading}>Reserve the book</button>
+<div class="main-container">
+<div class="profile-info book-info">
+    {#if bookDetails}
+    {#if $role =="user"}
+        <div>
+            <h1>{bookDetails.title}</h1>
+            <p>Author: {bookDetails.author}</p>
+            <p>Year: {bookDetails.year}</p>
+            <p>ISBN: <strong>{isbn}</strong></p>
+        </div>
     {:else}
-        <p>This book is currently unavailable</p>
-        <p>There are {reserved || 0} users waiting for this book.</p>
+        <div>
+            <h1>{bookDetails[0].title}</h1>
+            <p>Author: {bookDetails[0].author}</p>
+            <p>Year: {bookDetails[0].year}</p>
+            <p>ISBN: <strong>{isbn}</strong></p>
+        </div>
     {/if}
-{/if}
-
-<br>
-
-{#if $role === "manager" || $role === "librarian"}
-
-    <h3>Copies of the book in the library</h3>
-    {#if bookCopies.length > 0}
-        <ul>
-            {#each bookCopies as copy}
-                <li>Copy ID: {copy.id}</li>
-            {/each}
-        </ul>
     {:else}
-        <p>No other copies found.</p>
+        <p>Loading...</p>
     {/if}
 
-    <h3>List of all reservations for the book (ISBN: {isbn})</h3>
-    {#if bookReservations.length > 0}
-        <table border="1" >
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>User ID</th>
-                    <th>Expires At</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {#each bookReservations as r}
-                    <tr>
-                        <td>{r.id}</td>
-                        <td>{r.userId}</td>
-                        <td>{new Date(r.expiresAt).toLocaleString()}</td>
-                        <td>{r.canceled ? 'Canceled' : 'Active'}</td>
-                        <td>
-                            {#if !r.canceled}
-                                <button onclick={() => cancelReservation(r.id)}>Delete</button>
-                            {/if}
-                        </td>
-                    </tr>
+    {#if $role === "user"}
+        {#if available > 0}
+            <button onclick={createReservation} disabled={isLoading}>Reserve the book</button>
+        {:else}
+            <p>This book is currently unavailable</p>
+            <p>There are {reserved || 0} users waiting for this book.</p>
+        {/if}
+    {/if}
+
+    <br>
+
+    {#if $role === "manager" || $role === "librarian"}
+
+        <h3>Copies of the book in the library</h3>
+        {#if bookCopies.length > 0}
+            <ul>
+                {#each bookCopies as copy}
+                    <li>Copy ID: {copy.id}</li>
                 {/each}
-            </tbody>
-        </table>
-    {:else}
-        <p>No reservations.</p>
+            </ul>
+        {:else}
+            <p>No other copies found.</p>
+        {/if}
+
+        <h3>List of all reservations for the book (ISBN: {isbn})</h3>
+        {#if bookReservations.length > 0}
+            <table border="1" >
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User ID</th>
+                        <th>Expires At</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#each bookReservations as r}
+                        <tr>
+                            <td>{r.id}</td>
+                            <td>{r.userId}</td>
+                            <td>{new Date(r.expiresAt).toLocaleString()}</td>
+                            <td>{r.canceled ? 'Canceled' : 'Active'}</td>
+                            <td>
+                                {#if !r.canceled}
+                                    <button onclick={() => cancelReservation(r.id)}>Delete</button>
+                                {/if}
+                            </td>
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
+        {:else}
+            <p>No reservations.</p>
+        {/if}
     {/if}
-{/if}
-<br>
+    <br>
+</div>
+</div>

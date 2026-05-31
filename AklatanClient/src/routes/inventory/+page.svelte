@@ -226,105 +226,112 @@
 </script>
 
 <Header></Header>
-<h1>Browse books</h1>
-
-<button onclick={() => addDialog.showModal()}>Add new books to the system</button> 
-
-<h3>Search & Sort books</h3>
-<form onsubmit={handleSearch}>
-    <input type="text" placeholder="ID" bind:value={s_id}>
-    <input type="text" placeholder="isbn" bind:value={s_isbn}>
-    <input type="text" placeholder="title" bind:value={s_title}>
-    <input type="text" placeholder="author" bind:value={s_author}>
-    <input type="number" placeholder="year" bind:value={s_year}> 
-    <input type="submit" value="SEARCH" disabled={isLoading}>
-    <button type="button" onclick={clearFilters} disabled={isLoading}>CLEAR FILTERS</button>
-</form>
-
-<div style="margin-bottom: 1rem;">
-    <label for="sort-order">Sort by Book ID:</label>
-    <select id="sort-order" bind:value={sortOrder} disabled={isLoading} >
-        <option value="none">Default</option>
-        <option value="asc">ID: Low to High ↑</option>
-        <option value="desc">ID: High to Low ↓</option>
-    </select>
-</div>
-
-<hr>
-
-{#if isLoading}
-    <div style="text-align: center; padding: 2rem;">
-        <h1>Loading...</h1>
-        <p>Proszę czekać, pobieram dane z serwera...</p>
+<div class="main-container">
+    <div class="top-container">
+    <div class="header-options">
+        <h1>Browse books</h1>
+        <div>       
+            <button onclick={() => addDialog.showModal()}>Add new books to the system</button> 
+            <div>
+                <label for="sort-order">Sort by Book ID:</label>
+                <select id="sort-order" bind:value={sortOrder} disabled={isLoading} >
+                    <option value="none">Default</option>
+                    <option value="asc">ID: Low to High ↑</option>
+                    <option value="desc">ID: High to Low ↓</option>
+                </select>
+            </div>
+        </div>
     </div>
-{:else}
-    <div class="pagination-controls">
-        <button onclick={() => changePage(false)} disabled={currentPage === 0 || isLoading}>
-            Previous
-        </button>
-        
-        <span>Page {currentPage + 1} of {totalPages}</span>
-        
-        <button onclick={() => changePage(true)} disabled={currentPage === totalPages - 1 || isLoading}>
-            Next
-        </button>
 
-        <form onsubmit={handlePageJump} >
-            <label for="page-jump">Go to page:</label>
-            <input 
-                id="page-jump"
-                type="number" 
-                min="1" 
-                max={totalPages} 
-                bind:value={pageInput} 
-                disabled={isLoading}
-            />
-            <button type="submit" disabled={isLoading}>Go</button>
+    <div>
+        <form onsubmit={handleSearch} class="search-form">
+            <input type="text" placeholder="ID" bind:value={s_id}>
+            <input type="text" placeholder="isbn" bind:value={s_isbn}>
+            <input type="text" placeholder="title" bind:value={s_title}>
+            <input type="text" placeholder="author" bind:value={s_author}>
+            <input type="number" placeholder="year" bind:value={s_year}> 
+            <input type="submit" value="SEARCH" disabled={isLoading}>
+            <button type="button" onclick={clearFilters} disabled={isLoading}>CLEAR FILTERS</button>
         </form>
     </div>
 
-    {#if visibleBooks.length === 0}
-        <p>Brak książek do wyświetlenia.</p>
+        
+    </div>
+
+    {#if isLoading}
+        <div style="text-align: center; padding: 2rem;">
+            <h1>Loading...</h1>
+        </div>
     {:else}
-        <ul class="book-display">
-            {#each visibleBooks as book (book.id)}
-                <li>
-                    <a href="/book/{book.isbn}">
-                        <strong>[ID: {book.id}]</strong> {book.isbn} - {book.title || 'Brak tytułu'} ({book.author}) - {book.year}
-                    </a>
-                    <button onclick={() => openUpdateDialog(book)} >Update info</button> 
-                    <button onclick={() => deleteBook(book.id)}>Delete</button> 
-                </li>
-            {/each}
-        </ul>
+        <div class="pagination-controls">
+            <button onclick={() => changePage(false)} disabled={currentPage === 0 || isLoading}>
+                Previous
+            </button>
+            
+            <span>Page {currentPage + 1} of {totalPages}</span>
+            
+            <button onclick={() => changePage(true)} disabled={currentPage === totalPages - 1 || isLoading}>
+                Next
+            </button>
+
+            <form onsubmit={handlePageJump} >
+                <label for="page-jump">Go to page:</label>
+                <input 
+                    id="page-jump"
+                    type="number" 
+                    min="1" 
+                    max={totalPages} 
+                    bind:value={pageInput} 
+                    disabled={isLoading}
+                />
+                <button type="submit" disabled={isLoading}>Go</button>
+            </form>
+        </div>
+
+        {#if visibleBooks.length === 0}
+            <p>No books</p>
+        {:else}
+            <ul class="book-display">
+                {#each visibleBooks as book (book.id)}
+                    <li>
+                        <a href="/book/{book.isbn}">
+                            <strong>[ID: {book.id}]</strong> {book.isbn} - {book.title || 'Brak tytułu'} ({book.author}) - {book.year}
+                        </a>
+                        <button onclick={() => openUpdateDialog(book)} >Update info</button> 
+                        <button onclick={() => deleteBook(book.id)}>Delete</button> 
+                    </li>
+                {/each}
+            </ul>
+        {/if}
     {/if}
-{/if}
 
-<dialog bind:this={addDialog}>
-    <h2>Add New Books</h2>
-    <form onsubmit={handleAddBooks}>
-        <div><label>ISBN: <input type="text" bind:value={n_isbn} required></label></div>
-        <div><label>Title: <input type="text" bind:value={n_title}></label></div>
-        <div><label>Author: <input type="text" bind:value={n_author}></label></div>
-        <div><label>Year: <input type="text" bind:value={n_year}></label></div>
-        <div><label>Quantity: <input type="number" min="1" bind:value={n_quantity}></label></div>
-        <div>
-            <button type="submit" disabled={isLoading}>Add Book(s)</button>
-            <button type="button" onclick={() => addDialog.close()}>Cancel</button>
-        </div>
-    </form>
-</dialog>
+    <dialog bind:this={addDialog}>
+        <h2>Add New Books</h2>
+        <form onsubmit={handleAddBooks}>
+            <div><label>ISBN: <input type="text" bind:value={n_isbn} required></label></div>
+            <div><label>Title: <input type="text" bind:value={n_title}></label></div>
+            <div><label>Author: <input type="text" bind:value={n_author}></label></div>
+            <div><label>Year: <input type="text" bind:value={n_year}></label></div>
+            <div><label>Quantity: <input type="number" min="1" bind:value={n_quantity}></label></div>
+            <div>
+                <button type="submit" disabled={isLoading}>Add Book(s)</button>
+                <button type="button" onclick={() => addDialog.close()}>Cancel</button>
+            </div>
+        </form>
+    </dialog>
 
-<dialog bind:this={updateDialog}>
-    <h2>Update Book Info</h2>
-    <form onsubmit={handleUpdateBook}>
-        <div><label>ISBN: <input type="text" bind:value={u_isbn}></label></div>
-        <div><label>Title: <input type="text" bind:value={u_title}></label></div>
-        <div><label>Author: <input type="text" bind:value={u_author}></label></div>
-        <div><label>Year: <input type="text" bind:value={u_year}></label></div>
-        <div>
-            <button type="submit" disabled={isLoading}>Save Changes</button>
-            <button type="button" onclick={() => updateDialog.close()}>Cancel</button>
-        </div>
-    </form>
-</dialog>
+    <dialog bind:this={updateDialog}>
+        <h2>Update Book Info</h2>
+        <form onsubmit={handleUpdateBook}>
+            <div><label>ISBN: <input type="text" bind:value={u_isbn}></label></div>
+            <div><label>Title: <input type="text" bind:value={u_title}></label></div>
+            <div><label>Author: <input type="text" bind:value={u_author}></label></div>
+            <div><label>Year: <input type="text" bind:value={u_year}></label></div>
+            <div>
+                <button type="submit" disabled={isLoading}>Save Changes</button>
+                <button type="button" onclick={() => updateDialog.close()}>Cancel</button>
+            </div>
+        </form>
+    </dialog>
+
+</div>

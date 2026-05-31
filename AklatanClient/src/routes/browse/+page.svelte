@@ -118,59 +118,62 @@
 </script>
 
 <Header></Header>
-<h1>Browse books</h1>
+<div class="main-container">
+    <div class="top-container">
+    <div class="header-options">
+    <h1>Browse</h1>
+    <form onsubmit={handleSearch} class="search-form">
+        <input type="text" placeholder="ISBN" bind:value={s_isbn}>
+        <input type="text" placeholder="Title" bind:value={s_title}>
+        <input type="text" placeholder="Author" bind:value={s_author}>
+        <input type="number" placeholder="Year" bind:value={s_year}> 
+        <input type="submit" value="SEARCH" disabled={isLoading}>
+        <button type="button" onclick={clearFilters} disabled={isLoading}>CLEAR FILTERS</button>
+    </form>
 
-<h3>Search books</h3>
-<form onsubmit={handleSearch} style="margin-bottom: 1rem;">
-    <input type="text" placeholder="ISBN" bind:value={s_isbn}>
-    <input type="text" placeholder="Title" bind:value={s_title}>
-    <input type="text" placeholder="Author" bind:value={s_author}>
-    <input type="number" placeholder="Year" bind:value={s_year}> 
-    <input type="submit" value="SEARCH" disabled={isLoading}>
-    <button type="button" onclick={clearFilters} disabled={isLoading}>CLEAR FILTERS</button>
-</form>
-
-<hr>
-
-{#if isLoading}
-    <h3>Loading...</h3>
-{:else}
-    <div class="pagination-controls">
-        <button onclick={() => changePage(false)} disabled={currentPage === 0 || isLoading}>
-            Previous
-        </button>
-        
-        <span>Page {currentPage + 1} of {totalPages}</span>
-        
-        <button onclick={() => changePage(true)} disabled={currentPage === totalPages - 1 || isLoading}>
-            Next
-        </button>
-
-        <form onsubmit={handlePageJump} >
-            <label for="page-jump">Go to page:</label>
-            <input 
-                id="page-jump"
-                type="number" 
-                min="1" 
-                max={totalPages} 
-                bind:value={pageInput} 
-                disabled={isLoading}
-            />
-            <button type="submit" disabled={isLoading}>Go</button>
-        </form>
+    </div>
     </div>
 
-    {#if visibleBooks.length === 0}
-        <p>Brak książek do wyświetlenia spełniających kryteria.</p>
+    {#if isLoading}
+        <h3>Loading...</h3>
     {:else}
-        <ul class="book-display">
-            {#each visibleBooks as book}
-                <li>
-                    <a href="/book/{book.isbn}">
-                        {book.title || 'Brak tytułu'} - {book.author} ({book.isbn})
-                    </a>
-                </li>
-            {/each}
-        </ul>
+        <div class="pagination-controls">
+            <button onclick={() => changePage(false)} disabled={currentPage === 0 || isLoading}>
+                Previous
+            </button>
+            
+            <span>Page {currentPage + 1} of {totalPages}</span>
+            
+            <button onclick={() => changePage(true)} disabled={currentPage === totalPages - 1 || isLoading}>
+                Next
+            </button>
+
+            <form onsubmit={handlePageJump} >
+                <label for="page-jump">Go to page:</label>
+                <input 
+                    id="page-jump"
+                    type="number" 
+                    min="1" 
+                    max={totalPages} 
+                    bind:value={pageInput} 
+                    disabled={isLoading}
+                />
+                <button type="submit" disabled={isLoading}>Go</button>
+            </form>
+        </div>
+
+        {#if visibleBooks.length === 0}
+            <p>No matching books</p>
+        {:else}
+            <ul class="book-display">
+                {#each visibleBooks as book}
+                    <li>
+                        <a href="/book/{book.isbn}">
+                            {book.title || 'Brak tytułu'} - {book.author} ({book.isbn})
+                        </a>
+                    </li>
+                {/each}
+            </ul>
+        {/if}
     {/if}
-{/if}
+</div>

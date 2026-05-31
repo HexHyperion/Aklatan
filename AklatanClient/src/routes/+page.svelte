@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import Header from "../header.svelte";
+    import "../css/basic.css";
 
     const API_BASE = "http://localhost:8080";
 
@@ -88,87 +89,87 @@
 </script>
 
 <Header></Header>
-<h1>Welcome to Aklatan library!</h1>
+<div class="main-container">
 
-<div class="library-info">
-    <div class="open-hours">
-        <h2>Open Hours</h2>
-        {#if isLoadingInfo}
-            <p>Loading hours...</p>
-        {:else if sortedOpenHours.length > 0} 
-            <ul>
-                {#each sortedOpenHours as day} 
-                    <li>
-                        <strong>{getWeekdayName(day.weekDay)}:</strong> 
-                        {#if day.openTime && day.closeTime}
-                            {day.openTime} - {day.closeTime}
-                        {:else}
-                            <em>Closed</em>
-                        {/if}
-                    </li>
-                {/each}
-            </ul>
-        {:else}
-            <p>No open hours information available.</p>
-        {/if}
+    <h1>Welcome to Aklatan library!</h1>
+
+    <div class="library-info">
+        <div class="open-hours">
+            <h2>Open Hours</h2>
+            {#if isLoadingInfo}
+                <p>Loading hours...</p>
+            {:else if sortedOpenHours.length > 0} 
+                <ul>
+                    {#each sortedOpenHours as day} 
+                        <li>
+                            <strong>{getWeekdayName(day.weekDay)}:</strong> <br>
+                            {#if day.openTime && day.closeTime}
+                                {day.openTime} <br>{day.closeTime}
+                            {:else}
+                                <em>Closed</em>
+                            {/if}
+                        </li>
+                    {/each}
+                </ul>
+            {:else}
+                <p>No open hours information available.</p>
+            {/if}
+        </div>
+
+        <div class="exceptions">
+            <h2>Upcoming Holidays & Exceptions</h2>
+            {#if isLoadingInfo}
+                <p>Loading exceptions...</p>
+            {:else if upcomingExceptions.length > 0}
+                <ul>
+                    {#each upcomingExceptions as exception}
+                        <li>
+                            <strong>{exception.date}</strong> 
+                            {#if exception.comment}
+                                ({exception.comment})
+                            {/if}:
+                            
+                            {#if exception.openTime && exception.closeTime}
+                                {exception.openTime} - {exception.closeTime}
+                            {:else}
+                                <em>Closed</em>
+                            {/if}
+                        </li>
+                    {/each}
+                </ul>
+            {:else}
+                <p>No upcoming exceptions. Regular hours apply.</p>
+            {/if}
+        </div>
     </div>
 
-    <div class="exceptions">
-        <h2>Upcoming Holidays & Exceptions</h2>
-        {#if isLoadingInfo}
-            <p>Loading exceptions...</p>
-        {:else if upcomingExceptions.length > 0}
-            <ul>
-                {#each upcomingExceptions as exception}
-                    <li>
-                        <strong>{exception.date}</strong> 
-                        {#if exception.comment}
-                            ({exception.comment})
-                        {/if}:
-                        
-                        {#if exception.openTime && exception.closeTime}
-                            {exception.openTime} - {exception.closeTime}
-                        {:else}
-                            <em>Closed</em>
-                        {/if}
-                    </li>
-                {/each}
-            </ul>
-        {:else}
-            <p>No upcoming exceptions. Regular hours apply.</p>
+    <h2>Check if we have the book you are looking for</h2>
+    <form onsubmit={handleSearch} class="search-form">
+        <input type="text" placeholder="ISBN" bind:value={s_isbn} disabled={isSearching}>
+        <input type="text" placeholder="Title" bind:value={s_title} disabled={isSearching}>
+        <input type="text" placeholder="Author" bind:value={s_author} disabled={isSearching}>
+        <input type="number" placeholder="Year" bind:value={s_year} disabled={isSearching}> 
+        <input type="submit" value="SEARCH" disabled={isSearching}>
+    </form>
+
+    <div class="search-results">
+        {#if isSearching}
+            <p>Searching...</p>
+        {:else if searchResults !== null}
+            {#if searchResults.length > 0}
+                <ul>
+                    {#each searchResults as book}
+                    <a href="/account">
+                        <li class="result-item">
+                            <strong>{book.title || 'Unknown Title'}</strong> by {book.author || 'Unknown Author'} 
+                            (ISBN: {book.isbn})
+                        </li>
+                    </a>
+                    {/each}
+                </ul>
+            {:else}
+                <p>No books found matching your criteria.</p>
+            {/if}
         {/if}
     </div>
-</div>
-
-<hr>
-
-<h2>Check if we have the book you are looking for</h2>
-<form onsubmit={handleSearch} style="margin-bottom: 1rem;">
-    <input type="text" placeholder="ISBN" bind:value={s_isbn} disabled={isSearching}>
-    <input type="text" placeholder="Title" bind:value={s_title} disabled={isSearching}>
-    <input type="text" placeholder="Author" bind:value={s_author} disabled={isSearching}>
-    <input type="number" placeholder="Year" bind:value={s_year} disabled={isSearching}> 
-    <input type="submit" value="SEARCH" disabled={isSearching}>
-</form>
-
-<div class="search-results">
-    {#if isSearching}
-        <p>Searching...</p>
-    {:else if searchResults !== null}
-        <h3>Search Results:</h3>
-        {#if searchResults.length > 0}
-            <ul>
-                {#each searchResults as book}
-                    <li>
-                        <strong>{book.title || 'Unknown Title'}</strong> by {book.author || 'Unknown Author'} 
-                        (Year: {book.year}, ISBN: {book.isbn})
-                        <br>
-                        <a href="/account">Log in to reserve or see details</a>
-                    </li>
-                {/each}
-            </ul>
-        {:else}
-            <p>No books found matching your criteria.</p>
-        {/if}
-    {/if}
 </div>

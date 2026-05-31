@@ -138,113 +138,114 @@
     }
 </script>
 
-<Header></Header>
-<h1>Reservations Desk</h1>
 
-{#if isLoading}
-    <h2>Loading reservations...</h2>
-{:else}
-    <div >
-        
-        <div >
-            <h3>Create a New Reservation</h3>
-            <form onsubmit={handleCreateReservation}>
-                <div>
-                    <label>Book ISBN: <input type="text" bind:value={r_isbn} required></label>
-                </div>
-                <div>
-                    <label>User Email: <input type="email" bind:value={r_email}></label>
-                </div>
-                <button type="submit">Reserve Book</button>
-            </form>
+<Header></Header>
+<div class="main-container neutral-container">
+    <h1>Reservations Desk</h1>
+
+    {#if isLoading}
+        <h2>Loading reservations...</h2>
+    {:else}
+        <div class="top-container space-out">
+            <div >
+                <h3>Create a New Reservation</h3>
+                <form onsubmit={handleCreateReservation} class="search-form">
+                    <div>
+                        <label>Book ISBN: <input type="text" bind:value={r_isbn} required></label>
+                    </div>
+                    <div>
+                        <label>User Email: <input type="email" bind:value={r_email}></label>
+                    </div>
+                    <button type="submit">Reserve Book</button>
+                </form>
+            </div>
+
+            <div >
+                <h3>Search & Filters</h3>
+                
+                <form onsubmit={handleSearchByIsbn} >
+                    <input type="text" placeholder="Search by ISBN" bind:value={filterIsbn} required>
+                    <button type="submit">Search ISBN</button>
+                </form>
+
+                {#if filterIsbn || filterEmail}
+                    <button type="button" onclick={clearFilters}>Clear Filters</button>
+                {/if}
+            </div>
+
         </div>
 
-        <div >
-            <h3>Search & Filters</h3>
-            
-            <form onsubmit={handleSearchByIsbn} >
-                <input type="text" placeholder="Search by ISBN" bind:value={filterIsbn} required>
-                <button type="submit">Search ISBN</button>
-            </form>
 
-            {#if filterIsbn || filterEmail}
-                <button type="button" onclick={clearFilters}>Clear Filters</button>
+        <div class="tables-container">
+            <h3>Active Reservations</h3>
+            {#if activeReservations.length === 0}
+                <p>No active reservations found.</p>
+            {:else}
+                <table border="1" >
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Book ISBN</th>
+                            <th>User</th>
+                            <th>Reserved At</th>
+                            <th>Expires At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#each activeReservations as res (res.id)}
+                            <tr>
+                                <td>{res.id}</td>
+                                <td><a href="/book/{res.isbn}">{res.isbn}</a></td>
+                                <td>{res.email}</td>
+                                <td>{new Date(res.reservedAt).toLocaleString()}</td>
+                                <td>{new Date(res.expiresAt).toLocaleString()}</td>
+                                <td>
+                                    <button onclick={() => cancelReservation(res.id)} style="color: red;">
+                                        Cancel Reservation
+                                    </button>
+                                </td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
             {/if}
         </div>
 
-    </div>
-
-    <hr>
-
-    <div>
-        <h3>Active Reservations</h3>
-        {#if activeReservations.length === 0}
-            <p>No active reservations found.</p>
-        {:else}
-            <table border="1" >
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Book ISBN</th>
-                        <th>User</th>
-                        <th>Reserved At</th>
-                        <th>Expires At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each activeReservations as res (res.id)}
+        <div class="tables-container">
+            <h3>Past & Canceled Reservations</h3>
+            {#if pastReservations.length === 0}
+                <p>No historical reservations.</p>
+            {:else}
+                <table border="1" >
+                    <thead>
                         <tr>
-                            <td>{res.id}</td>
-                            <td><a href="/book/{res.isbn}">{res.isbn}</a></td>
-                            <td>{res.email}</td>
-                            <td>{new Date(res.reservedAt).toLocaleString()}</td>
-                            <td>{new Date(res.expiresAt).toLocaleString()}</td>
-                            <td>
-                                <button onclick={() => cancelReservation(res.id)} style="color: red;">
-                                    Cancel Reservation
-                                </button>
-                            </td>
+                            <th>ID</th>
+                            <th>Book ISBN</th>
+                            <th>User</th>
+                            <th>Status</th>
+                            <th>Expires At</th>
                         </tr>
-                    {/each}
-                </tbody>
-            </table>
-        {/if}
-    </div>
-
-    <div>
-        <h3>Past & Canceled Reservations</h3>
-        {#if pastReservations.length === 0}
-            <p>No historical reservations.</p>
-        {:else}
-            <table border="1" >
-                <thead>
-                    <tr style="background-color: #f5f5f5;">
-                        <th>ID</th>
-                        <th>Book ISBN</th>
-                        <th>User</th>
-                        <th>Status</th>
-                        <th>Expires At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each pastReservations as res (res.id)}
-                        <tr>
-                            <td>{res.id}</td>
-                            <td>{res.isbn}</td>
-                            <td>{res.email}</td>
-                            <td>
-                                {#if res.canceled}
-                                    <span style="color: #f44336; font-weight: bold;">Canceled</span>
-                                {:else}
-                                    <span style="color: #ff9800;">Expired / Picked up</span>
-                                {/if}
-                            </td>
-                            <td>{new Date(res.expiresAt).toLocaleString()}</td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-        {/if}
-    </div>
-{/if}
+                    </thead>
+                    <tbody>
+                        {#each pastReservations as res (res.id)}
+                            <tr>
+                                <td>{res.id}</td>
+                                <td>{res.isbn}</td>
+                                <td>{res.email}</td>
+                                <td>
+                                    {#if res.canceled}
+                                        <span style=" font-weight: bold;">Canceled</span>
+                                    {:else}
+                                        <span>Expired / Picked up</span>
+                                    {/if}
+                                </td>
+                                <td>{new Date(res.expiresAt).toLocaleString()}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            {/if}
+        </div>
+    {/if}
+</div>

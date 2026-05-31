@@ -16,6 +16,8 @@ body{
 .book-display{
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
     color: white;
     text-transform: none;
     li{
@@ -29,6 +31,200 @@ body{
             text-decoration: underline;
         }
     }
+    button{
+        border: 2px solid var(--secondary);
+        margin: 2px;
+    }
     
 }
 
+
+.main-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2em;
+    width: 98vw;
+    height: 93vh;
+    padding: 2em;
+    margin-bottom: 50px;
+    h1{
+        font-weight: 600;
+        color: var(--primary);
+    }
+}
+
+.neutral-container{
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.center-container{
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.login-container{
+    padding: 2em;
+    text-align: center;
+    gap:4em;
+}
+
+.user-form{
+    flex-direction: column;
+    margin:1em;
+}
+
+.top-container{
+    border : 4px solid var(--secondary);
+    border-radius: 5px;
+    padding: 2em;
+    display: flex;
+    flex-direction: column;
+    gap:2em;
+    .header-options{
+        display: flex;
+        gap: 1em;
+        justify-content: space-between;
+        align-items: center;
+        h1{
+            margin-right: 1em;
+        }
+        div{
+            display: flex;
+            gap: 1em;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+}
+
+.space-out{
+    justify-content: space-around;
+    flex-direction: row;
+    gap: 2em;
+    width: 100%;
+    h3{
+        margin-bottom: 10px;
+    }
+}
+
+.pagination-controls{
+    form{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1em;
+    }
+    button{
+        padding: 0.5em;
+        margin: 5px;
+    }
+    input{
+        border-radius: 5px;
+        padding: 2px;
+    }
+}
+
+
+.library-info{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2em;
+    background-color: var(--primary);
+    padding: 1em;
+    border-radius: 5px;
+    color: var(--secondary);
+    text-align: center;
+    .open-hours{
+        flex-direction: column;
+        gap: 0.5em;
+        text-align: left;
+        h2{
+            text-align: center;
+        }
+    }
+    .exceptions{
+        flex-direction: column;
+        gap: 0.5em;
+    }
+}
+
+button,input[type=submit],select{
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    border: none;
+    background-color: var(--primary);
+    color: var(--secondary);
+    font-weight: 600;
+    select{
+        background-color: whitesmoke !important;
+    }
+}
+
+.search-form{
+    display: flex;
+    gap: 0.5em;
+    input{
+        padding: 0.5em;
+        border-radius: 5px;
+        border: none;
+    }
+    button,input[type=submit]{
+        padding: 0.5em 1em;
+        border-radius: 5px;
+        border: none;
+        background-color: var(--primary);
+        color: var(--secondary);
+        font-weight: 600;
+    }
+}
+
+.search-results ul{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    justify-content: left;
+    align-items: start;
+    gap: 1em;
+    width: 100%;
+    font-size: 1.2em;
+    .result-item{
+        background-color: var(--secondary);
+        padding: 1em;
+        border-radius: 5px;
+        color: whitesmoke;
+        a{
+            color: whitesmoke;
+            text-decoration: none;
+        }
+        a:hover{
+            text-decoration: underline;
+        }
+    }
+}
+
+
+
+.tables-container{
+    td,th{
+        padding: 1em;
+    }
+}
+
+.book-info{
+    gap: 2em;
+    display: flex;
+    flex-direction: column;
+    ul{
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+    table{
+        text-align: center;
+        border: 2px solid whitesmoke;
+        border-collapse: collapse;
+    }
+}

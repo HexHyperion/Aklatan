@@ -1,6 +1,7 @@
 <script lang="ts">
     import { setAuth,logout } from "$lib/auth";
     import { goto } from '$app/navigation';
+    import "../../css/basic.css";
 
 
     import Header from "../../header.svelte";
@@ -74,9 +75,8 @@
         if(res.status === 200){
             const data = await res.json();
             const jwtToken = data.token; 
-            // console.log("JWT token:", jwtToken);
             setAuth(jwtToken);
-            goto("/my-library")
+            goto("/dashboard")
         }else{
             if(res.status == 401){
                 const errorData = await res.json();
@@ -136,27 +136,32 @@
     
 </script>
 <Header></Header>
+<div class="main-container center-container">
 
-<h1>Welcome to Aklatan!</h1>
- 
-<h3>Sign in</h3>
-<input type="email" placeholder="Login" bind:value={login_email}>
-<input type="password" placeholder="Password" bind:value={login_password}>
-<input type="submit" value="Log in" onclick={sendLogin}>
-<br>
-<button onclick={requestPassword}>Forgot password</button>
-
-<h3>Sign up</h3>
-<form>
-    <input type="email" placeholder="Email" name="email" bind:value={register_email}>
-    <input type="text" placeholder="Name" name="name" bind:value={register_name}>
-    <input type="password" placeholder="Password" name="password" bind:value={register_password}>
-    <input type="password" name="" id="" placeholder="pass2" bind:value={register_password_2}>
-    <input type="submit" value="Sign in" onclick={sendRegister}>
-</form>
-{#if isRegistering}
-<button onclick={requestAgain}>Request the link again</button>
-{/if}
+<div class="login-container">
+    <h1>Welcome to Aklatan!</h1>
+    <br>
+    <br>
+    <h2>Sign in</h2>
+    <div class="search-form user-form">
+        <input type="email" placeholder="Login" bind:value={login_email}>
+        <input type="password" placeholder="Password" bind:value={login_password}>
+        <input type="submit" value="Log in" onclick={sendLogin}>
+        <button onclick={requestPassword}>Forgot password</button>
+    </div>
+    <h2>Sign up</h2>
+    <form class="search-form user-form">
+        <input type="email" placeholder="Email" name="email" bind:value={register_email}>
+        <input type="text" placeholder="Name" name="name" bind:value={register_name}>
+        <input type="password" placeholder="Password" name="password" bind:value={register_password}>
+        <input type="password" name="" id="" placeholder="pass2" bind:value={register_password_2}>
+        <input type="submit" value="Sign in" onclick={sendRegister}>
+    </form>
+    {#if isRegistering}
+    <button onclick={requestAgain}>Request the link again</button>
+    {/if}
+</div>
+</div>
 
 
 

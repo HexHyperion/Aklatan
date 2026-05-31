@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { apiFetch,logout } from "$lib/auth";
     import Header from "../../header.svelte";
+    import "../../css/basic.css"
 
     let user = $state<any>(null);
     let isLoading = $state(true);
@@ -76,57 +77,49 @@
 </script>
 
 <Header></Header>
+<div class="main-container">
+    <h1>Your Account</h1>
+    <button onclick={logout} style="font-size:1.2em">LOGOUT</button>
 
-<h1>Your Account</h1>
-<button onclick={logout}>LOGOUT</button>
+    <section class="profile-info">
+        <h3>Profile Information</h3>
 
-<section class="profile-info">
-    <h3>Profile Information</h3>
-
-    {#if isLoading}
-        <p>Loading account details...</p>
-    {:else}
-        {#if user}
-            <table border="1" >
-                <tbody>
-                    <tr>
-                        <th>Full Name</th>
-                        <td>{user.name}</td>
-                    </tr>
-                    <tr>
-                        <th>Email Address</th>
-                        <td>{user.email}</td>
-                    </tr>
-                    <tr>
-                        <th>Role</th>
-                        <td ><strong>{user.role}</strong></td>
-                    </tr>
-                </tbody>
-            </table>
+        {#if isLoading}
+            <p>Loading account details...</p>
         {:else}
-            <p style="color: red;">Could not load user data. Please ensure you are logged in.</p>
+            {#if user}
+                <table border="1" class="tables-container">
+                    <tbody>
+                        <tr>
+                            <th>Full Name</th>
+                            <td>{user.name}</td>
+                        </tr>
+                        <tr>
+                            <th>Email Address</th>
+                            <td>{user.email}</td>
+                        </tr>
+                        <tr>
+                            <th>Role</th>
+                            <td ><strong>{user.role}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            {:else}
+                <p style="color: red;">Could not load user data. Please ensure you are logged in.</p>
+            {/if}
         {/if}
-    {/if}
-</section>
+    </section>
 
-<section class="profile-update">
-    <h3>Update Account Details</h3>
-    <form onsubmit={(e) => e.preventDefault()}>
-        <div>
-            <label for="up-name">New Full Name:</label><br>
-            <input id="up-name" type="text" placeholder="Leave empty if no change" bind:value={update_name}>
-        </div>
-        
-        <div style="margin-top: 10px;">
-            <label for="up-old-pass">Current Password (required for password changes):</label><br>
-            <input id="up-old-pass" type="password" placeholder="Current password" bind:value={update_old_password}>
-        </div>
-
-        <div style="margin-top: 10px;">
-            <label for="up-new-pass">New Password:</label><br>
-            <input id="up-new-pass" type="password" placeholder="New password" bind:value={update_new_password}>
-        </div>
-
-        <input type="submit" value="Save Changes" onclick={updateAccount} >
-    </form>
-</section>
+    <section class="user-form">
+        <h3>Update Account Details</h3>
+        <form class="search-form user-form" onsubmit={(e) => e.preventDefault()}>
+                <label for="up-name">New Full Name:</label>
+                <input id="up-name" type="text" placeholder="Leave empty if no change" bind:value={update_name}>
+                <label for="up-old-pass">Current Password (required for password changes):</label>
+                <input id="up-old-pass" type="password" placeholder="Current password" bind:value={update_old_password}>
+                <label for="up-new-pass">New Password:</label>
+                <input id="up-new-pass" type="password" placeholder="New password" bind:value={update_new_password}>
+            <input type="submit" value="Save Changes" onclick={updateAccount} >
+        </form>
+    </section>
+</div>
