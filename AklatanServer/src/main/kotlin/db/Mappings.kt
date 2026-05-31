@@ -97,10 +97,39 @@ data class Reservation (
 )
 
 @Serializable
+data class ReservationReadable (
+    val id: Int,
+    val isbn: String,
+    val title: String?,
+    val author: String?,
+    val year: String?,
+    val userId: Int,
+    val email: String,
+    val reservedAt: Instant,
+    val expiresAt: Instant,
+    val canceled: Boolean
+)
+
+@Serializable
 data class Borrow (
     val id: Int,
     val bookId: Int,
     val userId: Int,
+    val borrowedAt: Instant,
+    val endsAt: Instant,
+    val returnedAt: Instant?
+)
+
+@Serializable
+data class BorrowReadable (
+    val id: Int,
+    val bookId: Int,
+    val isbn: String,
+    val title: String?,
+    val author: String?,
+    val year: String?,
+    val userId: Int,
+    val email: String,
     val borrowedAt: Instant,
     val endsAt: Instant,
     val returnedAt: Instant?

@@ -466,7 +466,11 @@ Get a list of the authenticated user's active and past reservations if the reque
     - list of reservations consisting of:
       - `id` (int): The unique identifier of the reservation.
       - `isbn` (string): The ISBN of the reserved book.
+      - `title` (string): The title of the reserved book.
+      - `author` (string): The author of the reserved book.
+      - `year` (string): The publication year of the reserved book.
       - `userId` (int): The unique identifier of the user who made the reservation.
+      - `email` (string): The email of the user who made the reservation.
       - `reservedAt` (instant): The timestamp of when the reservation was made.
       - `expiresAt` (instant): The timestamp of when the reservation expires if not picked up.
       - `canceled` (boolean): Whether the reservation was canceled by the user (also when borrowing the reserved book).
@@ -499,7 +503,11 @@ Get the details of a specific reservation by its ID if it belongs to the authent
   - `200 OK` with the reservation information if found and accessible.
     - `id` (int): The unique identifier of the reservation.
     - `isbn` (string): The ISBN of the reserved book.
+    - `title` (string): The title of the reserved book.
+    - `author` (string): The author of the reserved book.
+    - `year` (string): The publication year of the reserved book.
     - `userId` (int): The unique identifier of the user who made the reservation.
+    - `email` (string): The email of the user who made the reservation.
     - `reservedAt` (instant): The timestamp of when the reservation was made.
     - `expiresAt` (instant): The timestamp of when the reservation expires if not picked up.
     - `canceled` (boolean): Whether the reservation was canceled by the user.
@@ -524,7 +532,11 @@ Get a list of all reservations for a book by its ISBN.
     - list of reservations consisting of:
       - `id` (int): The unique identifier of the reservation.
       - `isbn` (string): The ISBN of the reserved book.
+      - `title` (string): The title of the reserved book.
+      - `author` (string): The author of the reserved book.
+      - `year` (string): The publication year of the reserved book.
       - `userId` (int): The unique identifier of the user who made the reservation.
+      - `email` (string): The email of the user who made the reservation.
       - `reservedAt` (instant): The timestamp of when the reservation was made.
       - `expiresAt` (instant): The timestamp of when the reservation expires if not picked up.
       - `canceled` (boolean): Whether the reservation was canceled by the user.
@@ -539,7 +551,11 @@ Get a list of all reservations made by a specific user.
     - list of reservations consisting of:
       - `id` (int): The unique identifier of the reservation.
       - `isbn` (string): The ISBN of the reserved book.
+      - `title` (string): The title of the reserved book.
+      - `author` (string): The author of the reserved book.
+      - `year` (string): The publication year of the reserved book.
       - `userId` (int): The unique identifier of the user who made the reservation.
+      - `email` (string): The email of the user who made the reservation.
       - `reservedAt` (instant): The timestamp of when the reservation was made.
       - `expiresAt` (instant): The timestamp of when the reservation expires if not picked up.
       - `canceled` (boolean): Whether the reservation was canceled by the user.
@@ -555,7 +571,12 @@ Get a list of the authenticated user's active and past borrows if the request is
     - list of borrows consisting of:
       - `id` (int): The unique identifier of the borrow.
       - `bookId` (int): The unique identifier of the borrowed book copy.
+      - `isbn` (string): The ISBN of the borrowed book.
+      - `title` (string): The title of the borrowed book.
+      - `author` (string): The author of the borrowed book.
+      - `year` (string): The publication year of the borrowed book.
       - `userId` (int): The unique identifier of the user who made the borrow.
+      - `email` (string): The email of the user who made the borrow.
       - `borrowedAt` (instant): The timestamp of when the borrow was made.
       - `endsAt` (instant): The timestamp of when the borrow is due.
       - `returnedAt` (instant): The timestamp of when the book was returned, or null if not returned yet.
@@ -588,7 +609,12 @@ Get the details of a specific borrow by its ID if it belongs to the authenticate
   - `200 OK` with the borrow information if found and accessible.
     - `id` (int): The unique identifier of the borrow.
     - `bookId` (int): The unique identifier of the borrowed book copy.
+    - `isbn` (string): The ISBN of the borrowed book.
+    - `title` (string): The title of the borrowed book.
+    - `author` (string): The author of the borrowed book.
+    - `year` (string): The publication year of the borrowed book.
     - `userId` (int): The unique identifier of the user who made the borrow.
+    - `email` (string): The email of the user who made the borrow.
     - `borrowedAt` (instant): The timestamp of when the borrow was made.
     - `endsAt` (instant): The timestamp of when the borrow is due.
     - `returnedAt` (instant): The timestamp of when the book was returned, or null if not returned yet.
@@ -633,7 +659,12 @@ Get a list of all borrows for a specific book copy by its ID.
     - list of borrows consisting of:
       - `id` (int): The unique identifier of the borrow.
       - `bookId` (int): The unique identifier of the borrowed book copy.
+      - `isbn` (string): The ISBN of the borrowed book.
+      - `title` (string): The title of the borrowed book.
+      - `author` (string): The author of the borrowed book.
+      - `year` (string): The publication year of the borrowed book.
       - `userId` (int): The unique identifier of the user who made the borrow.
+      - `email` (string): The email of the user who made the borrow.
       - `borrowedAt` (instant): The timestamp of when the borrow was made.
       - `endsAt` (instant): The timestamp of when the borrow is due.
       - `returnedAt` (instant): The timestamp of when the book was returned, or null if not returned yet.
@@ -648,7 +679,12 @@ Get a list of all borrows made by a specific user.
     - list of borrows consisting of:
       - `id` (int): The unique identifier of the borrow.
       - `bookId` (int): The unique identifier of the borrowed book copy.
+      - `isbn` (string): The ISBN of the borrowed book.
+      - `title` (string): The title of the borrowed book.
+      - `author` (string): The author of the borrowed book.
+      - `year` (string): The publication year of the borrowed book.
       - `userId` (int): The unique identifier of the user who made the borrow.
+      - `email` (string): The email of the user who made the borrow.
       - `borrowedAt` (instant): The timestamp of when the borrow was made.
       - `endsAt` (instant): The timestamp of when the borrow is due.
       - `returnedAt` (instant): The timestamp of when the book was returned, or null if not returned yet.

@@ -28,9 +28,9 @@ fun Route.borrowRouting(
 
                 val reservations = if (role == "user") {
                     val userId = principal.payload.getClaim("id").asInt()
-                    reservationService.getAllForUser(userId)
+                    reservationService.getAllReadableForUserId(userId)
                 } else {
-                    reservationService.getAll()
+                    reservationService.getAllReadable()
                 }
                 call.respond(ApiResponse.SuccessWithData(reservations))
             }
@@ -73,7 +73,7 @@ fun Route.borrowRouting(
                     val reservationId = call.parameters["reservationId"]?.toIntOrNull()
                         ?: throw BadRequestException("Invalid reservation ID")
 
-                    val reservation = reservationService.getById(reservationId)
+                    val reservation = reservationService.getReadableById(reservationId)
                     if (role == "user" && reservation.userId != userId) {
                         throw ReservationNotFoundException()
                     }
@@ -103,7 +103,7 @@ fun Route.borrowRouting(
                     ?: throw BadRequestException("Invalid ISBN")
 
                 if (bookService.getManyByIsbn(isbn).isEmpty()) throw BookNotFoundException()
-                val reservations = reservationService.getAllForIsbn(isbn)
+                val reservations = reservationService.getAllReadableForIsbn(isbn)
                 call.respond(ApiResponse.SuccessWithData(reservations))
             }
 
@@ -112,7 +112,7 @@ fun Route.borrowRouting(
                     ?: throw BadRequestException("Invalid user email")
 
                 val userId = userService.getIdByEmail(email)
-                val reservations = reservationService.getAllForUser(userId)
+                val reservations = reservationService.getAllReadableForUserId(userId)
                 call.respond(ApiResponse.SuccessWithData(reservations))
             }
         }
@@ -126,9 +126,9 @@ fun Route.borrowRouting(
 
                 val borrows = if (role == "user") {
                     val userId = principal.payload.getClaim("id").asInt()
-                    borrowService.getAllForUserId(userId)
+                    borrowService.getAllReadableForUserId(userId)
                 } else {
-                    borrowService.getAll()
+                    borrowService.getAllReadable()
                 }
                 call.respond(ApiResponse.SuccessWithData(borrows))
             }
@@ -141,7 +141,7 @@ fun Route.borrowRouting(
                     val borrowId = call.parameters["borrowId"]?.toIntOrNull()
                         ?: throw BadRequestException("Invalid borrow ID")
 
-                    val borrow = borrowService.getById(borrowId)
+                    val borrow = borrowService.getReadableById(borrowId)
                     if (role == "user" && borrow.userId != userId) {
                         throw BorrowNotFoundException()
                     }
@@ -190,7 +190,7 @@ fun Route.borrowRouting(
                     ?: throw BadRequestException("Invalid book ID")
 
                 bookService.getById(bookId)
-                val borrows = borrowService.getAllForBookId(bookId)
+                val borrows = borrowService.getAllReadableForBookId(bookId)
                 call.respond(ApiResponse.SuccessWithData(borrows))
             }
 
@@ -199,7 +199,7 @@ fun Route.borrowRouting(
                     ?: throw BadRequestException("Invalid user email")
 
                 val userId = userService.getIdByEmail(email)
-                val borrows = borrowService.getAllForUserId(userId)
+                val borrows = borrowService.getAllReadableForUserId(userId)
                 call.respond(ApiResponse.SuccessWithData(borrows))
             }
 

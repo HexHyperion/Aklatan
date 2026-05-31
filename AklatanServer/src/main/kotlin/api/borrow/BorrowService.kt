@@ -2,9 +2,7 @@ package com.hexhyperion.aklatan.api.borrow
 
 import com.hexhyperion.aklatan.api.book.BookRepository
 import com.hexhyperion.aklatan.api.user.UserRepository
-import com.hexhyperion.aklatan.db.Borrow
-import com.hexhyperion.aklatan.db.Reservation
-import com.hexhyperion.aklatan.db.withTransaction
+import com.hexhyperion.aklatan.db.*
 import com.hexhyperion.aklatan.utility.exception.*
 import io.ktor.server.config.*
 import kotlin.time.Clock
@@ -78,16 +76,67 @@ class BorrowService (
         return borrowRepository.findById(id) ?: throw BorrowNotFoundException()
     }
 
-    suspend fun getAllForBookId(bookId: Int): List<Borrow> {
-        return borrowRepository.findByBookId(bookId)
+    private suspend fun borrowToReadable(
+        borrowRaw: Borrow,
+        emailsById: Map<Int, String>? = null,
+        booksById: Map<Int, Book>? = null
+    ): BorrowReadable {
+        val userEmail = if (emailsById != null) {
+            emailsById[borrowRaw.userId]
+        } else {
+            userRepository.findById(borrowRaw.userId)?.email
+        } ?: throw UserNotFoundException()
+
+        val book = if (booksById != null) {
+            booksById[borrowRaw.bookId]
+        } else {
+            bookRepository.findById(borrowRaw.bookId)
+        } ?: throw BookNotFoundException()
+
+        return BorrowReadable(
+            id = borrowRaw.id,
+            bookId = book.id,
+            isbn = book.isbn,
+            title = book.title,
+            author = book.author,
+            year = book.year,
+            userId = borrowRaw.userId,
+            email = userEmail,
+            borrowedAt = borrowRaw.borrowedAt,
+            endsAt = borrowRaw.endsAt,
+            returnedAt = borrowRaw.returnedAt,
+        )
     }
 
-    suspend fun getAllForUserId(userId: Int): List<Borrow> {
-        return borrowRepository.findByUserId(userId)
+    suspend fun getReadableById(id: Int): BorrowReadable {
+        val borrowRaw = borrowRepository.findById(id) ?: throw BorrowNotFoundException()
+        return borrowToReadable(borrowRaw)
     }
 
-    suspend fun getAll(): List<Borrow> {
-        return borrowRepository.findAll()
+    suspend fun getAllReadableForBookId(bookId: Int): List<BorrowReadable> {
+        val borrowsRaw = borrowRepository.findByBookId(bookId)
+        val emailsById = userRepository.findAll().associate { it.id to it.email }
+        val book = bookRepository.findById(bookId) ?: throw BookNotFoundException()
+        val booksById = mapOf(bookId to book)
+        return borrowsRaw.map { borrowRaw ->
+            borrowToReadable(borrowRaw, emailsById, booksById)
+        }
+    }
+
+    suspend fun getAllReadableForUserId(userId: Int): List<BorrowReadable> {
+        val borrowsRaw = borrowRepository.findByUserId(userId)
+        val emailsById = userRepository.findAll().associate { it.id to it.email }
+        return borrowsRaw.map { borrowRaw ->
+            borrowToReadable(borrowRaw, emailsById)
+        }
+    }
+
+    suspend fun getAllReadable(): List<BorrowReadable> {
+        val borrowsRaw = borrowRepository.findAll()
+        val emailsById = userRepository.findAll().associate { it.id to it.email }
+        return borrowsRaw.map { borrowRaw ->
+            borrowToReadable(borrowRaw, emailsById)
+        }
     }
 
     suspend fun getTotalAvailableAndReservedCountForIsbn(isbn: String): Pair<Int, Int> {
