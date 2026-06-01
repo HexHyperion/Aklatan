@@ -1,8 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import Header from "../../header.svelte";
-    import { apiFetch } from "$lib/auth";
+    import { apiFetch,role } from "$lib/auth";
     import "../../css/basic.css";
+    import { goto } from "$app/navigation";
 
     let isLoading = $state(true);
 
@@ -23,6 +24,9 @@
     );
 
     onMount(async () => {
+        if ($role == "user"){
+            goto("/browse")
+        }
         await fetchReservations();
         isLoading = false;
     });
@@ -201,7 +205,7 @@
                                 <td>{new Date(res.reservedAt).toLocaleString()}</td>
                                 <td>{new Date(res.expiresAt).toLocaleString()}</td>
                                 <td>
-                                    <button onclick={() => cancelReservation(res.id)} style="color: red;">
+                                    <button onclick={() => cancelReservation(res.id)}>
                                         Cancel Reservation
                                     </button>
                                 </td>

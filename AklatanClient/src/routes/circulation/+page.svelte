@@ -1,8 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import Header from "../../header.svelte";
-    import { apiFetch} from "$lib/auth";
+    import { apiFetch,role} from "$lib/auth";
     import "../../css/basic.css";
+    import { goto } from "$app/navigation";
 
     let isLoading = $state(true);
     let isManager = $state(false);
@@ -41,6 +42,9 @@
     );
 
     onMount(async () => {
+        if ($role == "user"){
+            goto("/browse")
+        }
         await Promise.all([
             fetchBorrows(),
         ]);
