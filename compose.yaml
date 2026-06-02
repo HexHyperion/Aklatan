@@ -1,6 +1,16 @@
 services:
+  client:
+    build:
+      context: ./AklatanClient
+    ports:
+      - "${CLIENT_PORT}:3000"
+    env_file:
+      - .env
+    depends_on:
+      - server
+
   server:
-    build: .
+    build: ./AklatanServer
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
@@ -15,7 +25,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./db/aklatan.sql:/docker-entrypoint-initdb.d/aklatan.sql
+      - ./AklatanServer/db/aklatan.sql:/docker-entrypoint-initdb.d/aklatan.sql
     expose:
       - "${POSTGRES_PORT}"
     healthcheck:
@@ -28,7 +38,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./cron/crontab:/etc/crontab
-    command: [ "/etc/crontab" ]
+      - ./AklatanServer/cron/crontab:/etc/crontab
+    command: [ "./etc/crontab" ]
     environment:
       - TZ=Europe/Warsaw
